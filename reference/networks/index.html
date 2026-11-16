@@ -16,13 +16,21 @@
         <link href="../../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
         <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
-        <link href="../../assets/docs.css" rel="stylesheet"> 
+        <link href="../../assets/docs-syntax.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet">
+  <script src="../../assets/docs-theme.js"></script>
+
     </head>
 
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">Netbone</a>
+  <a class="docs-skip" href="#docs-content">Skip to content</a>
+  <a class="navbar-brand docs-brand" href="../..">
+    <span class="docs-brand-icon"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i></span>
+    Netbone
+  </a>
+
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -30,242 +38,44 @@
 
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
-                        <!-- Main navigation -->
-                        <ul class="nav navbar-nav">
-                            <li class="nav-item">
-                                <a href="../.." class="nav-link">Home</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
-</li>
-                                    
-<li>
-    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
-</li>
-                                    
-<li>
-    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
-</li>
-                                    
-<li>
-    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
-</li>
-                                    
-<li>
-    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
-</li>
-                                    
-<li>
-    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
-</li>
-                                    
-<li>
-    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../browser/sample-demo/" class="dropdown-item">Try the web demo</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../methods/" class="dropdown-item">Method catalog</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../pipelines/" class="dropdown-item">Pipelines and results</a>
-</li>
-                                    
-<li>
-    <a href="./" class="dropdown-item active" aria-current="page">Networks and loaders</a>
-</li>
-                                    
-<li>
-    <a href="../measurement/" class="dropdown-item">Comparison, sweeps, and exports</a>
-</li>
-                                    
-<li>
-    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
-</li>
-                                    
-<li>
-    <a href="../registry/" class="dropdown-item">Registry discovery</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/default/" class="dropdown-item">Method default</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
-</li>
-                                    
-<li>
-    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
-</li>
-                                </ul>
-                            </li>
-                        </ul>
 
                     <ul class="nav navbar-nav ms-md-auto">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
-                                <i class="fa fa-search"></i> Search
-                            </a>
-                        </li>
-                            <li class="nav-item">
-                                <a rel="prev" href="../pipelines/" class="nav-link">
-                                    <i class="fa fa-arrow-left"></i> Previous
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a rel="next" href="../measurement/" class="nav-link">
-                                    Next <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
-                            </li>
+  
+    <li class="nav-item">
+      <button type="button" class="docs-header-search" aria-label="Search documentation"
+              data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <span>Search</span>
+      </button>
+    </li>
+  
+
+  <li class="nav-item">
+    <a class="docs-demo-link" href="../../browser/sample-demo/">
+      <i class="fa-solid fa-play" aria-hidden="true"></i>
+      Try the demo
+    </a>
+  </li>
+
+  
+    <li class="nav-item">
+      <a class="docs-repo-link" href="https://github.com/al1yass2n/netbone" aria-label="GitHub">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>GitHub</span>
+      </a>
+    </li>
+  
+  <li class="nav-item docs-theme-picker" hidden>
+    <span class="docs-theme-icon docs-theme-icon--system"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></span>
+    <span class="docs-theme-icon docs-theme-icon--light"><i class="fa-solid fa-sun" aria-hidden="true"></i></span>
+    <span class="docs-theme-icon docs-theme-icon--dark"><i class="fa-solid fa-moon" aria-hidden="true"></i></span>
+    <select id="docs-color-theme" aria-label="Color theme" title="Color theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </li>
+
                     </ul>
                 </div>
             </div>
@@ -273,45 +83,624 @@
 
         <div class="container">
             <div class="row">
-                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
-            <span class="fa fa-angle-down"></span>
-        </button>
-    </div>
+  
+  
+    
+  
+  
+  <div class="docs-layout docs-layout--outline">
+    <aside class="docs-sidebar" data-docs-disclosure>
+      <button class="docs-disclosure-button" type="button" aria-expanded="false"
+              aria-controls="docs-menu" hidden>
+        <i class="fa-solid fa-bars" aria-hidden="true"></i> <span>Browse docs</span> <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <nav id="docs-menu" aria-label="Documentation">
+        <ul class="docs-nav">
+          
+  
+    <li>
+      <a href="../..">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span>Home</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+          <span>Getting started</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../start/install/">
+        
+        <span>Install Netbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../start/first-backbone/">
+        
+        <span>Extract your first backbone</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-code" aria-hidden="true"></i>
+          <span>Python</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../python/inputs/">
+        
+        <span>Prepare network inputs</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/temporal/">
+        
+        <span>Aggregate temporal interactions</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/select/">
+        
+        <span>Choose what to keep</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/compare/">
+        
+        <span>Compare backbone results</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/sweep/">
+        
+        <span>Find settings with a sweep</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/reproduce/">
+        
+        <span>Save and reproduce an analysis</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-window-maximize" aria-hidden="true"></i>
+          <span>Web app</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../browser/sample-demo/">
+        
+        <span>Try the web demo</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/launch/">
+        
+        <span>Run the local web app</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/first-session/">
+        
+        <span>Extract a backbone in the browser</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/import/">
+        
+        <span>Import a network</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/evaluate/">
+        
+        <span>Compare and sweep</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
+          <span>Methods</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../methods/">
+        
+        <span>Method catalog</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/edge_weight/">
+        
+        <span>Edge Weight</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/edge_betweenness/">
+        
+        <span>Edge Betweenness</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/disparity/">
+        
+        <span>Disparity</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/lans/">
+        
+        <span>Locally Adaptive Network Sparsification</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_salience/">
+        
+        <span>Link Salience</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_prediction/">
+        
+        <span>Link Prediction</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_prediction_iforest/">
+        
+        <span>Link Prediction Isolation Forest</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/gspar/">
+        
+        <span>GSPAR</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/maximum_spanning_forest/">
+        
+        <span>Maximum Spanning Forest</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/primary_linkage/">
+        
+        <span>Primary Linkage</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/multiple_linkage/">
+        
+        <span>Multiple Linkage</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/planar_maximally_filtered_graph/">
+        
+        <span>Planar Maximally Filtered Graph</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/h_backbone/">
+        
+        <span>H-Backbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/doubly_stochastic/">
+        
+        <span>Doubly Stochastic</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/marginal_likelihood/">
+        
+        <span>Marginal Likelihood</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/noise_corrected/">
+        
+        <span>Noise Corrected</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/glanb/">
+        
+        <span>Globally and Locally Adaptive Network Backbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_degree/">
+        
+        <span>Node Degree</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_strength/">
+        
+        <span>Node Strength</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_betweenness/">
+        
+        <span>Node Betweenness</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section" open>
+        <summary>
+          <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+          <span>API reference</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../pipelines/">
+        
+        <span>Pipelines and results</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="./" aria-current="page">
+        
+        <span>Networks and loaders</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../measurement/">
+        
+        <span>Comparison, sweeps, and exports</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../temporal/">
+        
+        <span>Temporal input and aggregation</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../registry/">
+        
+        <span>Registry discovery</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/threshold/">
+        
+        <span>Threshold</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/fraction/">
+        
+        <span>Fraction</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/significance/">
+        
+        <span>Significance</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/default/">
+        
+        <span>Method default</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <span>Project</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../help/">
+        
+        <span>Troubleshooting</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../develop/">
+        
+        <span>Develop and publish the documentation</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+        </ul>
+      </nav>
+    </aside>
 
     
-    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
-        <ul class="nav flex-column">
-            
-            <li class="nav-item" data-bs-level="1"><a href="#networks-and-loaders" class="nav-link">Networks and loaders</a>
-              <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.Network" class="nav-link">Network</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_graph" class="nav-link">from_graph</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_edgelist" class="nav-link">from_edgelist</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_graphml" class="nav-link">from_graphml</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.to_undirected" class="nav-link">to_undirected</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-              </ul>
-            </li>
-        </ul>
-    </div>
-</div></div>
-                    <div class="col-md-9" role="main">
+      <aside class="docs-outline" data-docs-disclosure>
+        <div class="docs-outline-title">On this page</div>
+        <button class="docs-disclosure-button" type="button" aria-expanded="false"
+                aria-controls="docs-outline" hidden>
+          <i class="fa-solid fa-list" aria-hidden="true"></i> <span>On this page</span> <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <nav id="docs-outline" aria-label="On this page">
+          
+  <ul>
+    
+      <li>
+        <a href="#netbone.Network">Network</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.Network.directed">directed</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.edge_count">edge_count</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.multigraph">multigraph</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.node_count">node_count</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.weighted">weighted</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.summary">summary</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.to_dict">to_dict</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Network.to_original_graph">to_original_graph</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.from_graph">from_graph</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.from_edgelist">from_edgelist</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.from_graphml">from_graphml</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.to_undirected">to_undirected</a>
+        
+      </li>
+    
+  </ul>
+
+        </nav>
+      </aside>
+    
+
+    <main id="docs-content" class="docs-article" tabindex="-1">
+      
+        <div class="docs-breadcrumb">
+          <a href="../..">Documentation</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          API reference
+        </div>
+      
+      
+        
 
 <h1 id="networks-and-loaders">Networks and loaders<a class="headerlink" href="#networks-and-loaders" title="Permanent link">&para;</a></h1>
 <p>Import these names from <code>netbone</code>. Use the loaders to create normalized
@@ -366,7 +755,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.directed" class="doc doc-heading">
-            <code class=" language-python">directed</code>
+            <code class=" language-python"><span class="n">directed</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -388,7 +777,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.edge_count" class="doc doc-heading">
-            <code class=" language-python">edge_count</code>
+            <code class=" language-python"><span class="n">edge_count</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -410,7 +799,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.multigraph" class="doc doc-heading">
-            <code class=" language-python">multigraph</code>
+            <code class=" language-python"><span class="n">multigraph</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -432,7 +821,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.node_count" class="doc doc-heading">
-            <code class=" language-python">node_count</code>
+            <code class=" language-python"><span class="n">node_count</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -454,7 +843,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.weighted" class="doc doc-heading">
-            <code class=" language-python">weighted</code>
+            <code class=" language-python"><span class="n">weighted</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -478,7 +867,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.summary" class="doc doc-heading">
-            <code class=" language-python">summary()</code>
+            <code class=" language-python"><span class="n">summary</span><span class="p">()</span></code>
 
 <a href="#netbone.Network.summary" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -496,7 +885,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.to_dict" class="doc doc-heading">
-            <code class=" language-python">to_dict()</code>
+            <code class=" language-python"><span class="n">to_dict</span><span class="p">()</span></code>
 
 <a href="#netbone.Network.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -514,7 +903,7 @@ ids.</p>
 
 
 <h3 id="netbone.Network.to_original_graph" class="doc doc-heading">
-            <code class=" language-python">to_original_graph(<span style="color: #666">*</span>, node_ids<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, edge_ids<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, drop_isolates<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+            <code class=" language-python"><span class="n">to_original_graph</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">node_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">drop_isolates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#netbone.Network.to_original_graph" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -630,7 +1019,7 @@ edges.</p>
 
 
 <h2 id="netbone.from_graph" class="doc doc-heading">
-            <code class=" language-python">from_graph(graph, <span style="color: #666">*</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">from_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.from_graph" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -728,7 +1117,7 @@ edges.</p>
 
 
 <h2 id="netbone.from_edgelist" class="doc doc-heading">
-            <code class=" language-python">from_edgelist(path, <span style="color: #666">*</span>, source<span style="color: #666">=</span><span style="color: #4070A0">&#39;source&#39;</span>, target<span style="color: #666">=</span><span style="color: #4070A0">&#39;target&#39;</span>, weight<span style="color: #666">=</span><span style="color: #4070A0">&#39;weight&#39;</span>, delimiter<span style="color: #666">=</span><span style="color: #4070A0">&#39;,&#39;</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, directed<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+            <code class=" language-python"><span class="n">from_edgelist</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#netbone.from_edgelist" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -899,7 +1288,7 @@ weights are invalid, or duplicate simple-graph edges are present.</p>
 
 
 <h2 id="netbone.from_graphml" class="doc doc-heading">
-            <code class=" language-python">from_graphml(path, <span style="color: #666">*</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">from_graphml</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.from_graphml" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -998,7 +1387,7 @@ release.</p>
 
 
 <h2 id="netbone.to_undirected" class="doc doc-heading">
-            <code class=" language-python">to_undirected(graph_or_network, <span style="color: #666">*</span>, weight, reciprocal_merge)</code>
+            <code class=" language-python"><span class="n">to_undirected</span><span class="p">(</span><span class="n">graph_or_network</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">reciprocal_merge</span><span class="p">)</span></code>
 
 <a href="#netbone.to_undirected" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -1110,7 +1499,37 @@ unsupported.</p>
 
     </div>
 
-</div></div>
+</div>
+      
+      
+        <nav class="docs-pagination" aria-label="Page navigation">
+          
+  
+    <a rel="prev" class="docs-page-link" href="../pipelines/">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>
+        <small>Previous</small>
+        <strong>Pipelines and results</strong>
+      </span>
+    </a>
+  
+
+          
+  
+    <a rel="next" class="docs-page-link" href="../measurement/">
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      <span>
+        <small>Next</small>
+        <strong>Comparison, sweeps, and exports</strong>
+      </span>
+    </a>
+  
+
+        </nav>
+      
+    </main>
+  </div>
+
             </div>
         </div>
 
@@ -1124,6 +1543,7 @@ unsupported.</p>
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../../js/base.js"></script>
+        <script src="../../assets/docs-nav.js"></script>
         <script src="../../assets/copy-code.js"></script>
         <script src="../../search/main.js"></script>
 

@@ -16,13 +16,21 @@
         <link href="../../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
         <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
-        <link href="../../assets/docs.css" rel="stylesheet"> 
+        <link href="../../assets/docs-syntax.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet">
+  <script src="../../assets/docs-theme.js"></script>
+
     </head>
 
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">Netbone</a>
+  <a class="docs-skip" href="#docs-content">Skip to content</a>
+  <a class="navbar-brand docs-brand" href="../..">
+    <span class="docs-brand-icon"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i></span>
+    Netbone
+  </a>
+
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -30,242 +38,44 @@
 
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
-                        <!-- Main navigation -->
-                        <ul class="nav navbar-nav">
-                            <li class="nav-item">
-                                <a href="../.." class="nav-link">Home</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
-</li>
-                                    
-<li>
-    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
-</li>
-                                    
-<li>
-    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
-</li>
-                                    
-<li>
-    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
-</li>
-                                    
-<li>
-    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
-</li>
-                                    
-<li>
-    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
-</li>
-                                    
-<li>
-    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../browser/sample-demo/" class="dropdown-item">Try the web demo</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
-</li>
-                                    
-<li>
-    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../methods/" class="dropdown-item">Method catalog</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
-</li>
-                                    
-<li>
-    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../pipelines/" class="dropdown-item">Pipelines and results</a>
-</li>
-                                    
-<li>
-    <a href="../networks/" class="dropdown-item">Networks and loaders</a>
-</li>
-                                    
-<li>
-    <a href="./" class="dropdown-item active" aria-current="page">Comparison, sweeps, and exports</a>
-</li>
-                                    
-<li>
-    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
-</li>
-                                    
-<li>
-    <a href="../registry/" class="dropdown-item">Registry discovery</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
-</li>
-                                    
-<li>
-    <a href="../../filters/default/" class="dropdown-item">Method default</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
-                                <ul class="dropdown-menu">
-                                    
-<li>
-    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
-</li>
-                                    
-<li>
-    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
-</li>
-                                </ul>
-                            </li>
-                        </ul>
 
                     <ul class="nav navbar-nav ms-md-auto">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
-                                <i class="fa fa-search"></i> Search
-                            </a>
-                        </li>
-                            <li class="nav-item">
-                                <a rel="prev" href="../networks/" class="nav-link">
-                                    <i class="fa fa-arrow-left"></i> Previous
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a rel="next" href="../temporal/" class="nav-link">
-                                    Next <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
-                            </li>
+  
+    <li class="nav-item">
+      <button type="button" class="docs-header-search" aria-label="Search documentation"
+              data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <span>Search</span>
+      </button>
+    </li>
+  
+
+  <li class="nav-item">
+    <a class="docs-demo-link" href="../../browser/sample-demo/">
+      <i class="fa-solid fa-play" aria-hidden="true"></i>
+      Try the demo
+    </a>
+  </li>
+
+  
+    <li class="nav-item">
+      <a class="docs-repo-link" href="https://github.com/al1yass2n/netbone" aria-label="GitHub">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>GitHub</span>
+      </a>
+    </li>
+  
+  <li class="nav-item docs-theme-picker" hidden>
+    <span class="docs-theme-icon docs-theme-icon--system"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></span>
+    <span class="docs-theme-icon docs-theme-icon--light"><i class="fa-solid fa-sun" aria-hidden="true"></i></span>
+    <span class="docs-theme-icon docs-theme-icon--dark"><i class="fa-solid fa-moon" aria-hidden="true"></i></span>
+    <select id="docs-color-theme" aria-label="Color theme" title="Color theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </li>
+
                     </ul>
                 </div>
             </div>
@@ -273,81 +83,798 @@
 
         <div class="container">
             <div class="row">
-                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
-            <span class="fa fa-angle-down"></span>
-        </button>
-    </div>
+  
+  
+    
+  
+  
+  <div class="docs-layout docs-layout--outline">
+    <aside class="docs-sidebar" data-docs-disclosure>
+      <button class="docs-disclosure-button" type="button" aria-expanded="false"
+              aria-controls="docs-menu" hidden>
+        <i class="fa-solid fa-bars" aria-hidden="true"></i> <span>Browse docs</span> <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <nav id="docs-menu" aria-label="Documentation">
+        <ul class="docs-nav">
+          
+  
+    <li>
+      <a href="../..">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span>Home</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+          <span>Getting started</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../start/install/">
+        
+        <span>Install Netbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../start/first-backbone/">
+        
+        <span>Extract your first backbone</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-code" aria-hidden="true"></i>
+          <span>Python</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../python/inputs/">
+        
+        <span>Prepare network inputs</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/temporal/">
+        
+        <span>Aggregate temporal interactions</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/select/">
+        
+        <span>Choose what to keep</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/compare/">
+        
+        <span>Compare backbone results</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/sweep/">
+        
+        <span>Find settings with a sweep</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../python/reproduce/">
+        
+        <span>Save and reproduce an analysis</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-window-maximize" aria-hidden="true"></i>
+          <span>Web app</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../browser/sample-demo/">
+        
+        <span>Try the web demo</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/launch/">
+        
+        <span>Run the local web app</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/first-session/">
+        
+        <span>Extract a backbone in the browser</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/import/">
+        
+        <span>Import a network</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../browser/evaluate/">
+        
+        <span>Compare and sweep</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
+          <span>Methods</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../methods/">
+        
+        <span>Method catalog</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/edge_weight/">
+        
+        <span>Edge Weight</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/edge_betweenness/">
+        
+        <span>Edge Betweenness</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/disparity/">
+        
+        <span>Disparity</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/lans/">
+        
+        <span>Locally Adaptive Network Sparsification</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_salience/">
+        
+        <span>Link Salience</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_prediction/">
+        
+        <span>Link Prediction</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/link_prediction_iforest/">
+        
+        <span>Link Prediction Isolation Forest</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/gspar/">
+        
+        <span>GSPAR</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/maximum_spanning_forest/">
+        
+        <span>Maximum Spanning Forest</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/primary_linkage/">
+        
+        <span>Primary Linkage</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/multiple_linkage/">
+        
+        <span>Multiple Linkage</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/planar_maximally_filtered_graph/">
+        
+        <span>Planar Maximally Filtered Graph</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/h_backbone/">
+        
+        <span>H-Backbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/doubly_stochastic/">
+        
+        <span>Doubly Stochastic</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/marginal_likelihood/">
+        
+        <span>Marginal Likelihood</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/noise_corrected/">
+        
+        <span>Noise Corrected</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/glanb/">
+        
+        <span>Globally and Locally Adaptive Network Backbone</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_degree/">
+        
+        <span>Node Degree</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_strength/">
+        
+        <span>Node Strength</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../methods/node_betweenness/">
+        
+        <span>Node Betweenness</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section" open>
+        <summary>
+          <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+          <span>API reference</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../pipelines/">
+        
+        <span>Pipelines and results</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../networks/">
+        
+        <span>Networks and loaders</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="./" aria-current="page">
+        
+        <span>Comparison, sweeps, and exports</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../temporal/">
+        
+        <span>Temporal input and aggregation</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../registry/">
+        
+        <span>Registry discovery</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/threshold/">
+        
+        <span>Threshold</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/fraction/">
+        
+        <span>Fraction</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/significance/">
+        
+        <span>Significance</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../filters/default/">
+        
+        <span>Method default</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+  
+    <li>
+      <details class="docs-section">
+        <summary>
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <span>Project</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </summary>
+        <ul>
+          
+  
+    <li>
+      <a href="../../help/">
+        
+        <span>Troubleshooting</span>
+      </a>
+    </li>
+  
+
+  
+    <li>
+      <a href="../../develop/">
+        
+        <span>Develop and publish the documentation</span>
+      </a>
+    </li>
+  
+
+        </ul>
+      </details>
+    </li>
+  
+
+        </ul>
+      </nav>
+    </aside>
 
     
-    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
-        <ul class="nav flex-column">
-            
-            <li class="nav-item" data-bs-level="1"><a href="#comparison-sweeps-and-exports" class="nav-link">Comparison, sweeps, and exports</a>
-              <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.Comparison" class="nav-link">Comparison</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.compare" class="nav-link">compare</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.Sweep" class="nav-link">Sweep</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.SweepResult" class="nav-link">SweepResult</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.sweep" class="nav-link">sweep</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.Report" class="nav-link">Report</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.report" class="nav-link">report</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.save_experiment" class="nav-link">save_experiment</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.list_metrics" class="nav-link">list_metrics</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.describe_metric" class="nav-link">describe_metric</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#optional-plotting" class="nav-link">Optional plotting</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.viz.plot_comparison_metric" class="nav-link">plot_comparison_metric</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.viz.plot_pairwise_metric" class="nav-link">plot_pairwise_metric</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#netbone.viz.plot_sweep_metric" class="nav-link">plot_sweep_metric</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-              </ul>
-            </li>
-        </ul>
-    </div>
-</div></div>
-                    <div class="col-md-9" role="main">
+      <aside class="docs-outline" data-docs-disclosure>
+        <div class="docs-outline-title">On this page</div>
+        <button class="docs-disclosure-button" type="button" aria-expanded="false"
+                aria-controls="docs-outline" hidden>
+          <i class="fa-solid fa-list" aria-hidden="true"></i> <span>On this page</span> <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <nav id="docs-outline" aria-label="On this page">
+          
+  <ul>
+    
+      <li>
+        <a href="#netbone.Comparison">Comparison</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.Comparison.plot_data">plot_data</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Comparison.metric">metric</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Comparison.pairwise">pairwise</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Comparison.score_alignment">score_alignment</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Comparison.spearman">spearman</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Comparison.table">table</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.compare">compare</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.compare.Comparison">Comparison</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.compare.compare">compare</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep">Sweep</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.Sweep.describe">describe</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.filter">filter</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.grid">grid</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.measure">measure</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.run">run</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.score">score</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.vary_filter">vary_filter</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Sweep.vary_method">vary_method</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.SweepResult">SweepResult</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.SweepResult.failures">failures</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.SweepResult.plot_data">plot_data</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.SweepResult.runs">runs</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.SweepResult.table">table</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.SweepResult.to_dict">to_dict</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.sweep">sweep</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.sweep.Sweep">Sweep</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.sweep.SweepResult">SweepResult</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.sweep.sweep">sweep</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.Report">Report</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.Report.to_dict">to_dict</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Report.to_markdown">to_markdown</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.Report.write_markdown">write_markdown</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.report">report</a>
+        
+  <ul>
+    
+      <li>
+        <a href="#netbone.report.Report">Report</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.report.report">report</a>
+        
+      </li>
+    
+  </ul>
+
+      </li>
+    
+      <li>
+        <a href="#netbone.save_experiment">save_experiment</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.list_metrics">list_metrics</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.describe_metric">describe_metric</a>
+        
+      </li>
+    
+      <li>
+        <a href="#optional-plotting">Optional plotting</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.viz.plot_comparison_metric">plot_comparison_metric</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.viz.plot_pairwise_metric">plot_pairwise_metric</a>
+        
+      </li>
+    
+      <li>
+        <a href="#netbone.viz.plot_sweep_metric">plot_sweep_metric</a>
+        
+      </li>
+    
+  </ul>
+
+        </nav>
+      </aside>
+    
+
+    <main id="docs-content" class="docs-article" tabindex="-1">
+      
+        <div class="docs-breadcrumb">
+          <a href="../..">Documentation</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          API reference
+        </div>
+      
+      
+        
 
 <h1 id="comparison-sweeps-and-exports">Comparison, sweeps, and exports<a class="headerlink" href="#comparison-sweeps-and-exports" title="Permanent link">&para;</a></h1>
 <p>Import these names from <code>netbone</code>. The plotting functions live in
@@ -398,7 +925,7 @@
 
 
 <h3 id="netbone.Comparison.plot_data" class="doc doc-heading">
-            <code class=" language-python">plot_data</code>
+            <code class=" language-python"><span class="n">plot_data</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -422,7 +949,7 @@
 
 
 <h3 id="netbone.Comparison.metric" class="doc doc-heading">
-            <code class=" language-python">metric(name)</code>
+            <code class=" language-python"><span class="n">metric</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
 <a href="#netbone.Comparison.metric" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -440,7 +967,7 @@
 
 
 <h3 id="netbone.Comparison.pairwise" class="doc doc-heading">
-            <code class=" language-python">pairwise(metrics<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">pairwise</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.Comparison.pairwise" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -458,7 +985,7 @@
 
 
 <h3 id="netbone.Comparison.score_alignment" class="doc doc-heading">
-            <code class=" language-python">score_alignment(result_a, result_b)</code>
+            <code class=" language-python"><span class="n">score_alignment</span><span class="p">(</span><span class="n">result_a</span><span class="p">,</span> <span class="n">result_b</span><span class="p">)</span></code>
 
 <a href="#netbone.Comparison.score_alignment" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -476,7 +1003,7 @@
 
 
 <h3 id="netbone.Comparison.spearman" class="doc doc-heading">
-            <code class=" language-python">spearman()</code>
+            <code class=" language-python"><span class="n">spearman</span><span class="p">()</span></code>
 
 <a href="#netbone.Comparison.spearman" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -494,7 +1021,7 @@
 
 
 <h3 id="netbone.Comparison.table" class="doc doc-heading">
-            <code class=" language-python">table(metrics<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">table</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.Comparison.table" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -593,7 +1120,7 @@
 
 
 <h4 id="netbone.compare.Comparison.plot_data" class="doc doc-heading">
-            <code class=" language-python">plot_data</code>
+            <code class=" language-python"><span class="n">plot_data</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -617,7 +1144,7 @@
 
 
 <h4 id="netbone.compare.Comparison.metric" class="doc doc-heading">
-            <code class=" language-python">metric(name)</code>
+            <code class=" language-python"><span class="n">metric</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
 <a href="#netbone.compare.Comparison.metric" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -635,7 +1162,7 @@
 
 
 <h4 id="netbone.compare.Comparison.pairwise" class="doc doc-heading">
-            <code class=" language-python">pairwise(metrics<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">pairwise</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.compare.Comparison.pairwise" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -653,7 +1180,7 @@
 
 
 <h4 id="netbone.compare.Comparison.score_alignment" class="doc doc-heading">
-            <code class=" language-python">score_alignment(result_a, result_b)</code>
+            <code class=" language-python"><span class="n">score_alignment</span><span class="p">(</span><span class="n">result_a</span><span class="p">,</span> <span class="n">result_b</span><span class="p">)</span></code>
 
 <a href="#netbone.compare.Comparison.score_alignment" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -671,7 +1198,7 @@
 
 
 <h4 id="netbone.compare.Comparison.spearman" class="doc doc-heading">
-            <code class=" language-python">spearman()</code>
+            <code class=" language-python"><span class="n">spearman</span><span class="p">()</span></code>
 
 <a href="#netbone.compare.Comparison.spearman" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -689,7 +1216,7 @@
 
 
 <h4 id="netbone.compare.Comparison.table" class="doc doc-heading">
-            <code class=" language-python">table(metrics<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">table</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.compare.Comparison.table" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -716,7 +1243,7 @@
 
 
 <h3 id="netbone.compare.compare" class="doc doc-heading">
-            <code class=" language-python">compare(results)</code>
+            <code class=" language-python"><span class="n">compare</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
 
 <a href="#netbone.compare.compare" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -784,7 +1311,7 @@
 
 
 <h3 id="netbone.Sweep.describe" class="doc doc-heading">
-            <code class=" language-python">describe()</code>
+            <code class=" language-python"><span class="n">describe</span><span class="p">()</span></code>
 
 <a href="#netbone.Sweep.describe" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -802,7 +1329,7 @@
 
 
 <h3 id="netbone.Sweep.filter" class="doc doc-heading">
-            <code class=" language-python"><span style="color: #007020">filter</span>(strategy, <span style="color: #666">**</span>parameters)</code>
+            <code class=" language-python"><span class="nb">filter</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.filter" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -820,7 +1347,7 @@
 
 
 <h3 id="netbone.Sweep.grid" class="doc doc-heading">
-            <code class=" language-python">grid(<span style="color: #666">*</span>, methods, filters)</code>
+            <code class=" language-python"><span class="n">grid</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">methods</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.grid" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -840,7 +1367,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h3 id="netbone.Sweep.measure" class="doc doc-heading">
-            <code class=" language-python">measure(metrics)</code>
+            <code class=" language-python"><span class="n">measure</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.measure" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -858,7 +1385,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h3 id="netbone.Sweep.run" class="doc doc-heading">
-            <code class=" language-python">run()</code>
+            <code class=" language-python"><span class="n">run</span><span class="p">()</span></code>
 
 <a href="#netbone.Sweep.run" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -876,7 +1403,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h3 id="netbone.Sweep.score" class="doc doc-heading">
-            <code class=" language-python">score(method, <span style="color: #666">**</span>parameters)</code>
+            <code class=" language-python"><span class="n">score</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.score" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -894,7 +1421,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h3 id="netbone.Sweep.vary_filter" class="doc doc-heading">
-            <code class=" language-python">vary_filter(strategy<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, <span style="color: #666">**</span>parameter_grid)</code>
+            <code class=" language-python"><span class="n">vary_filter</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_grid</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.vary_filter" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -914,7 +1441,7 @@ parameters reuses cached method scores during <code>run()</code>.</p>
 
 
 <h3 id="netbone.Sweep.vary_method" class="doc doc-heading">
-            <code class=" language-python">vary_method(method<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, <span style="color: #666">**</span>parameter_grid)</code>
+            <code class=" language-python"><span class="n">vary_method</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_grid</span><span class="p">)</span></code>
 
 <a href="#netbone.Sweep.vary_method" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -985,7 +1512,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.SweepResult.failures" class="doc doc-heading">
-            <code class=" language-python">failures</code>
+            <code class=" language-python"><span class="n">failures</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1007,7 +1534,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.SweepResult.plot_data" class="doc doc-heading">
-            <code class=" language-python">plot_data</code>
+            <code class=" language-python"><span class="n">plot_data</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1029,7 +1556,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.SweepResult.runs" class="doc doc-heading">
-            <code class=" language-python">runs</code>
+            <code class=" language-python"><span class="n">runs</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1053,7 +1580,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.SweepResult.table" class="doc doc-heading">
-            <code class=" language-python">table()</code>
+            <code class=" language-python"><span class="n">table</span><span class="p">()</span></code>
 
 <a href="#netbone.SweepResult.table" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1071,7 +1598,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.SweepResult.to_dict" class="doc doc-heading">
-            <code class=" language-python">to_dict()</code>
+            <code class=" language-python"><span class="n">to_dict</span><span class="p">()</span></code>
 
 <a href="#netbone.SweepResult.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1172,7 +1699,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.Sweep.describe" class="doc doc-heading">
-            <code class=" language-python">describe()</code>
+            <code class=" language-python"><span class="n">describe</span><span class="p">()</span></code>
 
 <a href="#netbone.sweep.Sweep.describe" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1190,7 +1717,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.Sweep.filter" class="doc doc-heading">
-            <code class=" language-python"><span style="color: #007020">filter</span>(strategy, <span style="color: #666">**</span>parameters)</code>
+            <code class=" language-python"><span class="nb">filter</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.filter" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1208,7 +1735,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.Sweep.grid" class="doc doc-heading">
-            <code class=" language-python">grid(<span style="color: #666">*</span>, methods, filters)</code>
+            <code class=" language-python"><span class="n">grid</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">methods</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.grid" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1228,7 +1755,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h4 id="netbone.sweep.Sweep.measure" class="doc doc-heading">
-            <code class=" language-python">measure(metrics)</code>
+            <code class=" language-python"><span class="n">measure</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.measure" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1246,7 +1773,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h4 id="netbone.sweep.Sweep.run" class="doc doc-heading">
-            <code class=" language-python">run()</code>
+            <code class=" language-python"><span class="n">run</span><span class="p">()</span></code>
 
 <a href="#netbone.sweep.Sweep.run" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1264,7 +1791,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h4 id="netbone.sweep.Sweep.score" class="doc doc-heading">
-            <code class=" language-python">score(method, <span style="color: #666">**</span>parameters)</code>
+            <code class=" language-python"><span class="n">score</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.score" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1282,7 +1809,7 @@ values and finite sequences expand into grid values.</p>
 
 
 <h4 id="netbone.sweep.Sweep.vary_filter" class="doc doc-heading">
-            <code class=" language-python">vary_filter(strategy<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, <span style="color: #666">**</span>parameter_grid)</code>
+            <code class=" language-python"><span class="n">vary_filter</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_grid</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.vary_filter" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1302,7 +1829,7 @@ parameters reuses cached method scores during <code>run()</code>.</p>
 
 
 <h4 id="netbone.sweep.Sweep.vary_method" class="doc doc-heading">
-            <code class=" language-python">vary_method(method<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, <span style="color: #666">**</span>parameter_grid)</code>
+            <code class=" language-python"><span class="n">vary_method</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_grid</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.Sweep.vary_method" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1373,7 +1900,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.SweepResult.failures" class="doc doc-heading">
-            <code class=" language-python">failures</code>
+            <code class=" language-python"><span class="n">failures</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1395,7 +1922,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.SweepResult.plot_data" class="doc doc-heading">
-            <code class=" language-python">plot_data</code>
+            <code class=" language-python"><span class="n">plot_data</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1417,7 +1944,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.SweepResult.runs" class="doc doc-heading">
-            <code class=" language-python">runs</code>
+            <code class=" language-python"><span class="n">runs</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1441,7 +1968,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.SweepResult.table" class="doc doc-heading">
-            <code class=" language-python">table()</code>
+            <code class=" language-python"><span class="n">table</span><span class="p">()</span></code>
 
 <a href="#netbone.sweep.SweepResult.table" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1459,7 +1986,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h4 id="netbone.sweep.SweepResult.to_dict" class="doc doc-heading">
-            <code class=" language-python">to_dict()</code>
+            <code class=" language-python"><span class="n">to_dict</span><span class="p">()</span></code>
 
 <a href="#netbone.sweep.SweepResult.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1486,7 +2013,7 @@ instead of aborting the whole sweep.</p>
 
 
 <h3 id="netbone.sweep.sweep" class="doc doc-heading">
-            <code class=" language-python">sweep(graph_or_network)</code>
+            <code class=" language-python"><span class="n">sweep</span><span class="p">(</span><span class="n">graph_or_network</span><span class="p">)</span></code>
 
 <a href="#netbone.sweep.sweep" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1557,7 +2084,7 @@ require or call an LLM provider.</p>
 
 
 <h3 id="netbone.Report.to_dict" class="doc doc-heading">
-            <code class=" language-python">to_dict()</code>
+            <code class=" language-python"><span class="n">to_dict</span><span class="p">()</span></code>
 
 <a href="#netbone.Report.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1575,7 +2102,7 @@ require or call an LLM provider.</p>
 
 
 <h3 id="netbone.Report.to_markdown" class="doc doc-heading">
-            <code class=" language-python">to_markdown()</code>
+            <code class=" language-python"><span class="n">to_markdown</span><span class="p">()</span></code>
 
 <a href="#netbone.Report.to_markdown" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1593,7 +2120,7 @@ require or call an LLM provider.</p>
 
 
 <h3 id="netbone.Report.write_markdown" class="doc doc-heading">
-            <code class=" language-python">write_markdown(path, <span style="color: #666">*</span>, overwrite<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">True</span>)</code>
+            <code class=" language-python"><span class="n">write_markdown</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 <a href="#netbone.Report.write_markdown" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1768,7 +2295,7 @@ require or call an LLM provider.</p>
 
 
 <h4 id="netbone.report.Report.to_dict" class="doc doc-heading">
-            <code class=" language-python">to_dict()</code>
+            <code class=" language-python"><span class="n">to_dict</span><span class="p">()</span></code>
 
 <a href="#netbone.report.Report.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1786,7 +2313,7 @@ require or call an LLM provider.</p>
 
 
 <h4 id="netbone.report.Report.to_markdown" class="doc doc-heading">
-            <code class=" language-python">to_markdown()</code>
+            <code class=" language-python"><span class="n">to_markdown</span><span class="p">()</span></code>
 
 <a href="#netbone.report.Report.to_markdown" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1804,7 +2331,7 @@ require or call an LLM provider.</p>
 
 
 <h4 id="netbone.report.Report.write_markdown" class="doc doc-heading">
-            <code class=" language-python">write_markdown(path, <span style="color: #666">*</span>, overwrite<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">True</span>)</code>
+            <code class=" language-python"><span class="n">write_markdown</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 <a href="#netbone.report.Report.write_markdown" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1902,7 +2429,7 @@ while <code>overwrite=False</code>, or cannot be written.</p>
 
 
 <h3 id="netbone.report.report" class="doc doc-heading">
-            <code class=" language-python">report(subject, <span style="color: #666">*</span>, title<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">report</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.report.report" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1998,7 +2525,7 @@ while <code>overwrite=False</code>, or cannot be written.</p>
 
 
 <h2 id="netbone.save_experiment" class="doc doc-heading">
-            <code class=" language-python">save_experiment(subject, path, <span style="color: #666">*</span>, overwrite<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+            <code class=" language-python"><span class="n">save_experiment</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#netbone.save_experiment" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2115,7 +2642,7 @@ pipelines.</p>
 
 
 <h2 id="netbone.list_metrics" class="doc doc-heading">
-            <code class=" language-python">list_metrics(<span style="color: #666">*</span>, scope<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">list_metrics</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.list_metrics" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2133,7 +2660,7 @@ pipelines.</p>
 
 
 <h2 id="netbone.describe_metric" class="doc doc-heading">
-            <code class=" language-python">describe_metric(name)</code>
+            <code class=" language-python"><span class="n">describe_metric</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
 <a href="#netbone.describe_metric" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2152,7 +2679,7 @@ pipelines.</p>
 
 
 <h2 id="netbone.viz.plot_comparison_metric" class="doc doc-heading">
-            <code class=" language-python">plot_comparison_metric(comparison, metric, <span style="color: #666">*</span>, ax<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">plot_comparison_metric</span><span class="p">(</span><span class="n">comparison</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.viz.plot_comparison_metric" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2170,7 +2697,7 @@ pipelines.</p>
 
 
 <h2 id="netbone.viz.plot_pairwise_metric" class="doc doc-heading">
-            <code class=" language-python">plot_pairwise_metric(comparison, metric, <span style="color: #666">*</span>, ax<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">plot_pairwise_metric</span><span class="p">(</span><span class="n">comparison</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.viz.plot_pairwise_metric" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2188,7 +2715,7 @@ pipelines.</p>
 
 
 <h2 id="netbone.viz.plot_sweep_metric" class="doc doc-heading">
-            <code class=" language-python">plot_sweep_metric(sweep_result, metric, <span style="color: #666">*</span>, x<span style="color: #666">=</span><span style="color: #4070A0">&#39;parameter_value&#39;</span>, group_by<span style="color: #666">=</span><span style="color: #4070A0">&#39;method&#39;</span>, ax<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+            <code class=" language-python"><span class="n">plot_sweep_metric</span><span class="p">(</span><span class="n">sweep_result</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;parameter_value&#39;</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#netbone.viz.plot_sweep_metric" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -2200,7 +2727,37 @@ pipelines.</p>
 
     </div>
 
-</div></div>
+</div>
+      
+      
+        <nav class="docs-pagination" aria-label="Page navigation">
+          
+  
+    <a rel="prev" class="docs-page-link" href="../networks/">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>
+        <small>Previous</small>
+        <strong>Networks and loaders</strong>
+      </span>
+    </a>
+  
+
+          
+  
+    <a rel="next" class="docs-page-link" href="../temporal/">
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      <span>
+        <small>Next</small>
+        <strong>Temporal input and aggregation</strong>
+      </span>
+    </a>
+  
+
+        </nav>
+      
+    </main>
+  </div>
+
             </div>
         </div>
 
@@ -2214,6 +2771,7 @@ pipelines.</p>
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../../js/base.js"></script>
+        <script src="../../assets/docs-nav.js"></script>
         <script src="../../assets/copy-code.js"></script>
         <script src="../../search/main.js"></script>
 
