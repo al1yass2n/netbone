@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://al1yass2n.github.io/netbone/reference/methods/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Method catalog - Netbone</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet"> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Netbone</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
+</li>
+                                    
+<li>
+    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
+</li>
+                                    
+<li>
+    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
+</li>
+                                    
+<li>
+    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
+</li>
+                                    
+<li>
+    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Method catalog</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../pipelines/" class="dropdown-item">Pipelines and results</a>
+</li>
+                                    
+<li>
+    <a href="../networks/" class="dropdown-item">Networks and loaders</a>
+</li>
+                                    
+<li>
+    <a href="../measurement/" class="dropdown-item">Comparison, sweeps, and exports</a>
+</li>
+                                    
+<li>
+    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
+</li>
+                                    
+<li>
+    <a href="../registry/" class="dropdown-item">Registry discovery</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/default/" class="dropdown-item">Method default</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
+</li>
+                                    
+<li>
+    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../../browser/evaluate/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../methods/edge_weight/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#method-catalog" class="nav-link">Method catalog</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#baselines" class="nav-link">Baselines</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#paths-and-neighborhoods" class="nav-link">Paths and neighborhoods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#statistical-methods" class="nav-link">Statistical methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#structural-selections" class="nav-link">Structural selections</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#node-measures" class="nav-link">Node measures</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#try-a-method" class="nav-link">Try a method</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="method-catalog">Method catalog<a class="headerlink" href="#method-catalog" title="Permanent link">&para;</a></h1>
+<p>Choose a method by the structure it measures and by the data it requires.
+All entries support simple undirected graphs subject to their attribute
+requirements. Directed support is shown below. A node method produces an
+induced subgraph after filtering. The other methods select edges.</p>
+<h2 id="baselines">Baselines<a class="headerlink" href="#baselines" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weights</th>
+<th>Directed</th>
+<th>Suggested selection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../methods/edge_weight/">Edge Weight</a></td>
+<td>Finite numeric or unit weights</td>
+<td>No</td>
+<td>Threshold or fraction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="paths-and-neighborhoods">Paths and neighborhoods<a class="headerlink" href="#paths-and-neighborhoods" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weights</th>
+<th>Directed</th>
+<th>Suggested selection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../methods/edge_betweenness/">Edge Betweenness</a></td>
+<td>Positive when weighted</td>
+<td>No</td>
+<td>10% fraction</td>
+</tr>
+<tr>
+<td><a href="../../methods/link_salience/">Link Salience</a></td>
+<td>Positive or unit weights</td>
+<td>Yes</td>
+<td>Score ≥ 0.5</td>
+</tr>
+<tr>
+<td><a href="../../methods/link_prediction/">Link Prediction</a></td>
+<td>Positive when weighted</td>
+<td>Yes</td>
+<td>10% fraction with explicit direction</td>
+</tr>
+<tr>
+<td><a href="../../methods/link_prediction_iforest/">Link Prediction Isolation Forest</a></td>
+<td>Positive when weighted</td>
+<td>Yes</td>
+<td>10% fraction</td>
+</tr>
+<tr>
+<td><a href="../../methods/gspar/">GSPAR</a></td>
+<td>Weights ignored</td>
+<td>No</td>
+<td>10% fraction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="statistical-methods">Statistical methods<a class="headerlink" href="#statistical-methods" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weights</th>
+<th>Directed</th>
+<th>Suggested selection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../methods/disparity/">Disparity</a></td>
+<td>Positive</td>
+<td>Yes</td>
+<td>Significance</td>
+</tr>
+<tr>
+<td><a href="../../methods/lans/">Locally Adaptive Network Sparsification</a></td>
+<td>Positive</td>
+<td>Yes</td>
+<td>Significance</td>
+</tr>
+<tr>
+<td><a href="../../methods/marginal_likelihood/">Marginal Likelihood</a></td>
+<td>Positive integer counts</td>
+<td>No</td>
+<td>Significance</td>
+</tr>
+<tr>
+<td><a href="../../methods/noise_corrected/">Noise Corrected</a></td>
+<td>Positive integer counts</td>
+<td>Yes</td>
+<td>Score &gt; 1.64</td>
+</tr>
+<tr>
+<td><a href="../../methods/glanb/">Globally and Locally Adaptive Network Backbone</a></td>
+<td>Positive when weighted</td>
+<td>No</td>
+<td>Significance</td>
+</tr>
+</tbody>
+</table>
+<h2 id="structural-selections">Structural selections<a class="headerlink" href="#structural-selections" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weights</th>
+<th>Directed</th>
+<th>Suggested selection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../methods/maximum_spanning_forest/">Maximum Spanning Forest</a></td>
+<td>Finite numeric or unit weights</td>
+<td>No</td>
+<td>Selection flag = 1</td>
+</tr>
+<tr>
+<td><a href="../../methods/primary_linkage/">Primary Linkage</a></td>
+<td>Finite numeric</td>
+<td>No</td>
+<td>Selection flag = 1</td>
+</tr>
+<tr>
+<td><a href="../../methods/multiple_linkage/">Multiple Linkage</a></td>
+<td>Non-negative</td>
+<td>No</td>
+<td>Selection flag = 1</td>
+</tr>
+<tr>
+<td><a href="../../methods/planar_maximally_filtered_graph/">Planar Maximally Filtered Graph</a></td>
+<td>Finite numeric or unit weights</td>
+<td>No</td>
+<td>Selection flag = 1</td>
+</tr>
+<tr>
+<td><a href="../../methods/h_backbone/">H-Backbone</a></td>
+<td>Positive</td>
+<td>No</td>
+<td>Selection flag = 1</td>
+</tr>
+<tr>
+<td><a href="../../methods/doubly_stochastic/">Doubly Stochastic</a></td>
+<td>Positive</td>
+<td>No</td>
+<td>Connected-selection flag = 1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="node-measures">Node measures<a class="headerlink" href="#node-measures" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weights</th>
+<th>Directed</th>
+<th>Suggested selection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../methods/node_degree/">Node Degree</a></td>
+<td>Weights ignored</td>
+<td>No</td>
+<td>10% fraction</td>
+</tr>
+<tr>
+<td><a href="../../methods/node_strength/">Node Strength</a></td>
+<td>Finite numeric</td>
+<td>No</td>
+<td>10% fraction</td>
+</tr>
+<tr>
+<td><a href="../../methods/node_betweenness/">Node Betweenness</a></td>
+<td>Positive when weighted</td>
+<td>No</td>
+<td>10% fraction</td>
+</tr>
+</tbody>
+</table>
+<p>The 10% defaults use <a href="../../filters/fraction/">fraction filtering</a>, which
+can retain more when scores tie. Significance defaults use alpha 0.05 with
+correction set to <code>"none"</code>. Check the individual method page before choosing
+a cutoff or reporting a statistical claim.</p>
+<h2 id="try-a-method">Try a method<a class="headerlink" href="#try-a-method" title="Permanent link">&para;</a></h2>
+<p>The reference examples use this simple weighted graph. Run this block first,
+then run the block on a method page.</p>
+<div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code><span style="color: #007020; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #0E84B5; font-weight: bold">networkx</span><span style="color: #BBB"> </span><span style="color: #007020; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #0E84B5; font-weight: bold">nx</span>
+<span style="color: #007020; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #0E84B5; font-weight: bold">netbone</span><span style="color: #BBB"> </span><span style="color: #007020; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #0E84B5; font-weight: bold">nb</span>
+
+graph <span style="color: #666">=</span> nx<span style="color: #666">.</span>Graph()
+graph<span style="color: #666">.</span>add_weighted_edges_from(
+    [(<span style="color: #4070A0">&quot;A&quot;</span>, <span style="color: #4070A0">&quot;B&quot;</span>, <span style="color: #40A070">8</span>), (<span style="color: #4070A0">&quot;A&quot;</span>, <span style="color: #4070A0">&quot;C&quot;</span>, <span style="color: #40A070">3</span>), (<span style="color: #4070A0">&quot;B&quot;</span>, <span style="color: #4070A0">&quot;C&quot;</span>, <span style="color: #40A070">5</span>), (<span style="color: #4070A0">&quot;C&quot;</span>, <span style="color: #4070A0">&quot;D&quot;</span>, <span style="color: #40A070">2</span>)]
+)
+</code></pre></div>
+
+<p>Use <code>nb.list_methods()</code> to list registered names and
+<code>nb.describe_method(name)</code> to inspect metadata in Python.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../assets/copy-code.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

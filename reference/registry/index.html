@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://al1yass2n.github.io/netbone/reference/registry/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Registry discovery - Netbone</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet"> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Netbone</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
+</li>
+                                    
+<li>
+    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
+</li>
+                                    
+<li>
+    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
+</li>
+                                    
+<li>
+    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
+</li>
+                                    
+<li>
+    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../methods/" class="dropdown-item">Method catalog</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../pipelines/" class="dropdown-item">Pipelines and results</a>
+</li>
+                                    
+<li>
+    <a href="../networks/" class="dropdown-item">Networks and loaders</a>
+</li>
+                                    
+<li>
+    <a href="../measurement/" class="dropdown-item">Comparison, sweeps, and exports</a>
+</li>
+                                    
+<li>
+    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Registry discovery</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/default/" class="dropdown-item">Method default</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
+</li>
+                                    
+<li>
+    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../temporal/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../filters/threshold/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#registry-discovery-and-lower-level-helpers" class="nav-link">Registry discovery and lower-level helpers</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.list_methods" class="nav-link">list_methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.describe_method" class="nav-link">describe_method</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.list_filters" class="nav-link">list_filters</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.describe_filter" class="nav-link">describe_filter</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#scorers-exported-by-netbonemethods" class="nav-link">Scorers exported by netbone.methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.methods.compute_disparity" class="nav-link">compute_disparity</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.methods.compute_edge_weight" class="nav-link">compute_edge_weight</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.methods.compute_lans" class="nav-link">compute_lans</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.methods.compute_link_salience" class="nav-link">compute_link_salience</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#filters-exported-by-netbonefilters" class="nav-link">Filters exported by netbone.filters</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.filters.apply_threshold" class="nav-link">apply_threshold</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.filters.apply_fraction" class="nav-link">apply_fraction</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.filters.apply_significance" class="nav-link">apply_significance</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#version" class="nav-link">Version</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="registry-discovery-and-lower-level-helpers">Registry discovery and lower-level helpers<a class="headerlink" href="#registry-discovery-and-lower-level-helpers" title="Permanent link">&para;</a></h1>
+<p>Use the top-level registry functions to discover available methods and filters
+and inspect their metadata. For direct calls, the helpers shown below operate
+on normalized networks or computed method results. Most workflows can use
+<code>netbone.score()</code>, <code>netbone.filter_scores()</code>, or a pipeline.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.list_methods" class="doc doc-heading">
+            <code class=" language-python">list_methods()</code>
+
+<a href="#netbone.list_methods" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return registered built-in method names.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.describe_method" class="doc doc-heading">
+            <code class=" language-python">describe_method(name)</code>
+
+<a href="#netbone.describe_method" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return JSON-compatible metadata for a registered method.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.list_filters" class="doc doc-heading">
+            <code class=" language-python">list_filters()</code>
+
+<a href="#netbone.list_filters" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return registered built-in filter names.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.describe_filter" class="doc doc-heading">
+            <code class=" language-python">describe_filter(name)</code>
+
+<a href="#netbone.describe_filter" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return JSON-compatible metadata for a registered filter.</p>
+
+
+    </div>
+
+</div><h2 id="scorers-exported-by-netbonemethods">Scorers exported by netbone.methods<a class="headerlink" href="#scorers-exported-by-netbonemethods" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.methods.compute_disparity" class="doc doc-heading">
+            <code class=" language-python">compute_disparity(network, <span style="color: #666">*</span>, weight<span style="color: #666">=</span><span style="color: #4070A0">&#39;weight&#39;</span>, pvalue_aggregation<span style="color: #666">=</span><span style="color: #4070A0">&#39;min&#39;</span>, leaf_policy<span style="color: #666">=</span><span style="color: #4070A0">&#39;ignore&#39;</span>)</code>
+
+<a href="#netbone.methods.compute_disparity" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute edge p-values from the disparity filter.</p>
+<p>For each endpoint of an edge, the method computes the fraction of that
+endpoint's strength carried by the edge, then evaluates the disparity null
+model p-value <code>(1 - fraction) ** (degree - 1)</code>. Endpoint p-values are
+combined into the method-specific primary statistic <code>disparity_pvalue</code>.
+For a directed arc, the source value uses its outgoing distribution and the
+target value uses its incoming distribution.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>network</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Network
+
+
+  
+      dataclass
+   (netbone.network.Network)" href="../networks/#netbone.Network">Network</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Normalized simple directed or undirected network to score.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Edge attribute containing finite positive weights.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;weight&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pvalue_aggregation</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How to combine endpoint p-values: <code>min</code>, <code>max</code>, or
+<code>average</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;min&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>leaf_policy</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How degree-one endpoints contribute: <code>ignore</code> ignores
+them during aggregation when another endpoint is available, while
+<code>zero</code> uses the previous behavior where leaf endpoint p-values are
+<code>0.0</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;ignore&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a method parameter value is invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a required weight is missing, non-numeric,
+non-finite, zero, or negative.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.methods.compute_edge_weight" class="doc doc-heading">
+            <code class=" language-python">compute_edge_weight(network, <span style="color: #666">*</span>, weight<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+
+<a href="#netbone.methods.compute_edge_weight" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute one edge score per edge from a numeric weight attribute.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>network</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Network
+
+
+  
+      dataclass
+   (netbone.network.Network)" href="../networks/#netbone.Network">Network</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Normalized network to score.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Edge attribute containing numeric weights. When omitted, every
+edge receives score <code>1.0</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a requested weight attribute is missing or not
+finite numeric.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.methods.compute_lans" class="doc doc-heading">
+            <code class=" language-python">compute_lans(network, <span style="color: #666">*</span>, weight<span style="color: #666">=</span><span style="color: #4070A0">&#39;weight&#39;</span>, pvalue_aggregation<span style="color: #666">=</span><span style="color: #4070A0">&#39;min&#39;</span>, leaf_policy<span style="color: #666">=</span><span style="color: #4070A0">&#39;zero&#39;</span>)</code>
+
+<a href="#netbone.methods.compute_lans" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute LANS empirical upper-tail p-values for each edge.</p>
+<p>For undirected graphs, LANS compares an edge's fractional incident weight
+at both endpoints and combines the endpoint p-values. For directed graphs,
+each arc is evaluated only against its source node's outgoing fractional
+weight distribution; its source p-value is the primary <code>lans_pvalue</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>network</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Network
+
+
+  
+      dataclass
+   (netbone.network.Network)" href="../networks/#netbone.Network">Network</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Normalized simple graph to score.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Edge attribute containing finite positive weights.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;weight&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pvalue_aggregation</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How to combine endpoint p-values: <code>min</code>, <code>max</code>, or
+<code>average</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;min&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>leaf_policy</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How degree-one endpoints contribute: <code>zero</code> treats the
+leaf endpoint as locally significant, while <code>ignore</code> ignores them
+during aggregation when another endpoint is available.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;zero&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a method parameter value is invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a required weight is missing, non-numeric,
+non-finite, zero, or negative.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.methods.compute_link_salience" class="doc doc-heading">
+            <code class=" language-python">compute_link_salience(network, <span style="color: #666">*</span>, weight<span style="color: #666">=</span><span style="color: #4070A0">&#39;weight&#39;</span>, distance_transform<span style="color: #666">=</span><span style="color: #4070A0">&#39;inverse&#39;</span>)</code>
+
+<a href="#netbone.methods.compute_link_salience" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute edge link salience from shortest-path trees rooted at each node.</p>
+<p>Link salience is the fraction of root nodes whose shortest-path tree or
+shortest-path directed acyclic graph contains an edge. The default
+<code>distance_transform="inverse"</code> treats input weights as coupling strengths
+and uses <code>1 / weight</code> as the shortest-path distance.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>network</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Network
+
+
+  
+      dataclass
+   (netbone.network.Network)" href="../networks/#netbone.Network">Network</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Normalized simple graph to score. Directed graphs use
+outgoing shortest paths from each root and preserve arc direction.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Edge attribute containing numeric weights. Pass <code>None</code> for
+unweighted unit-distance salience.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;weight&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>distance_transform</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>inverse</code> for strength weights or <code>identity</code> when
+weights are already shortest-path distances.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;inverse&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>distance_transform</code> is unknown.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a configured weight is missing, non-numeric,
+non-finite, non-positive for <code>inverse</code>, or negative for <code>identity</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div><h2 id="filters-exported-by-netbonefilters">Filters exported by netbone.filters<a class="headerlink" href="#filters-exported-by-netbonefilters" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.filters.apply_threshold" class="doc doc-heading">
+            <code class=" language-python">apply_threshold(method_result, <span style="color: #666">*</span>, statistic<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, value, operator, drop_isolates<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+
+<a href="#netbone.filters.apply_threshold" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Select rows from method statistics using an explicit threshold operator.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method_result</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="MethodResult
+
+
+  
+      dataclass
+   (netbone.results.MethodResult)" href="../pipelines/#netbone.MethodResult">MethodResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Method statistics to filter.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>statistic</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional statistic column to compare. When omitted, the
+method result's primary statistic is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>value</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Numeric threshold value.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>operator</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One of <code>greater</code>, <code>greater_equal</code>, <code>less</code>, <code>less_equal</code>,
+<code>equal</code>, or <code>not_equal</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>drop_isolates</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether edge extraction should remove isolated nodes
+after filtering.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the statistic or operator is invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the threshold value or statistic values are not
+numeric.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.filters.apply_fraction" class="doc doc-heading">
+            <code class=" language-python">apply_fraction(method_result, <span style="color: #666">*</span>, fraction, statistic<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, direction<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, tie_policy<span style="color: #666">=</span><span style="color: #4070A0">&#39;include_all_ties&#39;</span>, random_seed<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, drop_isolates<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+
+<a href="#netbone.filters.apply_fraction" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Select the top retained fraction of method statistics.</p>
+<p>The method result's <code>preferred_direction</code> controls the ordering. Lower
+values are preferred for p-values and higher values are preferred for
+ordinary scores.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method_result</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="MethodResult
+
+
+  
+      dataclass
+   (netbone.results.MethodResult)" href="../pipelines/#netbone.MethodResult">MethodResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Method statistics to filter.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fraction</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Requested retained fraction in the closed interval [0, 1].</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>statistic</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional statistic column. Defaults to the method result's
+primary statistic.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>direction</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional ranking direction override. When omitted, the
+method result's preferred direction is used unless the method
+requires explicit direction.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tie_policy</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One of <code>include_all_ties</code>, <code>exact_stable</code>, <code>raise_on_tie</code>,
+or <code>random_seeded</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;include_all_ties&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>random_seed</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Required integer seed when <code>tie_policy="random_seeded"</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>drop_isolates</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether edge extraction should remove isolated nodes
+after filtering.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the tie policy or statistic is invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the fraction or statistic values are invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.filters.apply_significance" class="doc doc-heading">
+            <code class=" language-python">apply_significance(method_result, <span style="color: #666">*</span>, alpha<span style="color: #666">=</span><span style="color: #40A070">0.05</span>, statistic<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, correction<span style="color: #666">=</span><span style="color: #4070A0">&#39;none&#39;</span>, drop_isolates<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+
+<a href="#netbone.filters.apply_significance" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Select method rows whose p-values are significant.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method_result</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="MethodResult
+
+
+  
+      dataclass
+   (netbone.results.MethodResult)" href="../pipelines/#netbone.MethodResult">MethodResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Method statistics with <code>output_type="pvalue"</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Significance level in the closed interval [0, 1].</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.05</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>statistic</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional p-value column. Defaults to the primary statistic.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>correction</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Multiple-testing correction: <code>none</code>, <code>bonferroni</code>, <code>holm</code>,
+or <code>fdr_bh</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;none&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>drop_isolates</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether edge extraction should remove isolated nodes
+after filtering.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="../pipelines/#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the method output or correction is incompatible.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If alpha or p-values are invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div><h2 id="version">Version<a class="headerlink" href="#version" title="Permanent link">&para;</a></h2>
+<p>Read <code>netbone.__version__</code> to record the imported package version.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../assets/copy-code.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://al1yass2n.github.io/netbone/reference/pipelines/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Pipelines and results - Netbone</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet"> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Netbone</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
+</li>
+                                    
+<li>
+    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
+</li>
+                                    
+<li>
+    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
+</li>
+                                    
+<li>
+    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
+</li>
+                                    
+<li>
+    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../methods/" class="dropdown-item">Method catalog</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Pipelines and results</a>
+</li>
+                                    
+<li>
+    <a href="../networks/" class="dropdown-item">Networks and loaders</a>
+</li>
+                                    
+<li>
+    <a href="../measurement/" class="dropdown-item">Comparison, sweeps, and exports</a>
+</li>
+                                    
+<li>
+    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
+</li>
+                                    
+<li>
+    <a href="../registry/" class="dropdown-item">Registry discovery</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/default/" class="dropdown-item">Method default</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
+</li>
+                                    
+<li>
+    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../../methods/node_betweenness/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../networks/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#pipelines-and-results" class="nav-link">Pipelines and results</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.Pipeline" class="nav-link">Pipeline</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.pipeline" class="nav-link">pipeline</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.score" class="nav-link">score</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.filter_scores" class="nav-link">filter_scores</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.MethodResult" class="nav-link">MethodResult</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.Selection" class="nav-link">Selection</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.BackboneResult" class="nav-link">BackboneResult</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#errors" class="nav-link">Errors</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.NetboneError" class="nav-link">NetboneError</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.ValidationError" class="nav-link">ValidationError</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.ConfigurationError" class="nav-link">ConfigurationError</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.CompatibilityError" class="nav-link">CompatibilityError</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.UndefinedMetricError" class="nav-link">UndefinedMetricError</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="pipelines-and-results">Pipelines and results<a class="headerlink" href="#pipelines-and-results" title="Permanent link">&para;</a></h1>
+<p>Import these names from <code>netbone</code>. A method produces a <code>MethodResult</code> and a
+filter produces a <code>Selection</code>. Running the full pipeline produces a
+<code>BackboneResult</code>.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.Pipeline" class="doc doc-heading">
+            <code>Pipeline</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.Pipeline" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Immutable scoring and filtering configuration.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.compute" class="doc doc-heading">
+            <code class=" language-python">compute(graph_or_network)</code>
+
+<a href="#netbone.Pipeline.compute" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute method statistics without applying a filter.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.describe" class="doc doc-heading">
+            <code class=" language-python">describe()</code>
+
+<a href="#netbone.Pipeline.describe" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a compact description of the configured pipeline.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.filter" class="doc doc-heading">
+            <code class=" language-python"><span style="color: #007020">filter</span>(strategy, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.Pipeline.filter" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a new pipeline configured with a filtering strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>strategy</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="netbone.pipeline.FilterCallable">FilterCallable</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Registered filter name or custom filter callable.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**parameters</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Filter-specific parameters.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the filter strategy is unknown.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.from_dict" class="doc doc-heading">
+            <code class=" language-python">from_dict(config)</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#netbone.Pipeline.from_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Restore a pipeline configuration produced by <code>Pipeline.to_dict()</code>.</p>
+<p>Only registered method and filter names can be deserialized. Custom
+filter callables must be recreated in Python and attached with
+<code>Pipeline.filter(...)</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pipeline configuration mapping.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the configuration shape is invalid, a
+registered method or filter is unknown, or a custom callable
+filter is present.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.from_json" class="doc doc-heading">
+            <code class=" language-python">from_json(path)</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#netbone.Pipeline.from_json" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Restore a registered pipeline configuration from a JSON file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON file created from <code>Pipeline.to_json(...)</code> or equivalent
+<code>Pipeline.to_dict()</code> output.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file is missing, unreadable, or invalid
+JSON.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the decoded configuration is invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.run" class="doc doc-heading">
+            <code class=" language-python">run(graph_or_network)</code>
+
+<a href="#netbone.Pipeline.run" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute statistics, apply the filter, and return a backbone result.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pipeline has no scoring method or no
+filter strategy.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="CompatibilityError (netbone.exceptions.CompatibilityError)" href="#netbone.CompatibilityError">CompatibilityError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the selected result target cannot be
+extracted by this release.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.score" class="doc doc-heading">
+            <code class=" language-python">score(method, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.Pipeline.score" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a new pipeline configured with a scoring method.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Registered method name.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**parameters</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Method-specific parameters.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the method is unknown.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.Pipeline.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a JSON-compatible pipeline configuration summary.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Pipeline.to_json" class="doc doc-heading">
+            <code class=" language-python">to_json(path, <span style="color: #666">*</span>, indent<span style="color: #666">=</span><span style="color: #40A070">2</span>)</code>
+
+<a href="#netbone.Pipeline.to_json" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Write this registered pipeline configuration to a JSON file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Destination JSON file path.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>indent</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON indentation level. Pass <code>None</code> for compact JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pipeline contains a custom callable
+filter, which cannot be reliably restored from JSON.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file cannot be written.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="netbone.pipeline" class="doc doc-heading">
+            <code>pipeline</code>
+
+
+<a href="#netbone.pipeline" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Pipeline configuration and execution helpers.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="netbone.pipeline.Pipeline" class="doc doc-heading">
+            <code>Pipeline</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.pipeline.Pipeline" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Immutable scoring and filtering configuration.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.compute" class="doc doc-heading">
+            <code class=" language-python">compute(graph_or_network)</code>
+
+<a href="#netbone.pipeline.Pipeline.compute" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute method statistics without applying a filter.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.describe" class="doc doc-heading">
+            <code class=" language-python">describe()</code>
+
+<a href="#netbone.pipeline.Pipeline.describe" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a compact description of the configured pipeline.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.filter" class="doc doc-heading">
+            <code class=" language-python"><span style="color: #007020">filter</span>(strategy, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.pipeline.Pipeline.filter" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a new pipeline configured with a filtering strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>strategy</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="netbone.pipeline.FilterCallable">FilterCallable</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Registered filter name or custom filter callable.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**parameters</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Filter-specific parameters.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the filter strategy is unknown.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.from_dict" class="doc doc-heading">
+            <code class=" language-python">from_dict(config)</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#netbone.pipeline.Pipeline.from_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Restore a pipeline configuration produced by <code>Pipeline.to_dict()</code>.</p>
+<p>Only registered method and filter names can be deserialized. Custom
+filter callables must be recreated in Python and attached with
+<code>Pipeline.filter(...)</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pipeline configuration mapping.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the configuration shape is invalid, a
+registered method or filter is unknown, or a custom callable
+filter is present.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.from_json" class="doc doc-heading">
+            <code class=" language-python">from_json(path)</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#netbone.pipeline.Pipeline.from_json" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Restore a registered pipeline configuration from a JSON file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON file created from <code>Pipeline.to_json(...)</code> or equivalent
+<code>Pipeline.to_dict()</code> output.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file is missing, unreadable, or invalid
+JSON.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the decoded configuration is invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.run" class="doc doc-heading">
+            <code class=" language-python">run(graph_or_network)</code>
+
+<a href="#netbone.pipeline.Pipeline.run" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute statistics, apply the filter, and return a backbone result.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pipeline has no scoring method or no
+filter strategy.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="CompatibilityError (netbone.exceptions.CompatibilityError)" href="#netbone.CompatibilityError">CompatibilityError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the selected result target cannot be
+extracted by this release.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.score" class="doc doc-heading">
+            <code class=" language-python">score(method, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.pipeline.Pipeline.score" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a new pipeline configured with a scoring method.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Registered method name.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**parameters</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Method-specific parameters.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the method is unknown.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.pipeline.Pipeline.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a JSON-compatible pipeline configuration summary.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="netbone.pipeline.Pipeline.to_json" class="doc doc-heading">
+            <code class=" language-python">to_json(path, <span style="color: #666">*</span>, indent<span style="color: #666">=</span><span style="color: #40A070">2</span>)</code>
+
+<a href="#netbone.pipeline.Pipeline.to_json" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Write this registered pipeline configuration to a JSON file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Destination JSON file path.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>indent</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON indentation level. Pass <code>None</code> for compact JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ConfigurationError (netbone.exceptions.ConfigurationError)" href="#netbone.ConfigurationError">ConfigurationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pipeline contains a custom callable
+filter, which cannot be reliably restored from JSON.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file cannot be written.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.pipeline.filter_scores" class="doc doc-heading">
+            <code class=" language-python">filter_scores(graph_or_network, method_result, strategy<span style="color: #666">=</span><span style="color: #4070A0">&#39;threshold&#39;</span>, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.pipeline.filter_scores" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Filter existing method statistics using the functional API.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.pipeline.pipeline" class="doc doc-heading">
+            <code class=" language-python">pipeline()</code>
+
+<a href="#netbone.pipeline.pipeline" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return an empty immutable pipeline.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.pipeline.score" class="doc doc-heading">
+            <code class=" language-python">score(graph_or_network, method<span style="color: #666">=</span><span style="color: #4070A0">&#39;edge_weight&#39;</span>, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.pipeline.score" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute method statistics using the functional API.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.score" class="doc doc-heading">
+            <code class=" language-python">score(graph_or_network, method<span style="color: #666">=</span><span style="color: #4070A0">&#39;edge_weight&#39;</span>, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.score" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute method statistics using the functional API.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.filter_scores" class="doc doc-heading">
+            <code class=" language-python">filter_scores(graph_or_network, method_result, strategy<span style="color: #666">=</span><span style="color: #4070A0">&#39;threshold&#39;</span>, <span style="color: #666">**</span>parameters)</code>
+
+<a href="#netbone.filter_scores" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Filter existing method statistics using the functional API.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.MethodResult" class="doc doc-heading">
+            <code>MethodResult</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.MethodResult" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Normalized statistics returned by a scoring method.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.MethodResult.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.MethodResult.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a minimal JSON-compatible summary of the method result.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.Selection" class="doc doc-heading">
+            <code>Selection</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.Selection" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>A normalized selection produced by a filter.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Selection.summary" class="doc doc-heading">
+            <code class=" language-python">summary()</code>
+
+<a href="#netbone.Selection.summary" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return counts describing this selection.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Selection.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.Selection.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a minimal JSON-compatible summary of this selection.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.BackboneResult" class="doc doc-heading">
+            <code>BackboneResult</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.BackboneResult" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Final result of applying a selection to a network.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.BackboneResult.edge_fraction" class="doc doc-heading">
+            <code class=" language-python">edge_fraction</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.BackboneResult.edge_fraction" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the fraction of original edges present in the backbone graph.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.BackboneResult.node_fraction" class="doc doc-heading">
+            <code class=" language-python">node_fraction</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.BackboneResult.node_fraction" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the fraction of original nodes present in the backbone graph.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.BackboneResult.statistics" class="doc doc-heading">
+            <code class=" language-python">statistics</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.BackboneResult.statistics" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the method statistics table used for this extraction.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.BackboneResult.summary" class="doc doc-heading">
+            <code class=" language-python">summary()</code>
+
+<a href="#netbone.BackboneResult.summary" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a compact summary of graph retention and connectivity.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.BackboneResult.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.BackboneResult.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a minimal JSON-compatible summary of the backbone result.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="errors">Errors<a class="headerlink" href="#errors" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.NetboneError" class="doc doc-heading">
+            <code>NetboneError</code>
+
+
+<a href="#netbone.NetboneError" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+
+        <p>Base class for all package-specific errors.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.ValidationError" class="doc doc-heading">
+            <code>ValidationError</code>
+
+
+<a href="#netbone.ValidationError" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="NetboneError (netbone.exceptions.NetboneError)" href="#netbone.NetboneError">NetboneError</a></code></p>
+
+
+
+        <p>Raised when input data is malformed or missing required values.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.ConfigurationError" class="doc doc-heading">
+            <code>ConfigurationError</code>
+
+
+<a href="#netbone.ConfigurationError" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="NetboneError (netbone.exceptions.NetboneError)" href="#netbone.NetboneError">NetboneError</a></code></p>
+
+
+
+        <p>Raised when a pipeline, method, or filter configuration is invalid.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.CompatibilityError" class="doc doc-heading">
+            <code>CompatibilityError</code>
+
+
+<a href="#netbone.CompatibilityError" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="NetboneError (netbone.exceptions.NetboneError)" href="#netbone.NetboneError">NetboneError</a></code></p>
+
+
+
+        <p>Raised when an input graph or result is unsupported by this release.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.UndefinedMetricError" class="doc doc-heading">
+            <code>UndefinedMetricError</code>
+
+
+<a href="#netbone.UndefinedMetricError" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="NetboneError (netbone.exceptions.NetboneError)" href="#netbone.NetboneError">NetboneError</a></code></p>
+
+
+
+        <p>Raised when a requested metric is valid but mathematically undefined.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../assets/copy-code.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

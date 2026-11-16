@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://al1yass2n.github.io/netbone/reference/networks/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Networks and loaders - Netbone</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
+        <link href="../../assets/docs.css" rel="stylesheet"> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Netbone</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Start</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../start/install/" class="dropdown-item">Install Netbone</a>
+</li>
+                                    
+<li>
+    <a href="../../start/first-backbone/" class="dropdown-item">Extract your first backbone</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Python</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../python/inputs/" class="dropdown-item">Prepare network inputs</a>
+</li>
+                                    
+<li>
+    <a href="../../python/temporal/" class="dropdown-item">Aggregate temporal interactions</a>
+</li>
+                                    
+<li>
+    <a href="../../python/select/" class="dropdown-item">Choose what to keep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/compare/" class="dropdown-item">Compare backbone results</a>
+</li>
+                                    
+<li>
+    <a href="../../python/sweep/" class="dropdown-item">Find settings with a sweep</a>
+</li>
+                                    
+<li>
+    <a href="../../python/reproduce/" class="dropdown-item">Save and reproduce an analysis</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../browser/launch/" class="dropdown-item">Run the local web app</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/first-session/" class="dropdown-item">Extract a backbone in the browser</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/import/" class="dropdown-item">Import a network</a>
+</li>
+                                    
+<li>
+    <a href="../../browser/evaluate/" class="dropdown-item">Compare and sweep</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Methods</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../methods/" class="dropdown-item">Method catalog</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_weight/" class="dropdown-item">Edge Weight</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/edge_betweenness/" class="dropdown-item">Edge Betweenness</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/disparity/" class="dropdown-item">Disparity</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/lans/" class="dropdown-item">Locally Adaptive Network Sparsification</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_salience/" class="dropdown-item">Link Salience</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction/" class="dropdown-item">Link Prediction</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/link_prediction_iforest/" class="dropdown-item">Link Prediction Isolation Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/gspar/" class="dropdown-item">GSPAR</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/maximum_spanning_forest/" class="dropdown-item">Maximum Spanning Forest</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/primary_linkage/" class="dropdown-item">Primary Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/multiple_linkage/" class="dropdown-item">Multiple Linkage</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/planar_maximally_filtered_graph/" class="dropdown-item">Planar Maximally Filtered Graph</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/h_backbone/" class="dropdown-item">H-Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/doubly_stochastic/" class="dropdown-item">Doubly Stochastic</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/marginal_likelihood/" class="dropdown-item">Marginal Likelihood</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/noise_corrected/" class="dropdown-item">Noise Corrected</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/glanb/" class="dropdown-item">Globally and Locally Adaptive Network Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_degree/" class="dropdown-item">Node Degree</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_strength/" class="dropdown-item">Node Strength</a>
+</li>
+                                    
+<li>
+    <a href="../../methods/node_betweenness/" class="dropdown-item">Node Betweenness</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../pipelines/" class="dropdown-item">Pipelines and results</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Networks and loaders</a>
+</li>
+                                    
+<li>
+    <a href="../measurement/" class="dropdown-item">Comparison, sweeps, and exports</a>
+</li>
+                                    
+<li>
+    <a href="../temporal/" class="dropdown-item">Temporal input and aggregation</a>
+</li>
+                                    
+<li>
+    <a href="../registry/" class="dropdown-item">Registry discovery</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/threshold/" class="dropdown-item">Threshold</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/fraction/" class="dropdown-item">Fraction</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/significance/" class="dropdown-item">Significance</a>
+</li>
+                                    
+<li>
+    <a href="../../filters/default/" class="dropdown-item">Method default</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Project</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../help/" class="dropdown-item">Troubleshooting</a>
+</li>
+                                    
+<li>
+    <a href="../../develop/" class="dropdown-item">Develop and publish the documentation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../pipelines/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../measurement/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/al1yass2n/netbone" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#networks-and-loaders" class="nav-link">Networks and loaders</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.Network" class="nav-link">Network</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_graph" class="nav-link">from_graph</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_edgelist" class="nav-link">from_edgelist</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.from_graphml" class="nav-link">from_graphml</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#netbone.to_undirected" class="nav-link">to_undirected</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="networks-and-loaders">Networks and loaders<a class="headerlink" href="#networks-and-loaders" title="Permanent link">&para;</a></h1>
+<p>Import these names from <code>netbone</code>. Use the loaders to create normalized
+networks and <code>Network.to_original_graph()</code> to obtain a NetworkX graph with
+input labels.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="netbone.Network" class="doc doc-heading">
+            <code>Network</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#netbone.Network" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>A normalized NetworkX graph with stable internal node and edge ids.</p>
+<p>The stored graph uses integer node identifiers. Original node ids and edge
+attributes are preserved and result graphs are exported with original node
+ids.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.Network.directed" class="doc doc-heading">
+            <code class=" language-python">directed</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.Network.directed" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return whether the normalized graph is directed.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.Network.edge_count" class="doc doc-heading">
+            <code class=" language-python">edge_count</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.Network.edge_count" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the number of edges in the normalized graph.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.Network.multigraph" class="doc doc-heading">
+            <code class=" language-python">multigraph</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.Network.multigraph" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return whether the normalized graph is a multigraph.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.Network.node_count" class="doc doc-heading">
+            <code class=" language-python">node_count</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.Network.node_count" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the number of nodes in the normalized graph.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="netbone.Network.weighted" class="doc doc-heading">
+            <code class=" language-python">weighted</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#netbone.Network.weighted" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return whether any edge has a <code>weight</code> attribute.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Network.summary" class="doc doc-heading">
+            <code class=" language-python">summary()</code>
+
+<a href="#netbone.Network.summary" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a small JSON-compatible summary of the network.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Network.to_dict" class="doc doc-heading">
+            <code class=" language-python">to_dict()</code>
+
+<a href="#netbone.Network.to_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a minimal JSON-compatible summary of this network.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="netbone.Network.to_original_graph" class="doc doc-heading">
+            <code class=" language-python">to_original_graph(<span style="color: #666">*</span>, node_ids<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, edge_ids<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, drop_isolates<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+
+<a href="#netbone.Network.to_original_graph" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a new NetworkX graph using original node ids.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>node_ids</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="int">int</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional internal node ids to include. When omitted, all
+nodes are eligible unless <code>edge_ids</code> and <code>drop_isolates=True</code>
+restrict them.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>edge_ids</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="int">int</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional internal edge ids to include. When omitted, all
+edges between included nodes are included.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>drop_isolates</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to omit nodes without retained incident
+edges.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If unknown node or edge ids are requested.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.from_graph" class="doc doc-heading">
+            <code class=" language-python">from_graph(graph, <span style="color: #666">*</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+
+<a href="#netbone.from_graph" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Normalize a simple NetworkX graph into a <code>Network</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>graph</code>
+            </td>
+            <td>
+                  <code><span title="networkx.Graph">Graph</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A simple <code>networkx.Graph</code> or <code>networkx.DiGraph</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional user-supplied context retained in result metadata.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="CompatibilityError (netbone.exceptions.CompatibilityError)" href="../pipelines/#netbone.CompatibilityError">CompatibilityError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the graph type is unsupported.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If reserved internal attributes are present.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.from_edgelist" class="doc doc-heading">
+            <code class=" language-python">from_edgelist(path, <span style="color: #666">*</span>, source<span style="color: #666">=</span><span style="color: #4070A0">&#39;source&#39;</span>, target<span style="color: #666">=</span><span style="color: #4070A0">&#39;target&#39;</span>, weight<span style="color: #666">=</span><span style="color: #4070A0">&#39;weight&#39;</span>, delimiter<span style="color: #666">=</span><span style="color: #4070A0">&#39;,&#39;</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>, directed<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">False</span>)</code>
+
+<a href="#netbone.from_edgelist" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Load a CSV or delimiter-separated edge list into a <code>Network</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File path to read.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>source</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column containing source node ids.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;source&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>target</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column containing target node ids.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;target&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional column containing numeric edge weights. When provided,
+values are stored on edges as the canonical <code>weight</code> attribute.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;weight&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>delimiter</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Field delimiter, defaulting to comma.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;,&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional user-supplied context retained in result metadata.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>directed</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether source-to-target order defines directed arcs. When
+false, reversed rows are duplicate undirected edges.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If required columns are missing, ids are missing, edge
+weights are invalid, or duplicate simple-graph edges are present.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.from_graphml" class="doc doc-heading">
+            <code class=" language-python">from_graphml(path, <span style="color: #666">*</span>, context<span style="color: #666">=</span><span style="color: #007020; font-weight: bold">None</span>)</code>
+
+<a href="#netbone.from_graphml" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Load a GraphML file into a validated <code>Network</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>GraphML file path to read.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional user-supplied context retained in result metadata.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file does not exist or cannot be parsed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="CompatibilityError (netbone.exceptions.CompatibilityError)" href="../pipelines/#netbone.CompatibilityError">CompatibilityError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the loaded graph type is unsupported by this
+release.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="netbone.to_undirected" class="doc doc-heading">
+            <code class=" language-python">to_undirected(graph_or_network, <span style="color: #666">*</span>, weight, reciprocal_merge)</code>
+
+<a href="#netbone.to_undirected" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return a deterministic undirected projection of a directed network.</p>
+<p>One-way arcs become undirected edges without changing their attributes.
+When both arc directions exist, the selected finite numeric weight is
+combined with <code>reciprocal_merge</code>. Equal other attributes are retained;
+conflicting or missing values are stored as directional provenance on the
+projected edge.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>graph_or_network</code>
+            </td>
+            <td>
+                  <code><span title="networkx.Graph">Graph</span> | <a class="autorefs autorefs-internal" title="Network
+
+
+  
+      dataclass
+   (netbone.network.Network)" href="#netbone.Network">Network</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directed simple NetworkX graph or normalized network.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weight</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Edge attribute to combine on reciprocal arcs, or <code>None</code> for
+an unweighted projection.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>reciprocal_merge</code>
+            </td>
+            <td>
+                  <code><span title="netbone.network.ReciprocalMerge">ReciprocalMerge</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Rule used for the selected weight on reciprocal arcs:
+<code>"sum"</code>, <code>"mean"</code>, <code>"max"</code>, or <code>"min"</code>. Must be <code>None</code>
+when <code>weight</code> is <code>None</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ValidationError (netbone.exceptions.ValidationError)" href="../pipelines/#netbone.ValidationError">ValidationError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the input is undirected or the merge rule is
+unsupported.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../assets/copy-code.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
