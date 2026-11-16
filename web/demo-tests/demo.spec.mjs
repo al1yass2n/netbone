@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-test("the real workbench compares, changes and exports precomputed Karate Club runs", async ({ page }) => {
+test("the real workbench compares, changes and exports precomputed Karate Club runs", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const apiRequests = [];
   const errors = [];
   page.on("request", (request) => {
@@ -13,6 +14,11 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await page.goto("./browser/sample-demo/");
   await page.getByRole("link", { name: "Open the web demo" }).click();
   await expect(page.getByRole("heading", { name: "Zachary’s Karate Club" })).toBeVisible();
+  await page.getByRole("button", { name: "Copy BibTeX" }).click();
+  await expect(page.getByText("BibTeX copied", { exact: true })).toBeVisible();
+  const citation = await page.evaluate(() => navigator.clipboard.readText());
+  expect(citation).toMatch(/^@article\{yassin2023netbone,/);
+  expect(citation).toContain("doi = {10.1038/s41598-023-42076-3}");
   await expect(page.getByRole("button", { name: "Network settings" })).toHaveCount(0);
   await expect(page.getByLabel("Retained fraction")).toHaveValue("0.25");
   const networkPreview = page.getByRole("region", { name: "Network preview" });
@@ -38,10 +44,22 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspection = page.getByRole("dialog", { name: "Inspect & export" });
   await expect(inspection.getByRole("table", { name: "Method statistics" })).toBeVisible();
-  await inspection.getByRole("combobox", { name: "Graph", exact: true }).selectOption("backbone");
+  const inspectTab = inspection.getByRole("tab", { name: "Inspect" });
+  await expect(inspectTab).toHaveAttribute("aria-selected", "true");
+  await inspection.getByText("View run settings", { exact: true }).click();
+  const settings = page.waitForEvent("download");
+  await inspection.getByRole("button", { name: "Download settings (JSON)" }).click();
+  expect((await settings).suggestedFilename()).toBe("netbone-pipeline.json");
+  await inspectTab.press("ArrowRight");
+  await expect(inspection.getByRole("tab", { name: "Export" })).toBeFocused();
+  await expect(inspection.getByRole("table", { name: "Method statistics" })).toBeHidden();
+  await expect(inspection.getByRole("combobox", { name: "Graph", exact: true })).toHaveValue("backbone");
   const graph = page.waitForEvent("download");
   await inspection.getByRole("button", { name: "Download GraphML" }).click();
   expect((await graph).suggestedFilename()).toMatch(/\.graphml$/);
+  const extractionZip = page.waitForEvent("download");
+  await inspection.getByRole("button", { name: "Download ZIP" }).click();
+  expect((await extractionZip).suggestedFilename()).toMatch(/\.zip$/);
 
   expect(apiRequests).toEqual([]);
   expect(errors).toEqual([]);

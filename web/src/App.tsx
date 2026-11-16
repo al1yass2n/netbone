@@ -9,7 +9,6 @@ import {
   CircleAlert,
   Clock3,
   Download,
-  FileJson,
   GitCompareArrows,
   LoaderCircle,
   Moon,
@@ -20,11 +19,13 @@ import {
   Settings2,
   SlidersHorizontal,
   Sun,
+  Table2,
   Upload,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { api, downloadExperiment, downloadGraph, downloadJson } from "./api";
+import { CitationFooter } from "./components/CitationFooter";
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
 import { ControlField } from "./components/ControlField";
 import { Hint } from "./components/Hint";
@@ -502,10 +503,7 @@ export default function App() {
           event.target.value = "";
         }}
       />}
-      <footer className="citation-footer">
-        <a href="https://doi.org/10.1038/s41598-023-42076-3">Cite Netbone</a>
-        <span>Yassin et al. · Scientific Reports (2023)</span>
-      </footer>
+      <CitationFooter />
     </div>
   );
 }
@@ -806,6 +804,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
   const filterDialog = useRef<HTMLDialogElement>(null);
   const settingsDialog = useRef<HTMLDialogElement>(null);
   const resultDialog = useRef<HTMLDialogElement>(null);
+  const [resultTab, setResultTab] = useState<ResultTab>("inspect");
   const previousScore = useRef(props.score);
   const {
     schema, data, context, preview, previewBusy, mappingReviewPending, onMappingReviewFinished,
@@ -1093,7 +1092,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           <div className="analysis-actions">
             {score && filterChosen && <>
               <button className="button button--save" disabled={busy !== "" || saved || !draftReady} onClick={() => void onMaterialize(true)}>{busy === "filter" ? <LoaderCircle className="spin" size={17} /> : saved ? <Check size={17} /> : <Plus size={17} />} {saved ? "Backbone saved" : "Save this backbone"}</button>
-              <button className="button button--inspect" disabled={busy !== "" || !draftReady} onClick={() => { resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
+              <button className="button button--inspect" disabled={busy !== "" || !draftReady} onClick={() => { setResultTab("inspect"); resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
             </>}
             {!demoMode && networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button button--explore" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
             {savedCount >= 2 && <button className="button button--compare" disabled={busy !== ""} onClick={onCompare}><GitCompareArrows size={16} /> Compare</button>}
@@ -1102,7 +1101,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
       </footer>}
       <dialog className="workbench-dialog result-details-dialog" ref={resultDialog} aria-labelledby="result-title">
         <header><h2 id="result-title">Inspect &amp; export</h2><button className="button button--quiet" onClick={() => resultDialog.current?.close()}>Close</button></header>
-        {result && method ? <ResultDetails key={result.result_id} result={result} method={method} /> : <p role={error ? "alert" : "status"}>{error || "Preparing the backbone…"}</p>}
+        {result && method ? <ResultDetails key={result.result_id} result={result} method={method} tab={resultTab} onTab={setResultTab} /> : <p role={error ? "alert" : "status"}>{error || "Preparing the backbone…"}</p>}
       </dialog>
       <span className="visually-hidden" role="status" aria-atomic="true">{message}</span>
     </main>
@@ -1114,9 +1113,17 @@ function openFilterPicker(dialog: HTMLDialogElement | null) {
   dialog?.querySelector<HTMLButtonElement>("[data-initial-focus]")?.focus();
 }
 
-function ResultDetails({ result, method }: { result: ExtractionResponse; method: MethodSpec }) {
+const resultTabs = ["inspect", "export"] as const;
+type ResultTab = (typeof resultTabs)[number];
+
+function ResultDetails({ result, method, tab, onTab }: {
+  result: ExtractionResponse;
+  method: MethodSpec;
+  tab: ResultTab;
+  onTab: (tab: ResultTab) => void;
+}) {
   const [format, setFormat] = useState<"graphml" | "gexf">("graphml");
-  const [scope, setScope] = useState<"annotated" | "backbone">("annotated");
+  const [scope, setScope] = useState<"annotated" | "backbone">("backbone");
   const [exportError, setExportError] = useState("");
   const [preparingBundle, setPreparingBundle] = useState(false);
   const [bundleError, setBundleError] = useState("");
@@ -1134,52 +1141,69 @@ function ResultDetails({ result, method }: { result: ExtractionResponse; method:
   }
   return (
     <div className="result-details">
-      <div className="result-export-options" aria-label="Export options" role="group">
-        <section className="result-export-card">
-          <div className="result-export-heading">
-            <Network size={20} aria-hidden="true" />
-            <h3>Download graph</h3>
-          </div>
-          <div className="field-grid">
-            <label className="field"><span>Graph</span><select value={scope} onChange={(event) => setScope(event.target.value as typeof scope)}><option value="backbone">Backbone only</option><option value="annotated">Annotated original</option></select></label>
-            <label className="field"><span>Format</span><select value={format} onChange={(event) => setFormat(event.target.value as typeof format)}><option value="graphml">GraphML</option><option value="gexf">GEXF for Gephi</option></select></label>
-          </div>
-          <button className="button button--export export-card-download" onClick={() => {
-            setExportError("");
-            void downloadGraph(result.result_id, format, scope).catch((reason: unknown) => setExportError(errorMessage(reason)));
-          }}><Download size={16} aria-hidden="true" /> Download {format === "graphml" ? "GraphML" : "GEXF"}</button>
-          {exportError && <p className="error-text" role="alert">{exportError}</p>}
-        </section>
-        <section className="result-export-card">
-          <div className="result-export-heading">
-            <FileJson size={20} aria-hidden="true" />
-            <h3>Reproduce this analysis</h3>
-          </div>
-          <p>Save the method, filter, and settings used for this run.</p>
-          <details className="advanced-options resolved-config"><summary>View settings</summary><pre tabIndex={0}>{JSON.stringify(result.resolved_config, null, 2)}</pre></details>
-          <button className="button button--export export-card-download" onClick={() => downloadJson(result.resolved_config, "netbone-pipeline.json")}><Download size={16} /> Download JSON</button>
-        </section>
-        <section className="result-export-card result-export-card--experiment">
-          <div className="result-export-heading">
-            <Archive size={20} aria-hidden="true" />
-            <h3>Export full experiment</h3>
-          </div>
-          <ul className="result-experiment-contents">
-            <li><Check size={16} aria-hidden="true" /> Backbone and annotated graph</li>
-            <li><Check size={16} aria-hidden="true" /> Statistics and pipeline settings</li>
-            <li><Check size={16} aria-hidden="true" /> Report and file manifest</li>
-          </ul>
-          <button type="button" className="button button--export export-card-download" disabled={preparingBundle} onClick={() => void exportExperiment()}>
-            {preparingBundle ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
-            {preparingBundle ? "Preparing ZIP…" : "Download ZIP"}
-          </button>
-          <span className="visually-hidden" role="status">{preparingBundle ? "Preparing the experiment ZIP." : ""}</span>
-          {bundleError && <p className="error-text" role="alert">{bundleError}</p>}
-        </section>
+      <div className="result-tab-bar">
+        <div className="result-mode-tabs" role="tablist" aria-label="Backbone result" onKeyDown={(event) => {
+          let next: ResultTab;
+          if (event.key === "Home") next = "inspect";
+          else if (event.key === "End") next = "export";
+          else if (event.key === "ArrowLeft" || event.key === "ArrowRight") next = tab === "inspect" ? "export" : "inspect";
+          else return;
+          event.preventDefault();
+          onTab(next);
+          event.currentTarget.querySelector<HTMLButtonElement>(`#result-tab-${next}`)?.focus();
+        }}>
+          {resultTabs.map((item) => (
+            <button key={item} type="button" role="tab" id={`result-tab-${item}`} aria-controls={`result-panel-${item}`} aria-selected={tab === item} tabIndex={tab === item ? 0 : -1} onClick={() => onTab(item)}>
+              {item === "inspect" ? <Table2 size={17} aria-hidden="true" /> : <Download size={17} aria-hidden="true" />}
+              {item === "inspect" ? "Inspect" : "Export"}
+            </button>
+          ))}
+        </div>
       </div>
-      <section className="result-statistics">
-        <StatisticsTable heading="Inspect statistics" records={result.statistics} primaryStatistic={method.primary_statistic} filename={`${method.name}-statistics.csv`} />
-      </section>
+      <div id="result-panel-inspect" role="tabpanel" aria-labelledby="result-tab-inspect" hidden={tab !== "inspect"}>
+        <section className="result-statistics">
+          <StatisticsTable heading="Method statistics" records={result.statistics} primaryStatistic={method.primary_statistic} filename={`${method.name}-statistics.csv`} />
+        </section>
+        <details className="advanced-options resolved-config result-run-settings">
+          <summary>View run settings</summary>
+          <div className="result-settings-actions">
+            <button type="button" className="button button--export" onClick={() => downloadJson(result.resolved_config, "netbone-pipeline.json")}><Download size={16} aria-hidden="true" /> Download settings (JSON)</button>
+          </div>
+          <pre tabIndex={0}>{JSON.stringify(result.resolved_config, null, 2)}</pre>
+        </details>
+      </div>
+      <div id="result-panel-export" role="tabpanel" aria-labelledby="result-tab-export" hidden={tab !== "export"}>
+        <div className="result-export-options" aria-label="Export options" role="group">
+          <section className="result-export-card">
+            <div className="result-export-heading">
+              <Network size={20} aria-hidden="true" />
+              <h3>Graph</h3>
+            </div>
+            <div className="field-grid">
+              <label className="field"><span>Graph</span><select value={scope} onChange={(event) => setScope(event.target.value as typeof scope)}><option value="backbone">Backbone only</option><option value="annotated">Annotated original</option></select></label>
+              <label className="field"><span>Format</span><select value={format} onChange={(event) => setFormat(event.target.value as typeof format)}><option value="graphml">GraphML</option><option value="gexf">GEXF for Gephi</option></select></label>
+            </div>
+            <button className="button button--export export-card-download" onClick={() => {
+              setExportError("");
+              void downloadGraph(result.result_id, format, scope).catch((reason: unknown) => setExportError(errorMessage(reason)));
+            }}><Download size={16} aria-hidden="true" /> Download {format === "graphml" ? "GraphML" : "GEXF"}</button>
+            {exportError && <p className="error-text" role="alert">{exportError}</p>}
+          </section>
+          <section className="result-export-card result-export-card--experiment">
+            <div className="result-export-heading">
+              <Archive size={20} aria-hidden="true" />
+              <h3>Full experiment</h3>
+            </div>
+            <p>Both graphs, statistics, run settings, and a report in one ZIP.</p>
+            <button type="button" className="button button--export export-card-download" disabled={preparingBundle} onClick={() => void exportExperiment()}>
+              {preparingBundle ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
+              {preparingBundle ? "Preparing ZIP…" : "Download ZIP"}
+            </button>
+            <span className="visually-hidden" role="status">{preparingBundle ? "Preparing the experiment ZIP." : ""}</span>
+            {bundleError && <p className="error-text" role="alert">{bundleError}</p>}
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

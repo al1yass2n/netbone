@@ -65,6 +65,7 @@ test("an unweighted CSV blocks weight-only methods and extracts with Node Degree
   const table = inspect.getByRole("table", { name: "Method statistics" });
   await expect(table.getByRole("columnheader", { name: "Node", exact: true })).toBeVisible();
   await expect(table.getByRole("columnheader", { name: "Weight", exact: true })).toHaveCount(0);
+  await inspect.getByRole("tab", { name: "Export" }).click();
   await expectZip(page, inspect.getByRole("button", { name: "Download ZIP" }), "netbone-node-degree-experiment.zip");
   await inspect.getByRole("button", { name: "Close" }).click();
   await compareAndSweep(page);
@@ -90,8 +91,9 @@ test("a directed temporal example aggregates events and enables Disparity", asyn
   await expect(undirectedOnly).toContainText("Not available for directed networks");
   const inspect = await selectAndInspect(page, methods.getByRole("button", { name: /^Disparity / }), /^Significance/);
   await expect(inspect.getByRole("columnheader", { name: "Weight", exact: true })).toBeVisible();
-  await inspect.getByText("View settings", { exact: true }).click();
+  await inspect.getByText("View run settings", { exact: true }).click();
   await expect(inspect.locator("pre")).toContainText('"temporal_aggregation"');
+  await inspect.getByRole("tab", { name: "Export" }).click();
   await expectZip(page, inspect.getByRole("button", { name: "Download ZIP" }), "netbone-disparity-experiment.zip");
   await inspect.getByRole("button", { name: "Close" }).click();
   await page.getByRole("button", { name: "Change filter" }).click();
@@ -112,7 +114,7 @@ test("Noise Corrected applies the published cutoff and allows it to be changed",
   await cutoff.fill("2.32");
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
-  await inspect.getByText("View settings", { exact: true }).click();
+  await inspect.getByText("View run settings", { exact: true }).click();
   const configuration = JSON.parse(await inspect.locator("pre").textContent());
   expect(configuration.filter.parameters).toMatchObject({ value: 2.32, operator: "greater" });
 });

@@ -28,6 +28,17 @@ test("extract, compare and sweep backbones and download their experiments", asyn
   await expect(table.getByRole("columnheader", { name: "Source", exact: true })).toBeVisible();
   await expect(table.getByRole("columnheader", { name: "Target", exact: true })).toBeVisible();
   await expect(table.getByRole("columnheader", { name: "Weight", exact: true })).toBeVisible();
+  const inspectTab = inspect.getByRole("tab", { name: "Inspect" });
+  const exportTab = inspect.getByRole("tab", { name: "Export" });
+  await expect(inspectTab).toHaveAttribute("aria-selected", "true");
+  await expect(inspect.getByRole("button", { name: "Download ZIP" })).toBeHidden();
+  await inspect.getByText("View run settings", { exact: true }).click();
+  const settingsDownload = page.waitForEvent("download");
+  await inspect.getByRole("button", { name: "Download settings (JSON)" }).click();
+  expect((await settingsDownload).suggestedFilename()).toBe("netbone-pipeline.json");
+  await inspectTab.press("ArrowRight");
+  await expect(exportTab).toBeFocused();
+  await expect(table).toBeHidden();
   await expectZip(page, inspect.getByRole("button", { name: "Download ZIP" }), "netbone-edge-weight-experiment.zip");
   await page.keyboard.press("Escape");
   await expect(inspect).toBeHidden();

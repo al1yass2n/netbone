@@ -25,4 +25,8 @@ The demo loads precomputed Netbone results, including the statistics and
 downloads, for this dataset and its available settings. Use the
 [local web app](launch.md) to import your own file.
 
+Open **Inspect & export** to explore the method statistics, download run
+settings, or export a graph or experiment ZIP. Use **Copy BibTeX** in the
+footer to copy the Netbone citation.
+
 [Karate Club dataset](https://networkx.org/documentation/stable/reference/generated/networkx.generators.social.karate_club_graph.html)

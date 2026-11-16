@@ -12,8 +12,8 @@ interface StatisticsTableProps {
 
 export function StatisticsTable({ records, filename, primaryStatistic = "score", heading }: StatisticsTableProps) {
   const available = new Set(records.flatMap((record) => Object.keys(record)));
-  const first = [...new Set(["source", "target", "node", "weight", primaryStatistic])];
-  const last = ["retained", "edge_id", "source_id", "target_id", "node_id"];
+  const first = [...new Set(["source", "target", "node", "weight", primaryStatistic, "retained"])];
+  const last = ["edge_id", "source_id", "target_id", "node_id"];
   const columns = [...first, ...[...available].filter((column) => !first.includes(column) && !last.includes(column)), ...last]
     .filter((column) => available.has(column));
   return (
