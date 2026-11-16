@@ -1,129 +1,36 @@
 # Link Prediction Isolation Forest
 
-`link_prediction_iforest` scores observed edges by how unusual their selected
-link-prediction similarities are. It supports one similarity or a combination
-of similarities and uses scikit-learn's Isolation Forest as an optional
-second-stage scorer.
+Registered name `link_prediction_iforest`
 
-## Contract
+Fits scikit-learn's Isolation Forest to one or more edge similarity features.
+Higher scores identify edges that are more unusual in the chosen feature space.
+Install the [ml extra](../start/install.md#optional-tools). Retention is set by
+the Netbone filter.
 
-- **Name:** `link_prediction_iforest`
-- **Target:** edge
-- **Output type:** score
-- **Primary statistic:** `link_prediction_iforest_score`
-- **Preferred direction:** higher
-- **Default filter:** retained fraction `0.1`
-- **Directed input:** supported with the base Link Prediction method's ordered
-  semantics
-- **Optional dependency:** `netbone[ml]`
+Pass `similarities` as one name or a sequence of the
+[Link Prediction](link_prediction.md) similarity names. The method shares the
+`weight`, `weight_alpha`, `distance_transform`, and `epsilon` options. Model
+controls default to `n_estimators=100`, `max_samples="auto"`,
+`max_features=1.0`, `bootstrap=False`, and `random_state=0`. Inspect warnings
+if the selected features give identical values across edges.
 
-The method negates scikit-learn's `score_samples` output. Larger Netbone scores
-therefore mean more anomalous feature vectors. An edge may be anomalous because
-its similarities are unusually low, unusually high, or unusual in combination.
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `link_prediction_iforest_score` | higher | Supported | Positive when weighted |
 
-The method does not use Isolation Forest's contamination classification.
-Backbone extraction remains separate and uses Netbone's `fraction` or
-`threshold` filters.
+## Run the method
 
-## Similarity Features
-
-Pass one similarity name as a string:
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
 ```python
-scores = nb.score(
-    network,
-    method="link_prediction_iforest",
-    similarities="preferential_attachment",
-)
-```
-
-Pass an ordered list to fit a multivariate Isolation Forest:
-
-```python
-scores = nb.score(
-    network,
-    method="link_prediction_iforest",
-    similarities=[
-        "preferential_attachment",
-        "shortest_path",
-        "local_path",
-    ],
-    epsilon=0.25,
+candidate = nb.pipeline().score(
+    "link_prediction_iforest",
+    similarities=["preferential_attachment", "shortest_path"],
     random_state=0,
 )
+result = candidate.filter("fraction", fraction=0.5).run(graph)
+print(result.summary())
 ```
 
-Supported similarities are `preferential_attachment`, `shortest_path`, and
-`local_path`. Their definitions and weighted behavior are the same as in
-[`link_prediction`](link_prediction.md). `epsilon` applies only when
-`local_path` is selected.
-
-For directed input, every feature uses the same directed definition as the
-base scorer: source-out/target-in Preferential Attachment and forward
-source-to-target Shortest Path and Local Path. Reciprocal arcs are separate
-observations for Isolation Forest and may receive different anomaly scores.
-
-## Filtering
-
-Keep a fraction of the most anomalous edges:
-
-```python
-result = (
-    nb.pipeline()
-    .score(
-        "link_prediction_iforest",
-        similarities=["preferential_attachment", "shortest_path"],
-    )
-    .filter("fraction", fraction=0.1)
-    .run(network)
-)
-```
-
-Or apply an explicit anomaly-score threshold:
-
-```python
-result = (
-    nb.pipeline()
-    .score(
-        "link_prediction_iforest",
-        similarities="local_path",
-    )
-    .filter("threshold", value=0.6, operator="greater_equal")
-    .run(network)
-)
-```
-
-Inspect observed scores before choosing a threshold; their scale depends on the
-fitted network and selected features.
-
-## Isolation Forest Parameters
-
-- `n_estimators=100`: number of isolation trees;
-- `max_samples="auto"`: samples used to fit each tree;
-- `max_features=1.0`: features considered by each tree;
-- `bootstrap=False`: whether tree samples use replacement;
-- `random_state=0`: deterministic random seed.
-
-`contamination` is intentionally not exposed because it would combine scoring
-and selection. Use Netbone filters to control the retained backbone.
-
-## Statistics
-
-The statistics table contains edge identity columns, one input column per
-selected similarity, and the primary anomaly score. For example:
-
-- `link_prediction_iforest_preferential_attachment_similarity`
-- `link_prediction_iforest_shortest_path_similarity`
-- `link_prediction_iforest_local_path_similarity`
-- `link_prediction_iforest_score`
-
-Identical feature vectors produce tied anomaly scores. Fraction-filter tie
-behavior is controlled by the selected `tie_policy`.
-
-## References
-
-- Yassin, Cherifi, Seba, and Togni, *Integrating Link Prediction and Isolation
-  Forest for Backbone Extraction*, WAW 2025, LNCS 15699, pp. 189-204,
-  DOI [`10.1007/978-3-031-92898-7_13`](https://doi.org/10.1007/978-3-031-92898-7_13).
-- Liu, Ting, and Zhou, *Isolation Forest*, IEEE ICDM (2008),
-  DOI `10.1109/ICDM.2008.17`.
+[Algorithm reference](https://doi.org/10.1007/978-3-031-92898-7_13)

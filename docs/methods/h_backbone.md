@@ -1,42 +1,29 @@
 # H-Backbone
 
-`h_backbone` marks edges whose weight or bridge score passes an h-index style
-threshold.
+Registered name `h_backbone`
 
-## Summary
+Finds two h-index cutoffs, one over raw weights and one over unnormalized edge
+betweenness divided by the number of nodes. A link is marked if it meets at
+least one positive cutoff. This combines raw strength with a shortest-path
+measure of bridging.
 
-- **Name:** `h_backbone`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `h_backbone_selected`
-- **Preferred direction:** `higher`
-- **Weighted input:** required
-- **Positive weights:** required
-- **Default filter:** `threshold`, `value=1.0`, `operator="equal"`
-- **Default distance transform:** `inverse`
+Use `weight="weight"` (default) and `distance_transform="inverse"` for
+strengths or `"identity"` for path distances. Inspect `h_backbone_h_strength`
+and `h_backbone_h_bridge` in the score table for the chosen cutoffs.
 
-## Definition
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `h_backbone_selected` | higher | Unsupported | Positive |
 
-Netbone computes:
+## Run the method
 
-- an h-strength threshold from edge weights;
-- edge betweenness centrality divided by node count as `h_backbone_bridge`;
-- an h-bridge threshold from bridge values.
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-An edge is selected when it passes either positive threshold. The
-`distance_transform` parameter controls how weights are interpreted for shortest
-paths: `inverse` treats weights as strengths, while `identity` treats them as
-distances.
+```python
+candidate = nb.pipeline().score("h_backbone", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
+```
 
-## Output
-
-- `h_backbone_weight`
-- `h_backbone_bridge`
-- `h_backbone_h_strength`
-- `h_backbone_h_bridge`
-- `h_backbone_selected`
-
-## Reference
-
-Zhang, R. J., Stanley, H. E., and Ye, F. Y. (2018). DOI:
-`10.1038/s41598-018-32430-1`.
+[Algorithm reference](https://doi.org/10.1038/s41598-018-32430-1)

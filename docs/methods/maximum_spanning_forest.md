@@ -1,73 +1,28 @@
 # Maximum Spanning Forest
 
-`maximum_spanning_forest` marks the edges selected by a deterministic maximum
-spanning forest. It is a connectivity-preserving baseline rather than a
-statistical p-value method.
+Registered name `maximum_spanning_forest`
 
-## Summary
+Adds edges in descending weight order, skipping additions that would create a
+cycle. The result spans each original connected component. Use this to retain
+connectivity with a minimum number of links, at the cost of removing every
+cycle.
 
-- **Name:** `maximum_spanning_forest`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `maximum_spanning_forest_selected`
-- **Preferred direction:** `higher`
-- **Supported graphs:** simple undirected NetworkX graphs
-- **Weighted input:** optional
-- **Default weight attribute:** `weight`
-- **Default tie policy:** stable internal `edge_id` order
-- **Default filter:** `threshold`, `value=1.0`, `operator="equal"`
-- **Multigraph support:** no
-- **Directed graph support:** no
+The weight attribute defaults to `"weight"`. Pass `weight=None` to give each
+edge the same weight. Equal weights are ordered by internal `edge_id`. The
+primary statistic is a 1/0 membership flag. Use the default filter to extract
+marked edges.
 
-## Definition
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `maximum_spanning_forest_selected` | higher | Unsupported | Finite numeric or unit weights |
 
-The method applies Kruskal-style maximum spanning forest selection:
+## Run the method
 
-```text
-1. Sort edges by descending weight.
-2. Break equal-weight ties by stable internal edge_id.
-3. Keep an edge if it connects two previously disconnected components.
-4. Reject an edge if it would create a cycle.
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
+
+```python
+candidate = nb.pipeline().score("maximum_spanning_forest", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
 ```
-
-For disconnected input graphs, the result is a maximum spanning tree inside
-each connected component.
-
-## Parameters
-
-- `weight`: edge attribute name containing finite numeric weights. Defaults to
-  `"weight"`. Pass `None` to treat every edge as weight `1.0`.
-
-## Output
-
-`maximum_spanning_forest` returns one row per edge:
-
-- `edge_id`
-- `source_id`
-- `target_id`
-- `source`
-- `target`
-- `maximum_spanning_forest_weight`
-- `maximum_spanning_forest_order`
-- `maximum_spanning_forest_selected`
-
-`maximum_spanning_forest_selected` is `1.0` for selected forest edges and
-`0.0` for rejected edges. `maximum_spanning_forest_order` records the order in
-which selected edges entered the forest and is missing for rejected edges.
-
-## Validation
-
-The method raises `ValidationError` when a configured weight attribute is
-missing, non-numeric, boolean, infinite, or NaN. Negative weights are allowed
-because maximum spanning forests are still well-defined for finite signed
-weights.
-
-## Interpretation
-
-The extracted forest preserves component-level connectivity with as few edges
-as possible. This can be useful as a deterministic baseline, but it deliberately
-removes all cycle-forming edges, including edges that may be meaningful under
-local or shortest-path-based methods.
-
-If tied weights affect which edges are kept, Netbone emits a warning and breaks
-ties by stable internal `edge_id` order.

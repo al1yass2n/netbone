@@ -1,35 +1,28 @@
 # GSPAR
 
-`gspar` scores each edge by the Jaccard similarity of its endpoints' open
-neighborhoods. The name follows the GSPAR/global-sparsification convention, but
-the output column names make the Jaccard statistic explicit.
+Registered name `gspar`
 
-## Summary
+Ranks links by the Jaccard similarity of their endpoints' open neighborhoods,
+the count of common neighbors divided by the count of distinct neighbors. A
+higher value indicates more shared neighbors. The scorer takes no method
+parameters. Use a fraction filter to control how much the global ranking keeps
+and report the realized fraction when scores tie.
 
-- **Name:** `gspar`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `gspar_jaccard_similarity`
-- **Preferred direction:** `higher`
-- **Weighted input:** not required
-- **Default filter:** `fraction`, `fraction=0.1`
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `gspar_jaccard_similarity` | higher | Unsupported | Weights ignored |
 
-## Definition
+## Run the method
 
-For edge `(i, j)`, Netbone computes:
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-```text
-gspar_jaccard_similarity = |N(i) intersection N(j)| / |N(i) union N(j)|
+```python
+candidate = nb.pipeline().score("gspar")
+result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").run(
+    graph
+)
+print(result.summary())
 ```
 
-where `N(i)` is the open neighborhood containing the neighbors of node `i`.
-
-## Output
-
-The method returns one row per edge with `edge_id`, endpoint identifiers, and
-`gspar_jaccard_similarity`.
-
-## Reference
-
-Satuluri, V., Parthasarathy, S., and Ruan, Y. (2011). Local graph sparsification
-for scalable clustering. DOI: `10.1145/1989323.1989399`.
+[Algorithm reference](https://doi.org/10.1145/1989323.1989399)

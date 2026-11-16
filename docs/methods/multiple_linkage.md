@@ -1,43 +1,28 @@
-# Multiple Linkage Analysis
+# Multiple Linkage
 
-`multiple_linkage` marks a locally chosen prefix of each node's strongest
-incident edges. It generalizes primary linkage by allowing more than one edge
-from a node when the local weight distribution supports it.
+Registered name `multiple_linkage`
 
-## Summary
+Fits a local set of strongest links for each node. It orders positive incident
+weights, compares their weight shares to equal-share top-k patterns, and uses
+the prefix with the best fit. An edge is marked if either endpoint selects it.
 
-- **Name:** `multiple_linkage`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `multiple_linkage_selected`
-- **Preferred direction:** `higher`
-- **Weighted input:** required
-- **Non-negative weights:** required
-- **Default filter:** `threshold`, `value=1.0`, `operator="equal"`
-- **Tie policy:** stable internal `edge_id`
+`weight="weight"` names the non-negative numeric attribute. Zero-weight rows
+remain in the statistics and are excluded from the local fit. Equal weights use
+internal `edge_id` ordering.
 
-## Definition
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `multiple_linkage_selected` | higher | Unsupported | Non-negative |
 
-For each node:
+## Run the method
 
-1. Exclude zero-weight incident edges from the local flow distribution.
-2. Normalize remaining positive incident edge weights into percentages.
-3. Sort incident edges by descending normalized weight, then stable `edge_id`.
-4. Compare the observed distribution to every ideal top-`k` equal-share
-   distribution using squared correlation.
-5. Select the prefix with the globally largest coefficient of determination.
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-An edge is selected when at least one endpoint selects it. Zero-weight edges are
-reported in the statistics table for graph alignment, but they are not included
-in local MLAM distributions and cannot be selected.
+```python
+candidate = nb.pipeline().score("multiple_linkage", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
+```
 
-## Output
-
-- `multiple_linkage_weight`
-- `multiple_linkage_endpoint_count`
-- `multiple_linkage_selected`
-
-## Reference
-
-Nocaj, A., Ortmann, M., and Brandes, U. (2009). DOI:
-`10.1111/j.1467-9663.2009.00547.x`.
+[Algorithm reference](https://doi.org/10.1111/j.1467-9663.2009.00547.x)

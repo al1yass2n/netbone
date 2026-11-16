@@ -42,6 +42,7 @@ ml = [
 docs = [
   "mkdocs>=1.6",
   "mkdocstrings[python]>=0.25",
+  "pygments>=2.18",
 ]
 dev = [
   "build>=1.2",

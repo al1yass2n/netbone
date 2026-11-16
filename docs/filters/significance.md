@@ -1,39 +1,23 @@
-# Significance Filter
+# Significance
 
-`significance` selects rows from p-value method results using an alpha
-threshold and an optional multiple-testing correction.
+Use `significance` with methods that report `output_type="pvalue"`.
+The filter selects rows whose adjusted p-value is strictly less than `alpha`
+(default 0.05). Both alpha and each p-value must be in the closed interval from
+0 to 1. Use `statistic` to select an alternate valid p-value column.
 
-## Summary
+| `correction` | Adjustment |
+| --- | --- |
+| `none` (default) | Raw p-values are used and a warning is recorded. |
+| `bonferroni` | Bonferroni adjustment for the number of tested rows. |
+| `holm` | Holm step-down adjustment for family-wise error. |
+| `fdr_bh` | Benjamini–Hochberg false discovery rate adjustment. |
 
-- **Name:** `significance`
-- **Input:** `MethodResult` with `output_type="pvalue"`
-- **Output:** `Selection`
-- **Default statistic:** method `primary_statistic`
-- **Default alpha:** `0.05`
-- **Default correction:** `none`
-- **Default isolate behavior:** keep isolates
+Choose the correction with the method's null model and the set of tests in
+mind. To omit isolated nodes after edge filtering, set `drop_isolates=True`.
 
-## Parameters
+```python
+pvalues = nb.score(graph, "disparity", weight="weight")
+result = nb.filter_scores(graph, pvalues, "significance", alpha=0.05, correction="holm")
+```
 
-- `alpha`: significance level from `0` to `1`.
-- `statistic`: optional p-value column. Defaults to the method result's primary
-  statistic.
-- `correction`: `none`, `bonferroni`, `holm`, or `fdr_bh`.
-- `drop_isolates`: whether isolated nodes should be removed after edge
-  filtering. Defaults to `False`.
-
-## Behavior
-
-The filter adjusts p-values according to the configured correction and selects
-rows where the adjusted value is strictly less than `alpha`.
-
-When `correction="none"`, the selection includes a warning that no
-multiple-testing correction was used.
-
-## Validation
-
-The filter raises:
-
-- `ConfigurationError` for non-p-value method results, unknown correction
-  names, or missing statistic columns.
-- `ValidationError` for invalid alpha values or p-values outside `[0, 1]`.
+Use the [sample graph](../reference/methods.md#try-a-method) to try this rule.
