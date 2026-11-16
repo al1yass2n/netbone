@@ -1,0 +1,1208 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-11-16">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="undirected" mode="static" name="Zachary's Karate Club">
+    <attributes mode="static" class="edge">
+      <attribute id="1" title="netbone_edge_betweenness_6af3362f_edge_betweenness_weight" type="double" />
+      <attribute id="2" title="netbone_edge_betweenness_6af3362f_edge_betweenness_distance" type="double" />
+      <attribute id="3" title="netbone_edge_betweenness_6af3362f_edge_betweenness" type="double" />
+      <attribute id="4" title="netbone_edge_betweenness_6af3362f_selected" type="long" />
+      <attribute id="5" title="netbone_edge_betweenness_6af3362f_role" type="string" />
+      <attribute id="6" title="netbone_edge_betweenness_6af3362f_color" type="string" />
+      <attribute id="7" title="netbone_edge_betweenness_6af3362f_target" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="club" type="string" />
+    </attributes>
+    <nodes>
+      <node id="0" label="0">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="1" label="1">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="2" label="2">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="3" label="3">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="4" label="4">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="5" label="5">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="6" label="6">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="7" label="7">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="8" label="8">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="9" label="9">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="10" label="10">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="11" label="11">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="12" label="12">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="13" label="13">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="14" label="14">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="15" label="15">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="16" label="16">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="17" label="17">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="18" label="18">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="19" label="19">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="20" label="20">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="21" label="21">
+        <attvalues>
+          <attvalue for="0" value="Mr. Hi" />
+        </attvalues>
+      </node>
+      <node id="22" label="22">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="23" label="23">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="24" label="24">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="25" label="25">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="26" label="26">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="27" label="27">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="28" label="28">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="29" label="29">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="30" label="30">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="31" label="31">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="32" label="32">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+      <node id="33" label="33">
+        <attvalues>
+          <attvalue for="0" value="Officer" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="0" target="1" id="0" weight="4">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.017825311942959" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="2" id="1" weight="5">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.23172905525846701" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="3" id="2" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0392156862745098" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="4" id="3" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.05258467023172905" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="5" id="4" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0784313725490196" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="6" id="5" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.07754010695187165" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="7" id="6" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="8" id="7" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="10" id="8" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0516934046345811" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="11" id="9" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="12" id="10" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="13" id="11" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0142602495543672" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="17" id="12" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="19" id="13" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.020944741532976825" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="21" id="14" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.020944741532976825" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="0" target="31" id="15" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.07932263814616755" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="2" id="16" weight="6">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="6.0" />
+          <attvalue for="2" value="0.16666666666666666" />
+          <attvalue for="3" value="0.04679144385026738" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="3" id="17" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0106951871657754" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="7" id="18" weight="4">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0089126559714795" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="13" id="19" weight="5">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.0320855614973262" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="17" id="20" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="19" id="21" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.024955436720142603" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="21" id="22" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.03787878787878788" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="1" target="30" id="23" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0106951871657754" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="3" id="24" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.030748663101604276" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="7" id="25" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0463458110516934" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="8" id="26" weight="5">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.1586452762923351" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="9" id="27" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="13" id="28" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.00445632798573975" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="27" id="29" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.03832442067736185" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="28" id="30" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.029411764705882353" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="2" target="32" id="31" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.10695187165775401" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="3" target="7" id="32" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0035650623885918" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="3" target="12" id="33" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="3" target="13" id="34" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.029857397504456325" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="4" target="6" id="35" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0035650623885918" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="4" target="10" id="36" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.00267379679144385" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="5" target="6" id="37" weight="5">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.0035650623885918" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="5" target="10" id="38" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.006238859180035651" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="5" target="16" id="39" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.029411764705882353" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="6" target="16" id="40" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.029411764705882353" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="8" target="30" id="41" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.017825311942959" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="8" target="32" id="42" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0071301247771836" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="8" target="33" id="43" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.1319073083778966" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="9" target="33" id="44" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="13" target="33" id="45" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.08065953654188948" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="14" target="32" id="46" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.044563279857397504" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="14" target="33" id="47" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0142602495543672" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="15" target="32" id="48" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0071301247771836" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="15" target="33" id="49" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0516934046345811" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="18" target="32" id="50" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="18" target="33" id="51" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="19" target="33" id="52" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.012923351158645275" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="20" target="32" id="53" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.058823529411764705" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="20" target="33" id="54" weight="1">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="1.0" />
+          <attvalue for="2" value="1.0" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="22" target="32" id="55" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.006238859180035651" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="22" target="33" id="56" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.05258467023172905" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="23" target="25" id="57" weight="5">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.0231729055258467" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="23" target="27" id="58" weight="4">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0106951871657754" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="23" target="29" id="59" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0106951871657754" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="23" target="32" id="60" weight="5">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.0106951871657754" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="23" target="33" id="61" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.024955436720142603" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="24" target="25" id="62" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0017825311942959" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="24" target="27" id="63" weight="3">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.0338680926916221" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="24" target="31" id="64" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0231729055258467" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="25" target="31" id="65" weight="7">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="7.0" />
+          <attvalue for="2" value="0.14285714285714285" />
+          <attvalue for="3" value="0.0659536541889483" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="26" target="29" id="66" weight="4">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.012477718360071301" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="26" target="33" id="67" weight="2">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0463458110516934" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="27" target="33" id="68" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.040106951871657755" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="28" target="31" id="69" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0053475935828877" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="28" target="33" id="70" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.02406417112299465" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="29" target="32" id="71" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0570409982174688" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="29" target="33" id="72" weight="2">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="2.0" />
+          <attvalue for="2" value="0.5" />
+          <attvalue for="3" value="0.0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="30" target="32" id="73" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.01158645276292335" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="30" target="33" id="74" weight="3">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="3.0" />
+          <attvalue for="2" value="0.3333333333333333" />
+          <attvalue for="3" value="0.01871657754010695" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="31" target="32" id="75" weight="4">
+        <viz:color r="217" g="217" b="217" a="1.0" />
+        <viz:thickness value="0.7" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.0196078431372549" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="rejected" />
+          <attvalue for="6" value="#D9D9D9" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="31" target="33" id="76" weight="4">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="4.0" />
+          <attvalue for="2" value="0.25" />
+          <attvalue for="3" value="0.03297682709447415" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+      <edge source="32" target="33" id="77" weight="5">
+        <viz:color r="0" g="114" b="178" a="1.0" />
+        <viz:thickness value="2.5" />
+        <attvalues>
+          <attvalue for="1" value="5.0" />
+          <attvalue for="2" value="0.2" />
+          <attvalue for="3" value="0.0285204991087344" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="backbone" />
+          <attvalue for="6" value="#0072B2" />
+          <attvalue for="7" value="edge" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

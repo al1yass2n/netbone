@@ -1,0 +1,898 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d9" for="edge" attr.name="netbone_edge_betweenness_109ddacf_target" attr.type="string" />
+  <key id="d8" for="edge" attr.name="netbone_edge_betweenness_109ddacf_color" attr.type="string" />
+  <key id="d7" for="edge" attr.name="netbone_edge_betweenness_109ddacf_role" attr.type="string" />
+  <key id="d6" for="edge" attr.name="netbone_edge_betweenness_109ddacf_selected" attr.type="long" />
+  <key id="d5" for="edge" attr.name="netbone_edge_betweenness_109ddacf_edge_betweenness" attr.type="double" />
+  <key id="d4" for="edge" attr.name="netbone_edge_betweenness_109ddacf_edge_betweenness_distance" attr.type="double" />
+  <key id="d3" for="edge" attr.name="netbone_edge_betweenness_109ddacf_edge_betweenness_weight" attr.type="double" />
+  <key id="d2" for="edge" attr.name="weight" attr.type="long" />
+  <key id="d1" for="node" attr.name="club" attr.type="string" />
+  <key id="d0" for="graph" attr.name="name" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="0">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="1">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="2">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="3">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="4">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="5">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="6">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="7">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="8">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="9">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="10">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="11">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="12">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="13">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="14">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="15">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="16">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="17">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="18">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="19">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="20">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="21">
+      <data key="d1">Mr. Hi</data>
+    </node>
+    <node id="22">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="23">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="24">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="25">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="26">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="27">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="28">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="29">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="30">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="31">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="32">
+      <data key="d1">Officer</data>
+    </node>
+    <node id="33">
+      <data key="d1">Officer</data>
+    </node>
+    <edge source="0" target="1">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.017825311942959</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="2">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.23172905525846701</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="3">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0392156862745098</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="4">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.05258467023172905</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="5">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0784313725490196</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="6">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.07754010695187165</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="7">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="8">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="10">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0516934046345811</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="11">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="12">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="13">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0142602495543672</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="17">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="19">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.020944741532976825</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="21">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.020944741532976825</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="0" target="31">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.07932263814616755</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="2">
+      <data key="d2">6</data>
+      <data key="d3">6.0</data>
+      <data key="d4">0.16666666666666666</data>
+      <data key="d5">0.04679144385026738</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="3">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0106951871657754</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="7">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0089126559714795</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="13">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.0320855614973262</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="17">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="19">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.024955436720142603</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="21">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.03787878787878788</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="1" target="30">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0106951871657754</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="3">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.030748663101604276</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="7">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0463458110516934</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="8">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.1586452762923351</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="9">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="13">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.00445632798573975</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="27">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.03832442067736185</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="28">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.029411764705882353</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="2" target="32">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.10695187165775401</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="3" target="7">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0035650623885918</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="3" target="12">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="3" target="13">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.029857397504456325</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="4" target="6">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0035650623885918</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="4" target="10">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.00267379679144385</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="5" target="6">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.0035650623885918</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="5" target="10">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.006238859180035651</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="5" target="16">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.029411764705882353</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="6" target="16">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.029411764705882353</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="8" target="30">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.017825311942959</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="8" target="32">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0071301247771836</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="8" target="33">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.1319073083778966</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="9" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="13" target="33">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.08065953654188948</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="14" target="32">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.044563279857397504</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="14" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0142602495543672</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="15" target="32">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0071301247771836</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="15" target="33">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0516934046345811</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="18" target="32">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="18" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="19" target="33">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.012923351158645275</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="20" target="32">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.058823529411764705</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="20" target="33">
+      <data key="d2">1</data>
+      <data key="d3">1.0</data>
+      <data key="d4">1.0</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="22" target="32">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.006238859180035651</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="22" target="33">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.05258467023172905</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="23" target="25">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.0231729055258467</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="23" target="27">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0106951871657754</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="23" target="29">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0106951871657754</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="23" target="32">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.0106951871657754</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="23" target="33">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.024955436720142603</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="24" target="25">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0017825311942959</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="24" target="27">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.0338680926916221</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="24" target="31">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0231729055258467</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="25" target="31">
+      <data key="d2">7</data>
+      <data key="d3">7.0</data>
+      <data key="d4">0.14285714285714285</data>
+      <data key="d5">0.0659536541889483</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="26" target="29">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.012477718360071301</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="26" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0463458110516934</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="27" target="33">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.040106951871657755</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="28" target="31">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0053475935828877</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="28" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.02406417112299465</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="29" target="32">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0570409982174688</data>
+      <data key="d6">1</data>
+      <data key="d7">backbone</data>
+      <data key="d8">#0072B2</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="29" target="33">
+      <data key="d2">2</data>
+      <data key="d3">2.0</data>
+      <data key="d4">0.5</data>
+      <data key="d5">0.0</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="30" target="32">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.01158645276292335</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="30" target="33">
+      <data key="d2">3</data>
+      <data key="d3">3.0</data>
+      <data key="d4">0.3333333333333333</data>
+      <data key="d5">0.01871657754010695</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="31" target="32">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.0196078431372549</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="31" target="33">
+      <data key="d2">4</data>
+      <data key="d3">4.0</data>
+      <data key="d4">0.25</data>
+      <data key="d5">0.03297682709447415</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <edge source="32" target="33">
+      <data key="d2">5</data>
+      <data key="d3">5.0</data>
+      <data key="d4">0.2</data>
+      <data key="d5">0.0285204991087344</data>
+      <data key="d6">0</data>
+      <data key="d7">rejected</data>
+      <data key="d8">#D9D9D9</data>
+      <data key="d9">edge</data>
+    </edge>
+    <data key="d0">Zachary's Karate Club</data>
+  </graph>
+</graphml>

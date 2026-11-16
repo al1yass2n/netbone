@@ -16,8 +16,7 @@
         <link href="../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
         <link href="../assets/_mkdocstrings.css" rel="stylesheet">
-        <link href="../assets/docs.css" rel="stylesheet">
-        <link href="../assets/sample-demo.css" rel="stylesheet"> 
+        <link href="../assets/docs.css" rel="stylesheet"> 
     </head>
 
     <body>
@@ -83,7 +82,7 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../browser/sample-demo/" class="dropdown-item">Try a sample network</a>
+    <a href="../browser/sample-demo/" class="dropdown-item">Try the web demo</a>
 </li>
                                     
 <li>
@@ -313,6 +312,14 @@ in an active <a href="../start/install/">virtual environment</a>.</p>
 </code></pre></div>
 
 <h2 id="preview-and-build">Preview and build<a class="headerlink" href="#preview-and-build" title="Permanent link">&para;</a></h2>
+<p>The documentation includes a static build of the <a href="../browser/sample-demo/">web demo</a>.
+From the repository root, build the frontend and generate its fixtures first.
+Use the Python environment above and Node.js 24, which is also used in CI.</p>
+<div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>npm<span style="color: #BBB"> </span>ci<span style="color: #BBB"> </span>--prefix<span style="color: #BBB"> </span>web
+npm<span style="color: #BBB"> </span>run<span style="color: #BBB"> </span>build:demo<span style="color: #BBB"> </span>--prefix<span style="color: #BBB"> </span>web
+python<span style="color: #BBB"> </span>examples/build_sample_demo.py<span style="color: #BBB"> </span>docs/demo/data
+</code></pre></div>
+
 <div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>python<span style="color: #BBB"> </span>-m<span style="color: #BBB"> </span>mkdocs<span style="color: #BBB"> </span>serve<span style="color: #BBB"> </span>--strict
 </code></pre></div>
 
@@ -327,12 +334,8 @@ relative Markdown paths in the source. The Python reference uses
 mkdocstrings directives that read signatures and docstrings from <code>src/</code>.
 Update docstrings when the corresponding public contract changes and run
 new examples from an installed environment.</p>
-<p>The <a href="../browser/sample-demo/">sample demo</a> reads precomputed Netbone results.
-After changing its sample or selection settings, regenerate the data from
-the repository root and commit the updated JSON.</p>
-<div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>python<span style="color: #BBB"> </span>examples/build_sample_demo.py
-</code></pre></div>
-
+<p>Open the demo from the homepage. Regenerate its files after changing the
+dataset, supported settings, web interface, or Python result format.</p>
 <h2 id="run-project-checks">Run project checks<a class="headerlink" href="#run-project-checks" title="Permanent link">&para;</a></h2>
 <div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>python<span style="color: #BBB"> </span>-m<span style="color: #BBB"> </span>pytest
 python<span style="color: #BBB"> </span>-m<span style="color: #BBB"> </span>ruff<span style="color: #BBB"> </span>check<span style="color: #BBB"> </span>.
@@ -351,7 +354,8 @@ install frontend dependencies and <code>npm run build --prefix web</code> to bui
 packaged assets. Build assets only if working on the UI or preparing a
 package release.</p>
 <h2 id="publish-the-static-site">Publish the static site<a class="headerlink" href="#publish-the-static-site" title="Permanent link">&para;</a></h2>
-<p>From a clean checkout of the revision to publish, build and review the site.
+<p>From a clean checkout of the revision to publish, follow the demo and site
+build steps above and review the generated site.
 Deploy the contents of <code>site/</code> to a static host or use GitHub Pages. Set
 <code>NETBONE_DOCS_SITE_URL</code> to the public URL, including any path prefix, before
 building for publication. This sets the canonical URL and the links on the
@@ -387,7 +391,6 @@ a build on pushes and pull requests.
         </script>
         <script src="../js/base.js"></script>
         <script src="../assets/copy-code.js"></script>
-        <script src="../assets/sample-demo.js" type="module"></script>
         <script src="../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">

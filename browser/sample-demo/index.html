@@ -8,7 +8,7 @@
         
         <link rel="canonical" href="https://al1yass2n.github.io/netbone/browser/sample-demo/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Try a sample network - Netbone</title>
+        <title>Try the web demo - Netbone</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -16,8 +16,7 @@
         <link href="../../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
         <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
-        <link href="../../assets/docs.css" rel="stylesheet">
-        <link href="../../assets/sample-demo.css" rel="stylesheet"> 
+        <link href="../../assets/docs.css" rel="stylesheet"> 
     </head>
 
     <body>
@@ -83,7 +82,7 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Try a sample network</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Try the web demo</a>
 </li>
                                     
 <li>
@@ -285,8 +284,12 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#try-a-sample-network" class="nav-link">Try a sample network</a>
+            <li class="nav-item" data-bs-level="1"><a href="#try-the-web-demo" class="nav-link">Try the web demo</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#compare-two-20-edge-backbones" class="nav-link">Compare two 20-edge backbones</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -294,60 +297,28 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="try-a-sample-network">Try a sample network<a class="headerlink" href="#try-a-sample-network" title="Permanent link">&para;</a></h1>
-<p>Four researchers are linked by the papers they wrote together. Netbone scores
-each link by its publication count. Move the sliders to keep different
-fractions of the strongest links and compare the resulting backbones.</p>
-<div data-sample-demo class="sample-demo">
-
-<p data-demo-status role="status" hidden>Loading the sample network…</p>
-
-<div data-demo-view hidden>
-
-<div class="demo-panels">
-<section class="demo-panel" data-demo-panel aria-labelledby="demo-title-a">
-  <h2 id="demo-title-a">Backbone A</h2>
-  <div class="demo-slider-label">
-    <label for="demo-fraction-a">Retained fraction for A</label>
-    <output for="demo-fraction-a">25%</output>
-  </div>
-  <input id="demo-fraction-a" type="range" min="0" max="100" step="25" value="25">
-  <canvas width="800" height="480" role="img" aria-label="Collaboration network for backbone A"></canvas>
-  <p class="demo-count" data-demo-count></p>
-</section>
-<section class="demo-panel" data-demo-panel aria-labelledby="demo-title-b">
-  <h2 id="demo-title-b">Backbone B</h2>
-  <div class="demo-slider-label">
-    <label for="demo-fraction-b">Retained fraction for B</label>
-    <output for="demo-fraction-b">75%</output>
-  </div>
-  <input id="demo-fraction-b" type="range" min="0" max="100" step="25" value="75">
-  <canvas width="800" height="480" role="img" aria-label="Collaboration network for backbone B"></canvas>
-  <p class="demo-count" data-demo-count></p>
-</section>
-</div>
-
-<p class="demo-legend">Thick teal lines show retained links. Thin gray lines show removed links.</p>
-<p class="demo-comparison" data-demo-comparison role="status"></p>
-
-<table class="demo-table">
-  <caption>Link weights and selections</caption>
-  <thead>
-    <tr><th scope="col">Researchers</th><th scope="col">Joint papers</th><th scope="col">A</th><th scope="col">B</th></tr>
-  </thead>
-  <tbody data-demo-links></tbody>
-</table>
-
-</div>
-
-<noscript><p>Enable JavaScript to explore the sample network.</p></noscript>
-
-</div>
-
-<p>The two views use the same layout so you can compare links directly.
-<strong>Edge Jaccard</strong> is the share of links that both backbones keep, among all
-links kept by either backbone. The demo uses results precomputed with Netbone.</p>
-<p><a class="docs-button" href="../launch/">Analyze your own network in the local app</a></p></div>
+<h1 id="try-the-web-demo">Try the web demo<a class="headerlink" href="#try-the-web-demo" title="Permanent link">&para;</a></h1>
+<p>Explore Zachary’s Karate Club, a real network of 34 members and 78 links.
+Edge weights count the contexts in which two members interacted.</p>
+<p><a href="../../demo/" class="docs-button">Open the web demo</a></p>
+<h2 id="compare-two-20-edge-backbones">Compare two 20-edge backbones<a class="headerlink" href="#compare-two-20-edge-backbones" title="Permanent link">&para;</a></h2>
+<p>The demo opens with Edge Weight at 25% retention. <strong>Compare</strong> already
+contains two saved backbones at this edge budget.</p>
+<ol>
+<li>Run the comparison and select <strong>Overlap &amp; agreement</strong>, then <strong>Shared edges</strong>.</li>
+<li>Check the 6 shared links. Each method kept 20 links, with 14 selections
+   unique to each method.</li>
+<li>Return to the network preview. <strong>Change method</strong> to see how weighted Edge
+   Betweenness brings a different set of links into the graph.</li>
+<li>Choose <strong>50%</strong> to see what changes when the edge budget grows.</li>
+</ol>
+<p>Edge Weight ranks ties by their observed strength. Edge Betweenness ranks
+them by how often they lie on shortest paths, treating higher weights as
+shorter distances. Both use a stable tie rule to keep the same number of links.</p>
+<p>The demo loads precomputed Netbone results, including the statistics and
+downloads, for this dataset and its available settings. Use the
+<a href="../launch/">local web app</a> to import your own file.</p>
+<p><a href="https://networkx.org/documentation/stable/reference/generated/networkx.generators.social.karate_club_graph.html">Karate Club dataset</a></p></div>
             </div>
         </div>
 
@@ -362,7 +333,6 @@ links kept by either backbone. The demo uses results precomputed with Netbone.</
         </script>
         <script src="../../js/base.js"></script>
         <script src="../../assets/copy-code.js"></script>
-        <script src="../../assets/sample-demo.js" type="module"></script>
         <script src="../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
