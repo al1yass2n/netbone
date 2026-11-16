@@ -1,3 +1,5 @@
+<div class="docs-hero" markdown="1">
+
 # Netbone
 
 Extract a smaller graph from a network, inspect why its edges or nodes were
@@ -7,9 +9,13 @@ selected, and measure what the reduction preserves.
 [Try the web demo](browser/sample-demo.md){ .docs-button }
 [Run your first Python analysis](start/first-backbone.md){ .docs-button .docs-button-secondary }
 
+</div>
+
 <div class="guide-grid" markdown="1">
 
 <section markdown="1">
+
+<div class="guide-icon"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i></div>
 
 ## Prepare a network
 
@@ -22,6 +28,8 @@ time-stamped interactions before scoring.
 
 <section markdown="1">
 
+<div class="guide-icon"><i class="fa-solid fa-filter" aria-hidden="true"></i></div>
+
 ## Choose what to keep
 
 Use a method that matches the structure you want to preserve. Apply a cutoff,
@@ -33,6 +41,8 @@ a retention budget, a significance level, or the method's built-in selection.
 
 <section markdown="1">
 
+<div class="guide-icon"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></div>
+
 ## Evaluate a backbone
 
 Compare retention and connectivity, examine overlap and rank agreement, or
@@ -43,6 +53,8 @@ sweep settings to see where the result changes.
 </section>
 
 <section markdown="1">
+
+<div class="guide-icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></div>
 
 ## Share a run
 

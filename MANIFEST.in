@@ -3,6 +3,8 @@ include CITATION.cff
 include mkdocs.yml
 include README.md
 recursive-include docs *.md *.css *.js
+recursive-include docs_theme *.html
+recursive-include docs/assets/fonts *.woff2 *.txt
 prune docs/demo
 recursive-include examples *.csv *.py
 recursive-include src/netbone/webapp/static *.css *.html *.js
