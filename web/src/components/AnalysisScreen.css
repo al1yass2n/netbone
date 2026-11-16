@@ -213,3 +213,11 @@
   .analysis-workbench .analysis-canvas { grid-template-columns: minmax(0, 1fr); }
   .analysis-workbench .analysis-preview[data-waiting-for-scores="true"] .analysis-preview-empty { min-height: 0; }
 }
+
+.demo-note {
+  margin: 0 0 1rem;
+  padding: .75rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}

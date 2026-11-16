@@ -2,11 +2,14 @@ include LICENSE
 include CITATION.cff
 include mkdocs.yml
 include README.md
-recursive-include docs *.md *.css *.js *.json
+recursive-include docs *.md *.css *.js
+prune docs/demo
 recursive-include examples *.csv *.py
 recursive-include src/netbone/webapp/static *.css *.html *.js
 include web/index.html web/package.json web/package-lock.json web/tsconfig.json web/vite.config.ts
 include web/playwright.config.mjs
+include web/playwright.demo.config.mjs
 recursive-include web/browser-tests *.mjs
+recursive-include web/demo-tests *.mjs
 recursive-include web/src *.css *.ts *.tsx
 recursive-include tests *.py

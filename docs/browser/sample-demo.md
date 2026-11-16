@@ -1,57 +1,28 @@
-# Try a sample network
+# Try the web demo
 
-Four researchers are linked by the papers they wrote together. Netbone scores
-each link by its publication count. Move the sliders to keep different
-fractions of the strongest links and compare the resulting backbones.
+Explore Zachary’s Karate Club, a real network of 34 members and 78 links.
+Edge weights count the contexts in which two members interacted.
 
-<div data-sample-demo class="sample-demo">
+<a href="../../demo/" class="docs-button">Open the web demo</a>
 
-<p data-demo-status role="status" hidden>Loading the sample network…</p>
+## Compare two 20-edge backbones
 
-<div data-demo-view hidden>
+The demo opens with Edge Weight at 25% retention. **Compare** already
+contains two saved backbones at this edge budget.
 
-<div class="demo-panels">
-<section class="demo-panel" data-demo-panel aria-labelledby="demo-title-a">
-  <h2 id="demo-title-a">Backbone A</h2>
-  <div class="demo-slider-label">
-    <label for="demo-fraction-a">Retained fraction for A</label>
-    <output for="demo-fraction-a">25%</output>
-  </div>
-  <input id="demo-fraction-a" type="range" min="0" max="100" step="25" value="25">
-  <canvas width="800" height="480" role="img" aria-label="Collaboration network for backbone A"></canvas>
-  <p class="demo-count" data-demo-count></p>
-</section>
-<section class="demo-panel" data-demo-panel aria-labelledby="demo-title-b">
-  <h2 id="demo-title-b">Backbone B</h2>
-  <div class="demo-slider-label">
-    <label for="demo-fraction-b">Retained fraction for B</label>
-    <output for="demo-fraction-b">75%</output>
-  </div>
-  <input id="demo-fraction-b" type="range" min="0" max="100" step="25" value="75">
-  <canvas width="800" height="480" role="img" aria-label="Collaboration network for backbone B"></canvas>
-  <p class="demo-count" data-demo-count></p>
-</section>
-</div>
+1. Run the comparison and select **Overlap & agreement**, then **Shared edges**.
+2. Check the 6 shared links. Each method kept 20 links, with 14 selections
+   unique to each method.
+3. Return to the network preview. **Change method** to see how weighted Edge
+   Betweenness brings a different set of links into the graph.
+4. Choose **50%** to see what changes when the edge budget grows.
 
-<p class="demo-legend">Thick teal lines show retained links. Thin gray lines show removed links.</p>
-<p class="demo-comparison" data-demo-comparison role="status"></p>
+Edge Weight ranks ties by their observed strength. Edge Betweenness ranks
+them by how often they lie on shortest paths, treating higher weights as
+shorter distances. Both use a stable tie rule to keep the same number of links.
 
-<table class="demo-table">
-  <caption>Link weights and selections</caption>
-  <thead>
-    <tr><th scope="col">Researchers</th><th scope="col">Joint papers</th><th scope="col">A</th><th scope="col">B</th></tr>
-  </thead>
-  <tbody data-demo-links></tbody>
-</table>
+The demo loads precomputed Netbone results, including the statistics and
+downloads, for this dataset and its available settings. Use the
+[local web app](launch.md) to import your own file.
 
-</div>
-
-<noscript><p>Enable JavaScript to explore the sample network.</p></noscript>
-
-</div>
-
-The two views use the same layout so you can compare links directly.
-**Edge Jaccard** is the share of links that both backbones keep, among all
-links kept by either backbone. The demo uses results precomputed with Netbone.
-
-[Analyze your own network in the local app](launch.md){ .docs-button }
+[Karate Club dataset](https://networkx.org/documentation/stable/reference/generated/networkx.generators.social.karate_club_graph.html)

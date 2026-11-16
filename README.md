@@ -4,43 +4,48 @@
 [![Total PyPI downloads](https://api.pepy.tech/personalized-badge/netbone?period=TOTAL&units=NONE&left_text=Total%20PyPI%20downloads&left_color=grey&right_color=blue)](https://pepy.tech/projects/netbone)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Netbone extracts smaller graphs from networks and measures what the reduction
-preserves. Work in Python with NetworkX graphs and pandas tables, or launch the
-local browser app. Score and select edges or nodes, compare backbones, sweep
-settings, and export the results with their analysis configuration.
+Extract, compare, and export network backbones with Python or a local web app.
 
-## Install and run
+[**Try the web demo**](https://al1yass2n.github.io/netbone/demo/) · [Documentation](https://al1yass2n.github.io/netbone/)
 
-From a checkout of this repository, using Python 3.11 or later:
+## Use the web app
+
+Install from the current repository and launch the app.
 
 ```bash
+git clone https://github.com/al1yass2n/netbone.git
+cd netbone
 python -m pip install .
 netbone-web
 ```
 
-Open [127.0.0.1:8765](http://127.0.0.1:8765/) or follow the
-[Python tutorial](docs/start/first-backbone.md). This repository contains the
-0.3.0 source tree. The [0.2.3 PyPI release](https://pypi.org/project/netbone/0.2.3/)
-points to the [earlier GitLab codebase](https://gitlab.liris.cnrs.fr/coregraphie/netbone).
+Open [127.0.0.1:8765](http://127.0.0.1:8765/). Pick a built-in example or
+open your own network, choose a method and filter, then inspect the backbone.
+See the [browser guide](https://al1yass2n.github.io/netbone/browser/first-session/) for a walkthrough.
 
-## Documentation
+## Use Python
 
-- [Read the documentation online](https://al1yass2n.github.io/netbone/)
-- [Try a sample network](https://al1yass2n.github.io/netbone/browser/sample-demo/)
-- [Documentation home](docs/index.md)
-- [Install and choose extras](docs/start/install.md)
-- [Extract a backbone in the browser](docs/browser/first-session.md)
-- [Choose a scoring method](docs/reference/methods.md)
-- [Look up Python objects](docs/reference/pipelines.md)
-- [Run the documentation site locally](docs/develop.md#preview-and-build)
+With the same installation, extract the strongest 25% of links in the
+Karate Club network and print a summary.
+
+```python
+import networkx as nx
+import netbone as nb
+
+backbone = (
+    nb.pipeline()
+    .score("edge_weight", weight="weight")
+    .filter("fraction", fraction=0.25, tie_policy="exact_stable")
+    .run(nx.karate_club_graph())
+)
+print(backbone.summary())
+```
 
 ## Citation and license
 
-If you use or adapt Netbone in published work, cite Yassin, A., Haidar, A.,
-Cherifi, H., Seba, H., & Togni, O. (2023), *An evaluation tool for backbone
-extraction techniques in weighted complex networks*, Scientific Reports,
-13, Article 17000. [Journal article](https://doi.org/10.1038/s41598-023-42076-3)
+If you use Netbone in published work, cite Yassin, A., Haidar, A.,
+Cherifi, H., Seba, H., & Togni, O. (2023), *An evaluation tool for
+backbone extraction techniques in weighted complex networks*.
+[Journal article](https://doi.org/10.1038/s41598-023-42076-3)
 
-Ali Yassin authored Netbone. Abbas Haidar and Ali Yassin are the maintainers.
-The package uses the [MIT License](LICENSE). See the
-[contribution guide](CONTRIBUTING.md) for development information.
+Netbone is distributed under the [MIT License](LICENSE).
