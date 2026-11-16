@@ -1,0 +1,52 @@
+.launcher-backdrop {
+  width: min(100%, 1760px, max(900px, 185svh));
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.launcher-backdrop-graph {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.launcher-backdrop-graph line {
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.launcher-base-links { stroke: var(--launcher-network); stroke-opacity: 0.26; }
+.launcher-base-links [data-kind="letter"] { stroke: var(--launcher-accent); stroke-opacity: 0.67; }
+
+.launcher-backbone-links { stroke: var(--launcher-route); }
+.launcher-backbone-links [data-kind="letter"] { stroke: var(--launcher-accent); }
+
+.launcher-backbone-links line {
+  opacity: var(--backbone-word);
+  animation: launcher-backbone-cycle 21s ease-in-out infinite;
+}
+
+/* Hold each selection for six seconds and crossfade for one. */
+@keyframes launcher-backbone-cycle {
+  0%, 28.5714%, 100% { opacity: var(--backbone-word); }
+  33.3333%, 61.9048% { opacity: var(--backbone-upper); }
+  66.6667%, 95.2381% { opacity: var(--backbone-lower); }
+}
+
+.launcher-node-core { fill: var(--launcher-network); opacity: 0.55; }
+.launcher-node-core[data-letter="true"] { fill: var(--launcher-accent); opacity: 0.85; }
+
+@media (max-width: 800px) {
+  .launcher-backdrop { mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .launcher-backdrop-graph {
+    position: relative;
+    left: 50%;
+    width: calc(480px + 40%);
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher-backbone-links line { animation: none; }
+}

@@ -1,0 +1,4 @@
+source,target,time,magnitude
+alice,bob,0,2
+alice,bob,1,1
+bob,carol,2,4

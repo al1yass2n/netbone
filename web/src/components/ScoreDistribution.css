@@ -1,0 +1,86 @@
+.distribution {
+  --distribution-surface: #edf4f7;
+  --distribution-grid: #ccdae1;
+  --distribution-passed: #087c6f;
+  --distribution-excluded: #547791;
+  --distribution-hatch: rgb(255 255 255 / 26%);
+  --distribution-cutoff: #99520a;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+}
+
+[data-theme="dark"] .distribution {
+  --distribution-surface: #18232c;
+  --distribution-grid: #30434f;
+  --distribution-passed: #61d9bc;
+  --distribution-excluded: #7b9dc8;
+  --distribution-hatch: rgb(17 32 48 / 37%);
+  --distribution-cutoff: #f7b966;
+}
+
+.distribution__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.distribution__toolbar .segmented { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.distribution__toolbar button { min-height: 32px; padding: 4px 8px; }
+
+.distribution__plot {
+  position: relative;
+  display: flex;
+  gap: clamp(2px, .35vw, 5px);
+  height: 134px;
+  border-block-end: 1px solid var(--distribution-grid);
+  background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--distribution-grid) calc(25% - 1px) 25%) var(--distribution-surface);
+}
+
+.distribution__bar {
+  display: flex;
+  flex-direction: column-reverse;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.distribution__passed { background: var(--distribution-passed); }
+.distribution__excluded {
+  background: repeating-linear-gradient(135deg, transparent 0 3px, var(--distribution-hatch) 3px 4px) var(--distribution-excluded);
+}
+.distribution__bar > :last-child { border-radius: 3px 3px 0 0; }
+
+.distribution__boundary {
+  position: absolute;
+  inset-block: 0;
+  border-inline-start: 2px dashed var(--distribution-cutoff);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+.distribution figcaption { display: grid; gap: 8px; }
+
+.distribution__range,
+.distribution__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: var(--muted);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.distribution__range { justify-content: space-between; overflow-wrap: anywhere; }
+.distribution__legend { list-style: none; margin: 0; padding: 0; }
+.distribution__legend li { display: flex; align-items: center; gap: 6px; }
+.distribution__legend li > span { flex: none; width: 10px; height: 10px; border-radius: 2px; }
+.distribution__legend .distribution__cutoff {
+  border-inline-start: 2px dashed var(--distribution-cutoff);
+  border-radius: 0;
+  width: 2px;
+}

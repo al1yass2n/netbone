@@ -1,0 +1,262 @@
+"""Locally adaptive network sparsification scoring method."""
+
+from __future__ import annotations
+
+import math
+from numbers import Real
+from typing import Any
+
+import pandas as pd
+
+from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.network import EDGE_ID_ATTR, Network
+from netbone.results import MethodResult
+
+P_VALUE_AGGREGATIONS = frozenset({"average", "max", "min"})
+LEAF_POLICIES = frozenset({"ignore", "zero"})
+
+LANS_METADATA: dict[str, object] = {
+    "name": "lans",
+    "display_name": "Locally Adaptive Network Sparsification",
+    "target": "edge",
+    "output_type": "pvalue",
+    "primary_statistic": "lans_pvalue",
+    "preferred_direction": "lower",
+    "supports_directed": True,
+    "directed_semantics": "source_outgoing_distribution",
+    "supports_weighted": True,
+    "requires_weights": True,
+    "requires_positive_weights": True,
+    "supports_multigraph": False,
+    "supports_self_loops": False,
+    "default_filter": "significance",
+    "default_pvalue_aggregation": "min",
+    "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
+    "default_leaf_policy": "zero",
+    "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
+    "reference": "Foti, Hughes, and Rockmore, PLoS ONE 6(2): e16431 (2011).",
+    "doi": "10.1371/journal.pone.0016431",
+}
+
+
+def compute_lans(
+    network: Network,
+    *,
+    weight: str = "weight",
+    pvalue_aggregation: str = "min",
+    leaf_policy: str = "zero",
+) -> MethodResult:
+    """Compute LANS empirical upper-tail p-values for each edge.
+
+    For undirected graphs, LANS compares an edge's fractional incident weight
+    at both endpoints and combines the endpoint p-values. For directed graphs,
+    each arc is evaluated only against its source node's outgoing fractional
+    weight distribution; its source p-value is the primary `lans_pvalue`.
+
+    Args:
+        network: Normalized simple graph to score.
+        weight: Edge attribute containing finite positive weights.
+        pvalue_aggregation: How to combine endpoint p-values: `min`, `max`, or
+            `average`.
+        leaf_policy: How degree-one endpoints contribute: `zero` treats the
+            leaf endpoint as locally significant, while `ignore` ignores them
+            during aggregation when another endpoint is available.
+
+    Raises:
+        ConfigurationError: If a method parameter value is invalid.
+        ValidationError: If a required weight is missing, non-numeric,
+            non-finite, zero, or negative.
+    """
+
+    if pvalue_aggregation not in P_VALUE_AGGREGATIONS:
+        allowed = ", ".join(sorted(P_VALUE_AGGREGATIONS))
+        raise ConfigurationError(
+            f"lans parameter 'pvalue_aggregation' must be one of: {allowed}."
+        )
+    if leaf_policy not in LEAF_POLICIES:
+        allowed = ", ".join(sorted(LEAF_POLICIES))
+        raise ConfigurationError(
+            f"lans parameter 'leaf_policy' must be one of: {allowed}."
+        )
+
+    weights = _edge_weights(network, weight=weight)
+    fractions = _endpoint_fractions(network, weights)
+    endpoint_pvalues = _endpoint_pvalues(
+        network,
+        fractions,
+        leaf_policy=leaf_policy,
+    )
+
+    rows: list[dict[str, Any]] = []
+    for source_id, target_id, attributes in sorted(
+        network.graph.edges(data=True),
+        key=lambda edge: edge[2][EDGE_ID_ATTR],
+    ):
+        edge_id = int(attributes[EDGE_ID_ATTR])
+        source_fraction = fractions[source_id][edge_id]
+        source_pvalue = endpoint_pvalues[source_id][edge_id]
+        if network.directed:
+            target_fraction = None
+            target_pvalue = None
+            lans_pvalue = source_pvalue if source_pvalue is not None else 1.0
+        else:
+            target_fraction = fractions[target_id][edge_id]
+            target_pvalue = endpoint_pvalues[target_id][edge_id]
+            lans_pvalue = _aggregate_pvalues(
+                (source_pvalue, target_pvalue),
+                pvalue_aggregation=pvalue_aggregation,
+            )
+        rows.append(
+            {
+                "edge_id": edge_id,
+                "source_id": source_id,
+                "target_id": target_id,
+                "source": network.node_id_to_original[source_id],
+                "target": network.node_id_to_original[target_id],
+                "lans_weight": weights[edge_id],
+                "lans_source_fraction": source_fraction,
+                "lans_target_fraction": target_fraction,
+                "lans_source_pvalue": source_pvalue,
+                "lans_target_pvalue": target_pvalue,
+                "lans_pvalue": lans_pvalue,
+            }
+        )
+
+    statistics = pd.DataFrame(
+        rows,
+        columns=[
+            "edge_id",
+            "source_id",
+            "target_id",
+            "source",
+            "target",
+            "lans_weight",
+            "lans_source_fraction",
+            "lans_target_fraction",
+            "lans_source_pvalue",
+            "lans_target_pvalue",
+            "lans_pvalue",
+        ],
+    )
+    return MethodResult(
+        method_name="lans",
+        target="edge",
+        statistics=statistics,
+        primary_statistic="lans_pvalue",
+        output_type="pvalue",
+        preferred_direction="lower",
+        parameters={
+            "weight": weight,
+            "pvalue_aggregation": pvalue_aggregation,
+            "leaf_policy": leaf_policy,
+        },
+        metadata=LANS_METADATA,
+        warnings=(
+            (
+                "LANS parameter 'pvalue_aggregation' is ignored for directed "
+                "graphs because each arc is evaluated at its source only."
+            ),
+        )
+        if network.directed and pvalue_aggregation != "min"
+        else (),
+    )
+
+
+def _edge_weights(network: Network, *, weight: str) -> dict[int, float]:
+    weights: dict[int, float] = {}
+    for source_id, target_id, attributes in network.graph.edges(data=True):
+        edge_id = int(attributes[EDGE_ID_ATTR])
+        if weight not in attributes:
+            raise ValidationError(
+                f"Edge ({source_id}, {target_id}) is missing required weight "
+                f"attribute {weight!r}."
+            )
+        value = attributes[weight]
+        if isinstance(value, bool) or not isinstance(value, Real):
+            raise ValidationError(
+                f"Weight attribute {weight!r} on edge ({source_id}, {target_id}) "
+                "must be numeric."
+            )
+        edge_weight = float(value)
+        if not math.isfinite(edge_weight):
+            raise ValidationError(
+                f"Weight attribute {weight!r} on edge ({source_id}, {target_id}) "
+                "must be finite."
+            )
+        if edge_weight <= 0.0:
+            raise ValidationError(
+                f"Weight attribute {weight!r} on edge ({source_id}, {target_id}) "
+                "must be positive for LANS scoring."
+            )
+        weights[edge_id] = edge_weight
+    return weights
+
+
+def _endpoint_fractions(
+    network: Network,
+    weights: dict[int, float],
+) -> dict[int, dict[int, float]]:
+    strengths: dict[int, float] = {node_id: 0.0 for node_id in network.graph.nodes}
+    for edge_id, edge_weight in weights.items():
+        source_id, target_id = network.edge_id_to_endpoints[edge_id]
+        strengths[source_id] += edge_weight
+        if not network.directed:
+            strengths[target_id] += edge_weight
+
+    fractions: dict[int, dict[int, float]] = {
+        node_id: {} for node_id in network.graph.nodes
+    }
+    for edge_id, edge_weight in weights.items():
+        source_id, target_id = network.edge_id_to_endpoints[edge_id]
+        fractions[source_id][edge_id] = edge_weight / strengths[source_id]
+        if not network.directed:
+            fractions[target_id][edge_id] = edge_weight / strengths[target_id]
+    return fractions
+
+
+def _endpoint_pvalues(
+    network: Network,
+    fractions: dict[int, dict[int, float]],
+    *,
+    leaf_policy: str,
+) -> dict[int, dict[int, float | None]]:
+    pvalues: dict[int, dict[int, float | None]] = {}
+    for node_id, edge_fractions in fractions.items():
+        degree = (
+            network.graph.out_degree[node_id]
+            if network.directed
+            else network.graph.degree[node_id]
+        )
+        if degree <= 1 and leaf_policy == "ignore":
+            pvalues[node_id] = {edge_id: None for edge_id in sorted(edge_fractions)}
+            continue
+        if degree <= 1:
+            pvalues[node_id] = {edge_id: 0.0 for edge_id in sorted(edge_fractions)}
+            continue
+
+        values = list(edge_fractions.values())
+        pvalues[node_id] = {
+            edge_id: _upper_tail_pvalue(fraction, values)
+            for edge_id, fraction in edge_fractions.items()
+        }
+    return pvalues
+
+
+def _upper_tail_pvalue(fraction: float, values: list[float]) -> float:
+    empirical_cdf = sum(value <= fraction for value in values) / len(values)
+    return max(0.0, min(1.0, 1.0 - empirical_cdf))
+
+
+def _aggregate_pvalues(
+    pvalues: tuple[float | None, float | None],
+    *,
+    pvalue_aggregation: str,
+) -> float:
+    available = [pvalue for pvalue in pvalues if pvalue is not None]
+    if not available:
+        return 1.0
+    if pvalue_aggregation == "min":
+        return min(available)
+    if pvalue_aggregation == "max":
+        return max(available)
+    return sum(available) / len(available)

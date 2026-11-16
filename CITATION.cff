@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use or adapt Netbone, please cite the published paper below."
+title: Netbone
+type: software
+license: MIT
+repository-code: https://github.com/al1yass2n/netbone
+authors:
+  - given-names: Ali
+    family-names: Yassin
+preferred-citation:
+  type: article
+  title: An evaluation tool for backbone extraction techniques in weighted complex networks
+  authors:
+    - given-names: Ali
+      family-names: Yassin
+    - given-names: Abbas
+      family-names: Haidar
+    - given-names: Hocine
+      family-names: Cherifi
+    - given-names: Hamida
+      family-names: Seba
+    - given-names: Olivier
+      family-names: Togni
+  journal: Scientific Reports
+  year: 2023
+  volume: 13
+  start: 17000
+  doi: 10.1038/s41598-023-42076-3
+  url: https://www.nature.com/articles/s41598-023-42076-3

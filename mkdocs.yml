@@ -1,0 +1,65 @@
+site_name: Netbone
+repo_url: https://github.com/al1yass2n/netbone
+site_description: Deterministic NetworkX-based network backbone extraction tools.
+docs_dir: docs
+exclude_docs: |
+  /drafts/
+theme:
+  name: readthedocs
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - User Guide:
+      - Choosing Methods: user-guide/choosing-methods.md
+      - Loading Graphs: user-guide/loading-graphs.md
+      - Temporal Aggregation: user-guide/temporal-aggregation.md
+      - Filtering: user-guide/filtering.md
+      - Comparison: workflows/method_comparison.md
+      - Parameter Sweeps: workflows/parameter_sweeps.md
+      - Reports: workflows/deterministic_reporting.md
+      - Experiment Bundles: workflows/experiment_bundles.md
+      - Optional Visualization: workflows/optional_visualization.md
+  - Workflows:
+      - Basic Extraction: workflows/basic_extraction.md
+      - Local Web App: workflows/web_app.md
+      - Reproducible Configs: workflows/reproducible_configs.md
+  - Method Reference:
+      - Edge Weight: methods/edge_weight.md
+      - Disparity: methods/disparity.md
+      - LANS: methods/lans.md
+      - Link Salience: methods/link_salience.md
+      - Link Prediction: methods/link_prediction.md
+      - Link Prediction Isolation Forest: methods/link_prediction_iforest.md
+      - Edge Betweenness: methods/edge_betweenness.md
+      - Maximum Spanning Forest: methods/maximum_spanning_forest.md
+      - Primary Linkage Analysis: methods/primary_linkage.md
+      - Multiple Linkage Analysis: methods/multiple_linkage.md
+      - Planar Maximally Filtered Graph: methods/planar_maximally_filtered_graph.md
+      - H-Backbone: methods/h_backbone.md
+      - GSPAR: methods/gspar.md
+      - Doubly Stochastic: methods/doubly_stochastic.md
+      - Marginal Likelihood: methods/marginal_likelihood.md
+      - Noise Corrected: methods/noise_corrected.md
+      - GLANB: methods/glanb.md
+      - Node Degree: methods/node_degree.md
+      - Node Strength: methods/node_strength.md
+      - Node Betweenness: methods/node_betweenness.md
+  - Filter Reference:
+      - Threshold: filters/threshold.md
+      - Fraction: filters/fraction.md
+      - Significance: filters/significance.md
+      - Default: filters/default.md
+  - API Reference:
+      - Public API: api/public.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          options:
+            show_source: false
+            docstring_style: google

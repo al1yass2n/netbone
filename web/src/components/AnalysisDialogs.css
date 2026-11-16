@@ -1,0 +1,228 @@
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) {
+  --canvas: #eef3f6;
+  --panel: #ffffff;
+  --ink: #162832;
+  --muted: #49606e;
+  --line: #ccd9e0;
+  --line-strong: #7a929f;
+  --accent: #00695f;
+  --accent-soft: #d9f4ee;
+  --danger: #a52d3c;
+  --dialog-header: #e1f0f3;
+  --dialog-disabled: #e5edf1;
+  --dialog-action: #00695f;
+  --dialog-action-hover: #00584f;
+  --dialog-action-ink: #ffffff;
+  --dialog-selected-line: #238779;
+  --dialog-warning-surface: #fff4de;
+  --dialog-warning-ink: #744710;
+  --dialog-error-surface: #fff0f1;
+  --dialog-error-line: #e7a5ad;
+  --button-green-ink: var(--accent);
+  --button-green-fill: var(--accent-soft);
+  --button-green-border: var(--dialog-selected-line);
+  --button-green-hover: var(--accent-soft);
+  color-scheme: light;
+  border-radius: 16px;
+  box-shadow: 0 22px 65px rgb(11 14 17 / 32%);
+}
+
+.app-shell--analysis[data-theme="dark"] :is(.workbench-dialog, .method-dialog) {
+  --canvas: #111c25;
+  --panel: #1b2934;
+  --ink: #edf5f8;
+  --muted: #b2c4ce;
+  --line: #3a5261;
+  --line-strong: #668392;
+  --accent: #79e0ca;
+  --accent-soft: #1b423f;
+  --danger: #ffb6bd;
+  --dialog-header: #18323c;
+  --dialog-disabled: #223440;
+  --dialog-action: #70d9c4;
+  --dialog-action-hover: #9debdc;
+  --dialog-action-ink: #0b2824;
+  --dialog-selected-line: #56bbaa;
+  --dialog-warning-surface: #382e21;
+  --dialog-warning-ink: #f9d49d;
+  --dialog-error-surface: #3d242d;
+  --dialog-error-line: #9d5662;
+  color-scheme: dark;
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog)::backdrop {
+  background: rgb(14 17 20 / 72%);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) .button {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--panel);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) .button:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):not(:disabled) {
+  color: var(--dialog-action-ink);
+  border-color: var(--dialog-action);
+  background: var(--dialog-action);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):hover:not(:disabled) {
+  background: var(--dialog-action-hover);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) .button:disabled {
+  color: var(--muted);
+  border-color: var(--line);
+  background: var(--dialog-disabled);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.field > span, .choice-field legend, .advanced-options > summary) {
+  color: var(--ink);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.field input, .field select, .field textarea) {
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) .advanced-options {
+  background: var(--panel);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) .warning-list > div {
+  background: var(--dialog-warning-surface);
+  color: var(--dialog-warning-ink);
+}
+
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(input, select, textarea, summary, button):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.app-shell--analysis .network-settings-dialog {
+  width: min(790px, calc(100% - 24px));
+}
+
+.app-shell--analysis :is(.network-settings-dialog > header, .network-settings-footer, .network-settings-body, .method-library-header, .method-library-body) {
+  padding-inline: clamp(14px, 3vw, 26px);
+}
+
+.app-shell--analysis :is(.network-settings-dialog > header, .method-library-header) {
+  padding-block: clamp(15px, 2.6vw, 24px);
+  background: var(--dialog-header);
+}
+
+.app-shell--analysis :is(.network-settings-dialog > header h2, .method-library-header h2) {
+  margin: 0;
+  font-size: clamp(1.28rem, 2.7vw, 1.75rem);
+  font-weight: 680;
+  letter-spacing: -0.035em;
+}
+
+.app-shell--analysis .network-settings-file { font-variant-numeric: tabular-nums; }
+
+.app-shell--analysis :is(.network-settings-body, .method-library-body) {
+  padding-block: clamp(12px, 2.2vw, 20px);
+  background: var(--canvas);
+}
+
+.app-shell--analysis .network-settings-footer { padding-block: 12px; }
+.app-shell--analysis .network-settings-stack { gap: 12px; }
+.app-shell--analysis .network-settings-stack .mapping-panel { padding: clamp(12px, 2.6vw, 18px); }
+.app-shell--analysis .network-settings-stack .mapping-panel .pane-heading h3 { font-size: 1.12rem; }
+
+.app-shell--analysis .network-settings-dialog .mapping-list {
+  gap: 8px 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--canvas);
+}
+
+.app-shell--analysis .network-settings-dialog .mapping-list > div {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.app-shell--analysis .network-settings-dialog :is(.context-details, .network-source-preview, .graphml-summary, .toggle-row, .choice-option > span) {
+  border-color: var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.app-shell--analysis .network-settings-dialog .weight-meaning {
+  min-width: 0;
+  margin-inline: 0;
+  border-color: var(--dialog-selected-line);
+  background: var(--panel);
+}
+
+.app-shell--analysis .network-settings-dialog .weight-meaning legend { color: var(--accent); }
+
+.app-shell--analysis .network-settings-dialog .weight-meaning input { accent-color: var(--accent); }
+
+.app-shell--analysis .network-settings-dialog .weight-meaning .choice-option > span { background: var(--canvas); }
+
+.app-shell--analysis .network-settings-dialog .weight-meaning .choice-option input:checked + span {
+  border-color: var(--dialog-selected-line);
+  background: var(--accent-soft);
+}
+
+.app-shell--analysis .network-settings-dialog .readiness {
+  border-color: var(--dialog-error-line);
+  background: var(--dialog-error-surface);
+  color: var(--danger);
+}
+
+.app-shell--analysis .network-settings-dialog .readiness.is-ready {
+  border-color: var(--dialog-selected-line);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.app-shell--analysis .network-settings-dialog .toggle-row > i { background: var(--line-strong); }
+.app-shell--analysis .network-settings-dialog .toggle-row input:checked + i { background: var(--dialog-action); }
+.app-shell--analysis .network-settings-dialog .toggle-row input:checked + i::after { background: var(--dialog-action-ink); }
+.app-shell--analysis .network-settings-dialog .toggle-row input:focus-visible + i { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app-shell--analysis :is(.network-settings-dialog .data-sample th, .result-details-dialog th) {
+  background: var(--dialog-header);
+  color: var(--ink);
+}
+
+.app-shell--analysis .network-settings-dialog .data-sample td { background: var(--panel); }
+.app-shell--analysis .network-settings-dialog .data-sample tr:nth-child(even) td { background: var(--canvas); }
+.app-shell--analysis .result-details-dialog tr.is-retained td { background: var(--accent-soft); }
+
+.app-shell--analysis .method-dialog {
+  width: min(750px, calc(100% - 24px));
+  background: var(--panel);
+}
+
+.app-shell--analysis .method-library-header .pane-heading { flex-wrap: wrap; }
+
+.app-shell--analysis .method-dialog .method-facets {
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+.app-shell--analysis .method-dialog :is(.search-field, .method-list > button) { background: var(--panel); }
+.app-shell--analysis .method-dialog .search-field input { background: transparent; }
+.app-shell--analysis .method-dialog .method-list > button.is-incompatible:not(.is-active) { background: var(--dialog-disabled); }
+.app-shell--analysis .method-dialog .method-list > button > em { color: var(--dialog-warning-ink); }
+
+.app-shell--analysis .method-dialog .method-library-body .method-list > button:is(:hover:not(:disabled), .is-active) {
+  border-color: var(--button-green-border);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 520px) {
+  .app-shell--analysis .network-settings-footer > span:empty { display: none; }
+  .app-shell--analysis .network-settings-footer .button { min-height: 44px; }
+  .app-shell--analysis .network-settings-dialog .network-settings-body .field-grid { grid-template-columns: minmax(0, 1fr); }
+}

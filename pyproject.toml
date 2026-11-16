@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netbone"
+version = "0.3.0"
+description = "Extract and compare network backbones with Python and a local web app."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Ali Yassin", email = "al1yass2n@gmail.com" },
+]
+maintainers = [
+  { name = "Abbas Haidar" },
+  { name = "Ali Yassin" },
+]
+keywords = ["network-science", "backbone", "networkx", "graphs"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = [
+  "networkx>=3.0",
+  "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+viz = [
+  "matplotlib>=3.8",
+]
+ml = [
+  "scikit-learn>=1.4",
+]
+docs = [
+  "mkdocs>=1.6",
+  "mkdocstrings[python]>=0.25",
+]
+dev = [
+  "build>=1.2",
+  "mypy>=1.10",
+  "pytest>=8.0",
+  "ruff>=0.5",
+  "scikit-learn>=1.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/al1yass2n/netbone"
+Repository = "https://github.com/al1yass2n/netbone"
+Citation = "https://www.nature.com/articles/s41598-023-42076-3"
+"Legacy source (0.2.3)" = "https://gitlab.liris.cnrs.fr/coregraphie/netbone"
+
+[project.scripts]
+netbone-web = "netbone.webapp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"netbone.webapp" = ["static/*.html", "static/*.css", "static/*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+extend-exclude = ["PLAN.md", ".agents"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "N", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["networkx.*", "pandas.*"]
+ignore_missing_imports = true
