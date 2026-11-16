@@ -5,7 +5,7 @@ selected, and measure what the reduction preserves.
 {: .intro }
 
 [Run your first Python analysis](start/first-backbone.md){ .docs-button }
-[Open the browser tutorial](browser/first-session.md){ .docs-button .docs-button-secondary }
+[Try a sample network](browser/sample-demo.md){ .docs-button .docs-button-secondary }
 
 <div class="guide-grid" markdown="1">
 

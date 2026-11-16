@@ -1,0 +1,88 @@
+.sample-demo {
+  margin-block: 1.75rem;
+}
+
+.demo-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.demo-panel {
+  padding: 1rem;
+  border: 1px solid #d8e7e3;
+  border-radius: .55rem;
+  background: #f4f9f8;
+}
+
+[role="main"] .demo-panel h2 {
+  margin: 0 0 .75rem;
+  font-size: 1.2rem;
+}
+
+.demo-slider-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+  font-size: .9rem;
+}
+
+.demo-slider-label output {
+  color: #105d50;
+  font-weight: 700;
+}
+
+.demo-panel input {
+  width: 100%;
+  margin: .3rem 0 .75rem;
+  accent-color: #176d58;
+}
+
+.demo-panel input:focus-visible {
+  outline: 2px solid #176d58;
+  outline-offset: 3px;
+}
+
+.demo-panel canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e1ebe8;
+  border-radius: .4rem;
+  background: #fff;
+}
+
+.demo-count {
+  margin: .75rem 0 0;
+  font-weight: 650;
+}
+
+.demo-legend {
+  margin: .7rem 0 0;
+  color: #3f5960;
+  font-size: .9rem;
+}
+
+.demo-comparison {
+  margin: 1rem 0;
+  padding: .55rem .85rem;
+  border-left: 3px solid #176d58;
+  background: #f4f9f8;
+}
+
+.demo-table caption {
+  caption-side: top;
+  font-weight: 650;
+  color: #20343d;
+}
+
+[role="main"] .demo-table td {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .demo-panels {
+    grid-template-columns: 1fr;
+  }
+}

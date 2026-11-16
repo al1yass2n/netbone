@@ -22,6 +22,7 @@ nav:
       - Find settings with a sweep: python/sweep.md
       - Save and reproduce an analysis: python/reproduce.md
   - Browser:
+      - Try a sample network: browser/sample-demo.md
       - Run the local web app: browser/launch.md
       - Extract a backbone in the browser: browser/first-session.md
       - Import a network: browser/import.md
@@ -89,8 +90,11 @@ markdown_extensions:
 
 extra_css:
   - assets/docs.css
+  - assets/sample-demo.css
 extra_javascript:
   - assets/copy-code.js
+  - path: assets/sample-demo.js
+    type: module
 
 validation:
   nav:

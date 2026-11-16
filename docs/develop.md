@@ -27,6 +27,14 @@ mkdocstrings directives that read signatures and docstrings from `src/`.
 Update docstrings when the corresponding public contract changes and run
 new examples from an installed environment.
 
+The [sample demo](browser/sample-demo.md) reads precomputed Netbone results.
+After changing its sample or selection settings, regenerate the data from
+the repository root and commit the updated JSON.
+
+```bash
+python examples/build_sample_demo.py
+```
+
 ## Run project checks
 
 ```bash
