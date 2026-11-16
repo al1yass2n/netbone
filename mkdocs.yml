@@ -7,11 +7,12 @@ edit_uri: ''
 
 theme:
   name: mkdocs
+  custom_dir: docs_theme
   highlightjs: false
 
 nav:
   - Home: index.md
-  - Start:
+  - Getting started:
       - Install Netbone: start/install.md
       - Extract your first backbone: start/first-backbone.md
   - Python:
@@ -21,7 +22,7 @@ nav:
       - Compare backbone results: python/compare.md
       - Find settings with a sweep: python/sweep.md
       - Save and reproduce an analysis: python/reproduce.md
-  - Browser:
+  - Web app:
       - Try the web demo: browser/sample-demo.md
       - Run the local web app: browser/launch.md
       - Extract a backbone in the browser: browser/first-session.md
@@ -49,7 +50,7 @@ nav:
       - Node Degree: methods/node_degree.md
       - Node Strength: methods/node_strength.md
       - Node Betweenness: methods/node_betweenness.md
-  - Reference:
+  - API reference:
       - Pipelines and results: reference/pipelines.md
       - Networks and loaders: reference/networks.md
       - Comparison, sweeps, and exports: reference/measurement.md
@@ -85,12 +86,13 @@ markdown_extensions:
       permalink: true
   - codehilite:
       guess_lang: false
-      noclasses: true
-      pygments_style: friendly
+      noclasses: false
 
 extra_css:
+  - assets/docs-syntax.css
   - assets/docs.css
 extra_javascript:
+  - assets/docs-nav.js
   - assets/copy-code.js
 
 validation:

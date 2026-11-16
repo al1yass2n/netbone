@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% set icons = {
+  "Home": "house",
+  "Getting started": "rocket",
+  "Python": "code",
+  "Web app": "window-maximize",
+  "Methods": "diagram-project",
+  "API reference": "book-open",
+  "Project": "circle-info"
+} %}
+
+{% macro icon(name) -%}
+  <i class="fa-solid fa-{{ name }}" aria-hidden="true"></i>
+{%- endmacro %}
+
+{% macro site_item(item, top_level=false) %}
+  {% if item.children %}
+    <li>
+      <details class="docs-section"{% if item.active %} open{% endif %}>
+        <summary>
+          {{ icon(icons.get(item.title, "folder")) }}
+          <span>{{ item.title }}</span>
+          {{ icon("chevron-right") }}
+        </summary>
+        <ul>
+          {% for child in item.children %}{{ site_item(child) }}{% endfor %}
+        </ul>
+      </details>
+    </li>
+  {% else %}
+    <li>
+      <a href="{{ item.url | url }}"{% if item.active %} aria-current="page"{% endif %}>
+        {% if top_level %}{{ icon(icons.get(item.title, "file")) }}{% endif %}
+        <span>{{ item.title }}</span>
+      </a>
+    </li>
+  {% endif %}
+{% endmacro %}
+
+{% macro outline(items, depth=1) %}
+  <ul>
+    {% for item in items %}
+      <li>
+        <a href="{{ item.url }}">{{ item.title }}</a>
+        {% if item.children and depth < 2 %}{{ outline(item.children, depth + 1) }}{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% macro page_link(destination, direction) %}
+  {% if destination %}
+    <a rel="{{ direction }}" class="docs-page-link" href="{{ destination.url | url }}">
+      {{ icon("arrow-left" if direction == "prev" else "arrow-right") }}
+      <span>
+        <small>{{ "Previous" if direction == "prev" else "Next" }}</small>
+        <strong>{{ destination.title }}</strong>
+      </span>
+    </a>
+  {% endif %}
+{% endmacro %}
+
+{% block extrahead %}
+  <script src="{{ 'assets/docs-theme.js' | url }}"></script>
+{% endblock %}
+
+{% block site_name %}
+  <a class="docs-skip" href="#docs-content">Skip to content</a>
+  <a class="navbar-brand docs-brand" href="{{ nav.homepage.url | url }}">
+    <span class="docs-brand-icon">{{ icon("diagram-project") }}</span>
+    {{ config.site_name }}
+  </a>
+{% endblock %}
+
+{% block site_nav %}{% endblock %}
+
+{% block search_button %}
+  {% if "search" in config.plugins %}
+    <li class="nav-item">
+      <button type="button" class="docs-header-search" aria-label="Search documentation"
+              data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+        {{ icon("magnifying-glass") }}
+        <span>Search</span>
+      </button>
+    </li>
+  {% endif %}
+{% endblock %}
+
+{% block next_prev %}
+  <li class="nav-item">
+    <a class="docs-demo-link" href="{{ 'browser/sample-demo/' | url }}">
+      {{ icon("play") }}
+      Try the demo
+    </a>
+  </li>
+{% endblock %}
+
+{% block repo %}
+  {% if config.repo_url %}
+    <li class="nav-item">
+      <a class="docs-repo-link" href="{{ config.repo_url }}" aria-label="{{ config.repo_name }}">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>{{ config.repo_name }}</span>
+      </a>
+    </li>
+  {% endif %}
+  <li class="nav-item docs-theme-picker" hidden>
+    <span class="docs-theme-icon docs-theme-icon--system">{{ icon("circle-half-stroke") }}</span>
+    <span class="docs-theme-icon docs-theme-icon--light">{{ icon("sun") }}</span>
+    <span class="docs-theme-icon docs-theme-icon--dark">{{ icon("moon") }}</span>
+    <select id="docs-color-theme" aria-label="Color theme" title="Color theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </li>
+{% endblock %}
+
+{% block content %}
+  {% set headings = page.toc.items if page else [] %}
+  {% if headings | length == 1 and headings[0].level == 1 %}
+    {% set headings = headings[0].children %}
+  {% endif %}
+  {% set show_outline = page and not page.is_homepage and headings | length > 1 %}
+  <div class="docs-layout{% if show_outline %} docs-layout--outline{% endif %}">
+    <aside class="docs-sidebar" data-docs-disclosure>
+      <button class="docs-disclosure-button" type="button" aria-expanded="false"
+              aria-controls="docs-menu" hidden>
+        {{ icon("bars") }} <span>Browse docs</span> {{ icon("chevron-down") }}
+      </button>
+      <nav id="docs-menu" aria-label="Documentation">
+        <ul class="docs-nav">
+          {% for item in nav %}{{ site_item(item, true) }}{% endfor %}
+        </ul>
+      </nav>
+    </aside>
+
+    {% if show_outline %}
+      <aside class="docs-outline" data-docs-disclosure>
+        <div class="docs-outline-title">On this page</div>
+        <button class="docs-disclosure-button" type="button" aria-expanded="false"
+                aria-controls="docs-outline" hidden>
+          {{ icon("list") }} <span>On this page</span> {{ icon("chevron-down") }}
+        </button>
+        <nav id="docs-outline" aria-label="On this page">
+          {{ outline(headings) }}
+        </nav>
+      </aside>
+    {% endif %}
+
+    <main id="docs-content" class="docs-article" tabindex="-1">
+      {% if page and page.parent and not page.is_homepage %}
+        <div class="docs-breadcrumb">
+          <a href="{{ nav.homepage.url | url }}">Documentation</a>
+          {{ icon("chevron-right") }}
+          {{ page.parent.title }}
+        </div>
+      {% endif %}
+      {% block docs_article %}
+        {% include "content.html" %}
+      {% endblock %}
+      {% if page and not page.is_homepage and (page.previous_page or page.next_page) %}
+        <nav class="docs-pagination" aria-label="Page navigation">
+          {{ page_link(page.previous_page, "prev") }}
+          {{ page_link(page.next_page, "next") }}
+        </nav>
+      {% endif %}
+    </main>
+  </div>
+{% endblock %}
