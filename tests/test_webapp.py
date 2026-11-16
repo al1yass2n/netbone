@@ -537,13 +537,14 @@ def test_webapp_source_keeps_primary_result_actions_reachable() -> None:
     for label in (
         "Save this backbone",
         "Inspect &amp; export",
-        "Download graph",
-        "Inspect statistics",
-        "Reproduce this analysis",
-        "Download JSON",
+        "Method statistics",
+        "View run settings",
+        "Download settings (JSON)",
+        "Download ZIP",
     ):
         assert label in app
     assert "Download CSV" in _frontend_text("components", "StatisticsTable.tsx")
+    assert "downloadGraph(result.result_id, format, scope)" in app
     assert "resultDialog.current?.showModal()" in app
     assert "Comparison label" not in app
     assert "Rename saved result" in _frontend_text(

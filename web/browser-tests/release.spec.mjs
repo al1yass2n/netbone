@@ -89,10 +89,12 @@ test("large networks keep counts and downloads available without a graph preview
     await page.keyboard.press("ArrowRight");
     await expect.poll(() => statistics.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   }
+  await inspect.getByRole("tab", { name: "Export" }).click();
+  await expect(inspect.getByRole("combobox", { name: "Graph", exact: true })).toHaveValue("backbone");
   const pendingDownload = page.waitForEvent("download");
   await inspect.getByRole("button", { name: "Download GraphML" }).click();
   const download = await pendingDownload;
-  expect(download.suggestedFilename()).toBe("netbone-edge-weight-annotated.graphml");
+  expect(download.suggestedFilename()).toBe("netbone-edge-weight-backbone.graphml");
   expect(await download.failure()).toBeNull();
 });
 

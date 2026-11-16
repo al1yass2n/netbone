@@ -21,10 +21,13 @@ try extraction and export without preparing a file.
    were left out. **Backbone edges** counts retained links. Node coverage
    counts nodes incident to those links, which can differ from the number of
    output nodes when the result retains isolates.
-6. Choose **Inspect & export** to review the method statistics and selection.
-   Download the run settings as JSON. In the graph export, choose **Backbone
-   only** and download GraphML or GEXF for Gephi. Choose **Download ZIP** for
-   the full experiment.
+6. Open **Inspect & export**. In **Inspect**, review the method statistics
+   and open **View run settings** to download the pipeline JSON.
+7. Switch to **Export** for a GraphML or GEXF download. **Backbone only** is
+   selected by default. Choose **Download ZIP** for the full experiment.
+
+Use **Copy BibTeX** in the app footer to copy the Netbone citation.
+
 
 Use **Save this backbone** to add the result to the current comparison list.
 To see how retention sensitivity affects the result, continue with
