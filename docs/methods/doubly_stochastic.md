@@ -1,63 +1,33 @@
 # Doubly Stochastic
 
-`doubly_stochastic` computes edge scores from a Sinkhorn-normalized weighted
-adjacency matrix.
+Registered name `doubly_stochastic`
 
-## Summary
+Balances the weighted adjacency matrix of each connected component toward unit
+row and column sums. Its default extraction keeps a descending-score prefix
+sufficient to connect each input component. Read `doubly_stochastic_score` for
+the balanced values and `doubly_stochastic_connected_selected` for the
+selection used by `default`.
 
-- **Name:** `doubly_stochastic`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `doubly_stochastic_score`
-- **Preferred direction:** `higher`
-- **Weighted input:** required
-- **Positive weights:** required
-- **Default filter:** threshold on `doubly_stochastic_connected_selected`
+Parameters default to `weight="weight"`, `epsilon=1e-4`,
+`epsilon_mode="relative"`, `tolerance=1e-12`, and `max_iterations=1000`.
+Epsilon fills the matrix and is added to observed weights. In relative mode it
+is multiplied by mean edge weight within the component. In `"absolute"` mode it
+is used directly. Check convergence warnings before interpreting scores,
+especially on large components where the dense matrix is costly.
 
-## Definition
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `doubly_stochastic_score` | higher | Unsupported | Positive |
 
-Netbone builds a symmetric weighted adjacency matrix, adds a small positive
-`epsilon`, and alternates row and column normalization until row and column sums
-are within `tolerance` or `max_iterations` is reached. For disconnected graphs,
-the normalization is applied independently to each connected component. Each
-original edge gets the average normalized matrix value in both directions.
+## Run the method
 
-By default, `epsilon` is scale-relative:
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
 ```python
-effective_epsilon = epsilon * mean_positive_component_weight
+candidate = nb.pipeline().score("doubly_stochastic", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
 ```
 
-This keeps the score stable when all weights are multiplied by a constant. Pass
-`epsilon_mode="absolute"` to use `epsilon` directly.
-
-For default extraction, Netbone also records a deterministic connected-prefix
-selection: edges are sorted from highest to lowest `doubly_stochastic_score`,
-with stable `edge_id` tie-breaking, and added one after another until all nodes
-inside each connected component are connected. Isolated nodes do not require
-selected edges. Users can still apply ordinary `threshold` or `fraction`
-filters to `doubly_stochastic_score`.
-
-Ties in the default connected-prefix selection are broken by stable `edge_id`.
-This tie policy is deterministic and currently not user-configurable.
-
-## Parameters
-
-- `weight`: edge attribute containing positive numeric weights. Default:
-  `"weight"`.
-- `epsilon`: positive smoothing parameter. Default: `1e-4`.
-- `epsilon_mode`: `"relative"` or `"absolute"`. Default: `"relative"`.
-- `tolerance`: row/column sum convergence tolerance. Default: `1e-12`.
-- `max_iterations`: maximum Sinkhorn iterations per component. Default:
-  `1000`.
-
-## Output
-
-- `doubly_stochastic_weight`
-- `doubly_stochastic_score`
-- `doubly_stochastic_connected_order`
-- `doubly_stochastic_connected_selected`
-
-## Reference
-
-PNAS doubly stochastic transformation/filter. DOI: `10.1073/pnas.0904725106`.
+[Algorithm reference](https://doi.org/10.1073/pnas.0904725106)

@@ -1,47 +1,68 @@
-# Netbone Documentation
+# Netbone
 
-Netbone is a deterministic Python package for extracting, filtering,
-measuring, comparing, visualizing, reporting, and saving network backbones.
+Extract a smaller graph from a network, inspect why its edges or nodes were
+selected, and measure what the reduction preserves.
+{: .intro }
 
-The package installs and imports as `netbone`. It uses NetworkX for graphs and
-pandas DataFrames for method statistics and metric tables. The local web app
-provides a browser interface for extraction, comparison, and parameter sweeps.
+[Run your first Python analysis](start/first-backbone.md){ .docs-button }
+[Open the browser tutorial](browser/first-session.md){ .docs-button .docs-button-secondary }
 
-## Start Here
+<div class="guide-grid" markdown="1">
 
-- [Installation](getting-started/installation.md)
-- [Quickstart](getting-started/quickstart.md)
-- [Choosing methods](user-guide/choosing-methods.md)
-- [Basic extraction workflow](workflows/basic_extraction.md)
+<section markdown="1">
 
-## Common Tasks
+## Prepare a network
 
-- Load CSV edge lists or GraphML files: [Loading graphs](user-guide/loading-graphs.md)
-- Aggregate temporal event lists before extraction:
-  [Temporal aggregation](user-guide/temporal-aggregation.md)
-- Select edges or nodes from method statistics: [Filtering](user-guide/filtering.md)
-- Compare backbone results: [Method comparison](workflows/method_comparison.md)
-- Sweep thresholds, fractions, and method parameters:
-  [Parameter sweeps](workflows/parameter_sweeps.md)
-- Generate deterministic Markdown summaries:
-  [Reports](workflows/deterministic_reporting.md)
-- Save reproducible folders with reports, tables, configuration, and graph
-  exports: [Experiment bundles](workflows/experiment_bundles.md)
-- Run the first extraction workflow in a browser:
-  [Local web app](workflows/web_app.md)
-- Plot comparison and sweep tables with optional Matplotlib helpers:
-  [Optional visualization](workflows/optional_visualization.md)
+Load a CSV edge list, read GraphML, work with NetworkX directly, or aggregate
+time-stamped interactions before scoring.
 
-## Reference
+[Prepare graph inputs](python/inputs.md)
 
-- [Method reference](methods/edge_weight.md)
-- [Filter reference](filters/threshold.md)
-- [Public API reference](api/public.md)
+</section>
 
-## Citation
+<section markdown="1">
 
-If you use or adapt Netbone in published work, please cite the journal article:
+## Choose what to keep
 
-> Yassin, A., Haidar, A., Cherifi, H., Seba, H., & Togni, O. (2023).
-> [An evaluation tool for backbone extraction techniques in weighted complex networks](https://doi.org/10.1038/s41598-023-42076-3).
-> *Scientific Reports*, 13, Article 17000.
+Use a method that matches the structure you want to preserve. Apply a cutoff,
+a retention budget, a significance level, or the method's built-in selection.
+
+[Choose a method and filter](python/select.md)
+
+</section>
+
+<section markdown="1">
+
+## Evaluate a backbone
+
+Compare retention and connectivity, examine overlap and rank agreement, or
+sweep settings to see where the result changes.
+
+[Compare backbones](python/compare.md) · [Sweep settings](python/sweep.md)
+
+</section>
+
+<section markdown="1">
+
+## Share a run
+
+Save settings, a deterministic report, and tables. Export the original and
+backbone graphs for inspection in other tools.
+
+[Save and reproduce an analysis](python/reproduce.md)
+
+</section>
+
+</div>
+
+The Python package returns NetworkX graphs and pandas tables. The local web app
+uses the same analysis engine and ships with the package. If you already know
+the object or method you need, go to the [Python reference](reference/pipelines.md)
+or the [method catalog](reference/methods.md).
+
+## Cite Netbone
+
+Yassin, A., Haidar, A., Cherifi, H., Seba, H., & Togni, O. (2023).
+*An evaluation tool for backbone extraction techniques in weighted complex
+networks*. Scientific Reports, 13, Article 17000.
+[Journal article](https://doi.org/10.1038/s41598-023-42076-3)

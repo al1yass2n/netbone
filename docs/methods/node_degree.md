@@ -1,42 +1,24 @@
 # Node Degree
 
-`node_degree` scores nodes by unweighted degree.
+Registered name `node_degree`
 
-## Summary
+Ranks nodes by the number of incident links. The scorer takes no method
+parameters. Apply a fraction or threshold to keep nodes with the desired degree
+and use the resulting induced graph to inspect their connections.
 
-- **Name:** `node_degree`
-- **Target:** node
-- **Output type:** `score`
-- **Primary statistic:** `node_degree`
-- **Preferred direction:** `higher`
-- **Supported graphs:** simple undirected NetworkX graphs
-- **Weighted input:** ignored
-- **Default filter:** `fraction`, `fraction=0.1`
-- **Multigraph support:** no
-- **Directed graph support:** no
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| node | `node_degree` | higher | Unsupported | Weights ignored |
 
-## Definition
+## Run the method
 
-For each node `i`, Netbone computes:
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-```text
-node_degree(i) = number of incident edges
+```python
+candidate = nb.pipeline().score("node_degree")
+result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").run(
+    graph
+)
+print(result.summary())
 ```
-
-## Parameters
-
-`node_degree` has no method parameters.
-
-## Output
-
-`node_degree` returns one row per node:
-
-- `node_id`
-- `node`
-- `node_degree`
-
-## Interpretation
-
-Higher values indicate nodes with more incident edges. Filtering a node method
-returns the node-induced subgraph on selected nodes, so edges between selected
-nodes are retained and edges touching rejected nodes are removed.

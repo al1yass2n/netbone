@@ -1,33 +1,26 @@
-# Primary Linkage Analysis
+# Primary Linkage
 
-`primary_linkage` marks the strongest incident edge of each node and keeps the
-union of those choices.
+Registered name `primary_linkage`
 
-## Summary
+Each node nominates its strongest incident link. An edge is marked if at least
+one endpoint nominates it. Choose this when each node's leading connection is
+the relevant signal. Use `weight="weight"` (default) or name another finite
+numeric attribute. Equal weights are ordered by internal `edge_id`. The score
+table also reports the number of nominations per edge.
 
-- **Name:** `primary_linkage`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `primary_linkage_selected`
-- **Preferred direction:** `higher`
-- **Weighted input:** required
-- **Default filter:** `threshold`, `value=1.0`, `operator="equal"`
-- **Tie policy:** stable internal `edge_id`
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `primary_linkage_selected` | higher | Unsupported | Finite numeric |
 
-## Definition
+## Run the method
 
-For every node, incident edges are sorted by descending weight. If multiple
-edges tie for the maximum, the stable internal `edge_id` breaks the tie. An edge
-is selected when at least one endpoint chooses it.
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-## Output
+```python
+candidate = nb.pipeline().score("primary_linkage", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
+```
 
-- `primary_linkage_weight`
-- `primary_linkage_endpoint_count`
-- `primary_linkage_selected`
-
-## Reference
-
-Nocaj, A., Ortmann, M., and Brandes, U. (2009). Untangling the hairballs of
-multi-centered, small-world online social media networks. DOI:
-`10.1111/j.1467-9663.2009.00547.x`.
+[Algorithm reference](https://doi.org/10.1111/j.1467-9663.2009.00547.x)

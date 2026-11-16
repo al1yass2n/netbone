@@ -1,48 +1,32 @@
-# Fraction Filter
+# Fraction
 
-`fraction` selects the top retained fraction of a method result using the
-method's declared preferred direction, unless an explicit ranking direction is
-provided.
+Use `fraction` for a retention budget on score, p-value, or numeric custom
+statistics. Give a number from 0 to 1. The requested count is
+`ceil(fraction * number_of_rows)`. A fraction of zero keeps zero items and a
+fraction of one keeps all items.
 
-## Summary
+The filter defaults to the primary statistic and the method's preferred
+direction. Override them with `statistic` and `direction="higher"` or
+`direction="lower"`. [Link Prediction](../methods/link_prediction.md)
+requires an explicit direction.
 
-- **Name:** `fraction`
-- **Input:** `MethodResult`
-- **Output:** `Selection`
-- **Default statistic:** method `primary_statistic`
-- **Default tie policy:** `include_all_ties`
-- **Default isolate behavior:** keep isolates
+## Ties at the cutoff
 
-## Parameters
+| `tie_policy` | Behavior |
+| --- | --- |
+| `include_all_ties` (default) | Keep every item tied at the cutoff. The realized count can exceed the requested count. |
+| `exact_stable` | Break ties by internal ID and keep the requested count. |
+| `raise_on_tie` | Raise an error if the cutoff splits a tie. |
+| `random_seeded` | Choose the remaining items from the tied group using the required integer `random_seed`. |
 
-- `fraction`: requested retained fraction from `0` to `1`.
-- `statistic`: optional statistic column. Defaults to the method result's
-  primary statistic.
-- `direction`: optional ranking override, either `higher` or `lower`. When
-  omitted, the method result's preferred direction is used.
-- `tie_policy`: tie handling at the cutoff.
-- `random_seed`: required integer seed when `tie_policy="random_seeded"`.
-- `drop_isolates`: whether isolated nodes should be removed after edge
-  filtering. Defaults to `False`.
+Inspect the requested and actual counts in `result.selection.parameters`.
+Missing, non-numeric, or non-finite values cause a validation error. Use
+`drop_isolates=True` if you want an edge-target result without isolates.
 
-## Tie Policies
+```python
+result = nb.filter_scores(
+    graph, scores, "fraction", fraction=0.5, tie_policy="exact_stable"
+)
+```
 
-- `include_all_ties`: include every item tied at the cutoff and report the
-  actual retained count.
-- `exact_stable`: keep exactly the requested count, breaking ties by stable
-  node or edge id and warning when ties are truncated.
-- `raise_on_tie`: raise `ConfigurationError` when ties affect the cutoff.
-- `random_seeded`: keep exactly the requested count by choosing among cutoff
-  ties with a reproducible random seed. The selection records the seed and
-  affected tied ids.
-
-## Behavior
-
-For methods where higher values are preferred, such as `edge_weight`, the
-filter keeps the largest values. For methods where lower values are preferred,
-such as p-value methods, the filter keeps the smallest values.
-
-Some neutral similarity methods require an explicit `direction` because the
-same score can define different backbone semantics. For example,
-`link_prediction` uses `direction="higher"` for high-similarity backbones and
-`direction="lower"` for low-similarity backbones.
+Use `graph` and `scores` from [the score reuse example](../python/select.md#reuse-an-existing-score-table).

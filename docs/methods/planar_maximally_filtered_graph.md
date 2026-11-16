@@ -1,32 +1,29 @@
 # Planar Maximally Filtered Graph
 
-`planar_maximally_filtered_graph` marks edges selected by the Planar Maximally
-Filtered Graph procedure.
+Registered name `planar_maximally_filtered_graph`
 
-## Summary
+Tries input links in descending weight order and accepts each link if the
+retained graph stays planar. Use PMFG when the output needs cycles and must
+also admit a drawing without crossings. The algorithm tests available links
+only.
 
-- **Name:** `planar_maximally_filtered_graph`
-- **Target:** edge
-- **Output type:** `score`
-- **Primary statistic:** `pmfg_selected`
-- **Preferred direction:** `higher`
-- **Weighted input:** optional
-- **Default filter:** `threshold`, `value=1.0`, `operator="equal"`
-- **Tie policy:** stable internal `edge_id`
+`weight="weight"` is the default. Pass `weight=None` to make weights equal.
+Ties use internal `edge_id`. The result warns when equal weights appear on both
+sides of the final selection.
 
-## Definition
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| edge | `pmfg_selected` | higher | Unsupported | Finite numeric or unit weights |
 
-Edges are considered by descending weight. Each edge is kept if adding it to
-the growing backbone preserves planarity. The process stops when no more input
-edges remain or when the planar graph reaches `3 * (n - 2)` edges for `n >= 3`.
+## Run the method
 
-## Output
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-- `pmfg_weight`
-- `pmfg_order`
-- `pmfg_selected`
+```python
+candidate = nb.pipeline().score("planar_maximally_filtered_graph", weight="weight")
+result = candidate.filter("default").run(graph)
+print(result.summary())
+```
 
-## Reference
-
-Tumminello, M., Aste, T., Di Matteo, T., and Mantegna, R. N. (2005). A tool for
-filtering information in complex systems. DOI: `10.1073/pnas.0500298102`.
+[Algorithm reference](https://doi.org/10.1073/pnas.0500298102)

@@ -1,48 +1,25 @@
 # Node Strength
 
-`node_strength` scores nodes by weighted degree, also called strength.
+Registered name `node_strength`
 
-## Summary
+Ranks nodes by the sum of the weights on their incident links. An isolated node
+has strength zero. Use the `weight` parameter to choose the numeric attribute,
+which defaults to `"weight"`. This measure can rank a node with a few strong
+links ahead of a node with many weak links.
 
-- **Name:** `node_strength`
-- **Target:** node
-- **Output type:** `score`
-- **Primary statistic:** `node_strength`
-- **Preferred direction:** `higher`
-- **Supported graphs:** simple undirected NetworkX graphs
-- **Weighted input:** required
-- **Default weight attribute:** `weight`
-- **Default filter:** `fraction`, `fraction=0.1`
-- **Multigraph support:** no
-- **Directed graph support:** no
+| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
+| --- | --- | --- | --- | --- |
+| node | `node_strength` | higher | Unsupported | Finite numeric |
 
-## Definition
+## Run the method
 
-For each node `i`, Netbone computes:
+Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
+compatible graph of your own.
 
-```text
-node_strength(i) = sum of weights on edges incident to i
+```python
+candidate = nb.pipeline().score("node_strength", weight="weight")
+result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").run(
+    graph
+)
+print(result.summary())
 ```
-
-## Parameters
-
-- `weight`: edge attribute name containing finite numeric weights. Defaults to
-  `"weight"`.
-
-## Output
-
-`node_strength` returns one row per node:
-
-- `node_id`
-- `node`
-- `node_strength`
-
-## Validation
-
-The method raises `ValidationError` when a configured weight attribute is
-missing, non-numeric, boolean, infinite, or NaN.
-
-## Interpretation
-
-Higher values indicate nodes with greater total incident edge weight. Filtering
-a node method returns the node-induced subgraph on selected nodes.

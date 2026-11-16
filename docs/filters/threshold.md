@@ -1,72 +1,25 @@
-# Threshold Filter
+# Threshold
 
-`threshold` converts method output values into a selection by comparing one
-named value column against an explicit threshold.
+Use `threshold` when the score has a meaningful cutoff. `value` is a finite
+number. `operator` is required and determines how equality is handled.
 
-## Summary
+| Operator | Keep a row when its statistic |
+| --- | --- |
+| `greater` | Is greater than the cutoff |
+| `greater_equal` | Is greater than or equal to the cutoff |
+| `less` | Is less than the cutoff |
+| `less_equal` | Is less than or equal to the cutoff |
+| `equal` | Equals the cutoff |
+| `not_equal` | Differs from the cutoff |
 
-- **Name:** `threshold`
-- **Input:** `MethodResult`
-- **Output:** `Selection`
-- **Supported targets:** edge selections in the current vertical slice
-- **Default isolate behavior:** keep isolates
+Use `statistic="column_name"` to select a numeric column other than the primary
+statistic. Missing, non-numeric, or non-finite values cause a validation error.
+Use `drop_isolates=True` to remove isolated nodes after edge filtering.
 
-## Parameters
-
-- `statistic`: optional value column to compare, such as `score`. When omitted,
-  the method's `primary_statistic` is used.
-- `value`: finite numeric threshold.
-- `operator`: comparison operator.
-- `drop_isolates`: whether isolated nodes should be removed after edge
-  filtering. Defaults to `False`.
-
-Supported operators:
-
-- `greater`
-- `greater_equal`
-- `less`
-- `less_equal`
-- `equal`
-- `not_equal`
-
-## Behavior
-
-For each row in the method output table, `threshold` evaluates:
-
-```text
-row[statistic] operator value
+```python
+result = nb.filter_scores(graph, scores, "threshold", value=5, operator="greater_equal")
 ```
 
-Rows where the expression is true become selected ids. Rows where it is false
-become rejected ids.
-
-Most users do not need to pass `statistic`. The method result already declares
-its primary statistic, and `threshold` uses that by default. Passing
-`statistic=...` is an advanced override for method results with multiple
-comparable columns.
-
-For edge selections, `Pipeline.run()` extracts a new NetworkX graph from the
-selected edge ids. Original node ids are used in the returned graph.
-
-## Isolates
-
-When `drop_isolates=False`, all original nodes are kept, even if they have no
-selected incident edges.
-
-When `drop_isolates=True`, nodes without retained incident edges are omitted
-from the backbone graph.
-
-## Validation
-
-The filter raises:
-
-- `ConfigurationError` for unknown operators or missing statistic columns.
-- `ValidationError` for non-numeric, missing, infinite, or NaN threshold/value
-  data.
-
-## Interpretation
-
-The threshold filter does not infer which direction is scientifically correct.
-Users must choose the statistic and operator explicitly. This is intentional:
-some methods prefer higher values, while others may prefer lower values such as
-p-values.
+See [how to reuse an existing score table](../python/select.md#reuse-an-existing-score-table)
+for a complete example and [significance](significance.md) for p-value
+correction.
