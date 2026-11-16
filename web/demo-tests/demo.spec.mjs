@@ -21,9 +21,9 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   expect(citation).toContain("doi = {10.1038/s41598-023-42076-3}");
   await expect(page.getByRole("button", { name: "Network settings" })).toHaveCount(0);
   await expect(page.getByLabel("Retained fraction")).toHaveValue("0.25");
-  const networkPreview = page.getByRole("region", { name: "Network preview" });
-  await expect(networkPreview.getByText("Backbone edges", { exact: true })).toBeVisible();
-  await expect(networkPreview).toContainText("20");
+  const retention = page.getByLabel("Retention preview");
+  await expect(retention.getByText("Backbone edges", { exact: true })).toBeVisible();
+  await expect(retention).toContainText("20");
 
   await page.getByRole("button", { name: "Compare", exact: true }).click();
   await page.getByRole("button", { name: "Compare 2 backbones" }).click();
@@ -40,7 +40,7 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await page.getByRole("button", { name: "Change method" }).click();
   await page.getByRole("dialog", { name: "Choose a scoring method" }).getByRole("button", { name: /^Edge Betweenness / }).click();
   await page.getByLabel("Retained fraction").selectOption("0.5");
-  await expect(networkPreview).toContainText("39");
+  await expect(retention).toContainText("39");
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspection = page.getByRole("dialog", { name: "Inspect & export" });
   await expect(inspection.getByRole("table", { name: "Method statistics" })).toBeVisible();
