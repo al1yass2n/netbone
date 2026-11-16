@@ -1,6 +1,7 @@
 # Netbone
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB)](docs/start/install.md)
+[![Total PyPI downloads](https://api.pepy.tech/personalized-badge/netbone?period=TOTAL&units=NONE&left_text=Total%20PyPI%20downloads&left_color=grey&right_color=blue)](https://pepy.tech/projects/netbone)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 Netbone extracts smaller graphs from networks and measures what the reduction
