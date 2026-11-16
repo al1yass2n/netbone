@@ -63,9 +63,18 @@ test("search finds API reference pages from the header", async ({ page }) => {
   await search.getByRole("searchbox").pressSequentially("BackboneResult");
   const result = search.getByRole("link", { name: "BackboneResult", exact: true });
   await expect(result).toBeVisible();
+  await page.route("**/assets/fonts/*.woff2", async (route) => {
+    // Exercise fragment alignment when fonts finish loading after navigation.
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    await route.continue();
+  });
   await result.click();
   await expect(page).toHaveURL(/reference\/pipelines\/#netbone.BackboneResult$/);
-  await expect(page.getByRole("main").getByRole("heading", { name: /^BackboneResult\b/, level: 2 })).toBeInViewport();
+  const heading = page.getByRole("main").getByRole("heading", { name: /^BackboneResult\b/, level: 2 });
+  await expect(heading).toBeInViewport();
+  await expect.poll(() => heading.evaluate((element) =>
+    element.getBoundingClientRect().top >= document.querySelector(".navbar").getBoundingClientRect().bottom,
+  )).toBe(true);
 });
 
 test("choose light or dark and reset the docs theme to the system setting", async ({ page }) => {
