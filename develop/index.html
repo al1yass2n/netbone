@@ -16,7 +16,8 @@
         <link href="../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
         <link href="../assets/_mkdocstrings.css" rel="stylesheet">
-        <link href="../assets/docs.css" rel="stylesheet"> 
+        <link href="../assets/docs.css" rel="stylesheet">
+        <link href="../assets/sample-demo.css" rel="stylesheet"> 
     </head>
 
     <body>
@@ -80,6 +81,10 @@
                             <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Browser</a>
                                 <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../browser/sample-demo/" class="dropdown-item">Try a sample network</a>
+</li>
                                     
 <li>
     <a href="../browser/launch/" class="dropdown-item">Run the local web app</a>
@@ -322,6 +327,12 @@ relative Markdown paths in the source. The Python reference uses
 mkdocstrings directives that read signatures and docstrings from <code>src/</code>.
 Update docstrings when the corresponding public contract changes and run
 new examples from an installed environment.</p>
+<p>The <a href="../browser/sample-demo/">sample demo</a> reads precomputed Netbone results.
+After changing its sample or selection settings, regenerate the data from
+the repository root and commit the updated JSON.</p>
+<div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>python<span style="color: #BBB"> </span>examples/build_sample_demo.py
+</code></pre></div>
+
 <h2 id="run-project-checks">Run project checks<a class="headerlink" href="#run-project-checks" title="Permanent link">&para;</a></h2>
 <div class="codehilite" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><code>python<span style="color: #BBB"> </span>-m<span style="color: #BBB"> </span>pytest
 python<span style="color: #BBB"> </span>-m<span style="color: #BBB"> </span>ruff<span style="color: #BBB"> </span>check<span style="color: #BBB"> </span>.
@@ -376,6 +387,7 @@ a build on pushes and pull requests.
         </script>
         <script src="../js/base.js"></script>
         <script src="../assets/copy-code.js"></script>
+        <script src="../assets/sample-demo.js" type="module"></script>
         <script src="../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
