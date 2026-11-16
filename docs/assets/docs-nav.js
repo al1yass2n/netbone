@@ -1,3 +1,34 @@
+function docsAnchor(hash) {
+  try {
+    return document.getElementById(decodeURIComponent(hash.slice(1)));
+  } catch {
+    return null;
+  }
+}
+
+// A webfont can move an inbound fragment after the browser's initial scroll.
+const initialFragment = window.location.hash;
+const initialHeading = docsAnchor(initialFragment);
+if (initialHeading?.closest(".docs-article")) {
+  const interaction = new AbortController();
+  for (const event of ["pointerdown", "wheel", "keydown", "touchstart"]) {
+    window.addEventListener(event, () => interaction.abort(), { passive: true, signal: interaction.signal });
+  }
+
+  window.addEventListener("load", async () => {
+    await document.fonts.ready;
+    requestAnimationFrame(() => {
+      if (interaction.signal.aborted) return;
+      interaction.abort();
+      if (window.location.hash !== initialFragment) return;
+
+      const top = initialHeading.getBoundingClientRect().top;
+      const headerBottom = document.querySelector(".navbar").getBoundingClientRect().bottom;
+      if (top < headerBottom || top >= window.innerHeight) initialHeading.scrollIntoView();
+    });
+  }, { once: true });
+}
+
 document.querySelectorAll("[data-docs-disclosure]").forEach((disclosure) => {
   const button = disclosure.querySelector("button");
   const panel = document.getElementById(button.getAttribute("aria-controls"));
@@ -23,7 +54,7 @@ document.querySelectorAll("[data-docs-disclosure]").forEach((disclosure) => {
       link.addEventListener("click", () => {
         if (button.offsetParent) {
           close();
-          const heading = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+          const heading = docsAnchor(link.hash);
           if (heading) {
             heading.tabIndex = -1;
             heading.focus({ preventScroll: true });
@@ -36,7 +67,7 @@ document.querySelectorAll("[data-docs-disclosure]").forEach((disclosure) => {
 
 const outlineEntries = [...document.querySelectorAll("#docs-outline a")].map((link) => ({
   link,
-  heading: document.getElementById(decodeURIComponent(link.hash.slice(1))),
+  heading: docsAnchor(link.hash),
 })).filter(({ heading }) => heading);
 
 if (outlineEntries.length) {
