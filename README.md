@@ -26,6 +26,7 @@ points to the [earlier GitLab codebase](https://gitlab.liris.cnrs.fr/coregraphie
 ## Documentation
 
 - [Read the documentation online](https://al1yass2n.github.io/netbone/)
+- [Try a sample network](https://al1yass2n.github.io/netbone/browser/sample-demo/)
 - [Documentation home](docs/index.md)
 - [Install and choose extras](docs/start/install.md)
 - [Extract a backbone in the browser](docs/browser/first-session.md)
