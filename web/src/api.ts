@@ -1,3 +1,4 @@
+import { demoAttachment, demoMode, demoResponse } from "./demo-api";
 import type {
   ComparisonResponse,
   ExtractionResponse,
@@ -9,7 +10,8 @@ import type {
   UiSchema,
 } from "./types";
 
-async function requestJson<T>(path: string, body?: unknown): Promise<T> {
+async function requestJson<T>(path: string, body?: JsonRecord): Promise<T> {
+  if (demoMode) return demoResponse(path, body) as Promise<T>;
   const response = await fetch(path, body === undefined
     ? undefined
     : {
@@ -54,7 +56,7 @@ export function downloadWorkspaceExperiment(experimentId: string): Promise<void>
 }
 
 async function downloadAttachment(path: string, payload: JsonRecord, fallbackFilename: string): Promise<void> {
-  const response = await fetch(path, {
+  const response = demoMode ? await demoAttachment(path, payload) : await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

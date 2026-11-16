@@ -4,8 +4,8 @@ Extract a smaller graph from a network, inspect why its edges or nodes were
 selected, and measure what the reduction preserves.
 {: .intro }
 
-[Run your first Python analysis](start/first-backbone.md){ .docs-button }
-[Try a sample network](browser/sample-demo.md){ .docs-button .docs-button-secondary }
+[Try the web demo](browser/sample-demo.md){ .docs-button }
+[Run your first Python analysis](start/first-backbone.md){ .docs-button .docs-button-secondary }
 
 <div class="guide-grid" markdown="1">
 

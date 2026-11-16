@@ -65,6 +65,8 @@ import {
   parseHeaders,
 } from "./utils";
 
+import { demoMode, loadDemo } from "./demo-api";
+
 export default function App() {
   const [schema, setSchema] = useState<UiSchema | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -74,7 +76,7 @@ export default function App() {
       return "light";
     }
   });
-  const [workspace, setWorkspace] = useState<Workspace>("start");
+  const [workspace, setWorkspace] = useState<Workspace>(demoMode ? "analysis" : "start");
   const [data, setData] = useState<DataDraft>({ ...emptyDataDraft });
   const [context, setContext] = useState<NetworkContext>({ ...defaultContext });
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
@@ -104,8 +106,33 @@ export default function App() {
   }, [workspace]);
 
   useEffect(() => {
-    api.schema()
-      .then(setSchema)
+    const initialize = demoMode ? loadDemo().then((demo) => {
+      const baseline = Object.values(demo.runs).filter(({ result }) => demo.baseline.includes(result.result_id));
+      const first = baseline[0];
+      const initialMethod = demo.schema.methods.find(({ name }) => name === first?.result.extraction.method);
+      const initialScore = initialMethod && demo.scores[initialMethod.name];
+      if (!first || !initialMethod || !initialScore) throw new Error("The demo results are incomplete.");
+      setData({ ...emptyDataDraft, mode: "graphml", text: demo.graphml, filename: "karate-club.graphml", weight: "weight" });
+      setContext({
+        ...defaultContext,
+        dataset: "Zachary’s Karate Club",
+        nodes: "club members",
+        edges: "interactions",
+        weight: "interaction contexts",
+        weightSemantics: "strength",
+      });
+      setPreview(demo.preview);
+      setMethodName(initialMethod.name);
+      setFilterControls(filterDefaults(demo.schema, "fraction", initialMethod, initialScore));
+      setFilterChosen(true);
+      setScore(initialScore);
+      setResult(first.result);
+      setSavedResults(baseline.map(({ result }) => ({
+        resultId: result.result_id, label: shortBackboneLabel(result), selected: true, result,
+      })));
+      setSchema(demo.schema);
+    }) : api.schema().then(setSchema);
+    initialize
       .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not load the UI schema."));
   }, []);
 
@@ -134,7 +161,7 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (!schema || !data.text || !analysisOpen) return;
+    if (demoMode || !schema || !data.text || !analysisOpen) return;
     let cancelled = false;
     setPreviewBusy(true);
     const timer = window.setTimeout(async () => {
@@ -307,7 +334,7 @@ export default function App() {
     setMessage(`Computing ${scoringMethod.label} scores…`);
     try {
       const nextScore = await api.score(payload);
-      setFilterChosen(false);
+      setFilterChosen(demoMode);
       setScore(nextScore);
       setResult(null);
       setMessage(`${nextScore.score_summary.score_row_count} ${scoringMethod.target} scores are ready.`);
@@ -381,7 +408,7 @@ export default function App() {
       {workspace !== "start" && (
         <header className="app-header app-header--start single-workbench-header">
           {workspace === "analysis" ? (
-            <span className="brand"><strong>Netbone</strong></span>
+            <span className="brand"><strong>{demoMode ? "Netbone demo" : "Netbone"}</strong></span>
           ) : (
             <button className="brand" disabled={busy !== ""} onClick={() => setWorkspace("analysis")}>
               <span className="brand-mark"><Network size={20} aria-hidden="true" /></span>
@@ -390,7 +417,8 @@ export default function App() {
           )}
           <div className="workbench-header-actions">
             {themeButton}
-            {hasData && workspace === "analysis" && <button className="button button--quiet new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
+            {demoMode && <a className="button button--quiet" href="../browser/launch/">Run locally</a>}
+            {!demoMode && hasData && workspace === "analysis" && <button className="button button--quiet new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
               Change network
             </button>}
             {hasData && workspace !== "analysis" && <button className="button button--quiet new-analysis" onClick={() => setWorkspace("analysis")}><ArrowLeft size={16} /> Back to analysis</button>}
@@ -463,7 +491,7 @@ export default function App() {
         />
       )}
 
-      <input
+      {!demoMode && <input
         ref={importInput}
         hidden
         type="file"
@@ -473,7 +501,7 @@ export default function App() {
           if (file) openNetworkFile(file);
           event.target.value = "";
         }}
-      />
+      />}
       <footer className="citation-footer">
         <a href="https://doi.org/10.1038/s41598-023-42076-3">Cite Netbone</a>
         <span>Yassin et al. · Scientific Reports (2023)</span>
@@ -912,8 +940,9 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
             </dl>
           )}
         </div>
-        <button className="button button--quiet" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>
+        {!demoMode && <button className="button button--quiet" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>}
       </header>
+      {demoMode && <p className="demo-note">Two 25% backbones are ready to compare. Edge Weight favors strong ties, while Edge Betweenness favors links on shortest paths. Choose 50% to try a larger edge budget.</p>}
       <dialog className="workbench-dialog network-settings-dialog" ref={settingsDialog} aria-labelledby="network-settings-title" key={data.filename} onCancel={onMappingReviewFinished}>
         <header>
           <div>
@@ -998,7 +1027,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           {!method && <p className="analysis-step-intro">Choose how Netbone scores the nodes or edges in this network.</p>}
           {method && <div className="analysis-selection-row">
             <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint></div>
-            {score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
+            {!demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
           </div>}
           {!score && (selectedBlocked || basicMethodSpecs.length > 0 || advancedMethodSpecs.length > 0) && <div className="scoring-settings">{scoringSettings}</div>}
           {!score && <div className="step-actions">
@@ -1012,7 +1041,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         {score && method && <section className="analysis-step">
           <div className="pane-heading analysis-step-header">
             <h2 className="analysis-step-title" id="retention-title" tabIndex={-1}><span aria-hidden="true">2</span> Filter</h2>
-            {filterChosen && filterChoiceButton}
+            {!demoMode && filterChosen && filterChoiceButton}
           </div>
               {filterChosen && <div className="analysis-selection-row"><div className="label-with-hint"><strong>{filterLabel(filterName)}</strong><Hint label="How this filter works">{filterDescription(filterName, context, method)}</Hint></div></div>}
               {!filterChosen && <div className="step-actions">{filterChoiceButton}</div>}
@@ -1066,7 +1095,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
               <button className="button button--save" disabled={busy !== "" || saved || !draftReady} onClick={() => void onMaterialize(true)}>{busy === "filter" ? <LoaderCircle className="spin" size={17} /> : saved ? <Check size={17} /> : <Plus size={17} />} {saved ? "Backbone saved" : "Save this backbone"}</button>
               <button className="button button--inspect" disabled={busy !== "" || !draftReady} onClick={() => { resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
             </>}
-            {networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button button--explore" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
+            {!demoMode && networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button button--explore" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
             {savedCount >= 2 && <button className="button button--compare" disabled={busy !== ""} onClick={onCompare}><GitCompareArrows size={16} /> Compare</button>}
           </div>
         </div>

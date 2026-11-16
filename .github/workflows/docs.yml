@@ -15,7 +15,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
       - name: Install documentation dependencies
         run: python -m pip install -e ".[docs]"
+      - name: Build the web demo
+        run: |
+          npm ci --prefix web
+          npm run build:demo --prefix web
+          python examples/build_sample_demo.py docs/demo/data
       - name: Build documentation
         run: python -m mkdocs build --strict
+      - name: Test the static web demo
+        run: |
+          npx --prefix web playwright install --with-deps chromium
+          npx --prefix web playwright test --config web/playwright.demo.config.mjs

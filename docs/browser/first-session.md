@@ -1,7 +1,7 @@
 # Extract a backbone in the browser
 
-[Try the interactive sample](sample-demo.md) to see how retention changes a
-network before installing the local app.
+[Try the web demo](sample-demo.md) to compare two methods on a real network
+before installing the local app.
 
 [Start the app](launch.md), then use the built-in collaboration network to
 try extraction and export without preparing a file.

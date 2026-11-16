@@ -9,6 +9,16 @@ python -m pip install -e ".[dev,docs]"
 
 ## Preview and build
 
+The documentation includes a static build of the [web demo](browser/sample-demo.md).
+From the repository root, build the frontend and generate its fixtures first.
+Use the Python environment above and Node.js 24, which is also used in CI.
+
+```bash
+npm ci --prefix web
+npm run build:demo --prefix web
+python examples/build_sample_demo.py docs/demo/data
+```
+
 ```bash
 python -m mkdocs serve --strict
 ```
@@ -27,13 +37,8 @@ mkdocstrings directives that read signatures and docstrings from `src/`.
 Update docstrings when the corresponding public contract changes and run
 new examples from an installed environment.
 
-The [sample demo](browser/sample-demo.md) reads precomputed Netbone results.
-After changing its sample or selection settings, regenerate the data from
-the repository root and commit the updated JSON.
-
-```bash
-python examples/build_sample_demo.py
-```
+Open the demo from the homepage. Regenerate its files after changing the
+dataset, supported settings, web interface, or Python result format.
 
 ## Run project checks
 
@@ -58,7 +63,8 @@ package release.
 
 ## Publish the static site
 
-From a clean checkout of the revision to publish, build and review the site.
+From a clean checkout of the revision to publish, follow the demo and site
+build steps above and review the generated site.
 Deploy the contents of `site/` to a static host or use GitHub Pages. Set
 `NETBONE_DOCS_SITE_URL` to the public URL, including any path prefix, before
 building for publication. This sets the canonical URL and the links on the

@@ -1,5 +1,6 @@
 import { BarChart3, Check, Download, GitCompareArrows, GripVertical, Pencil, Settings2, Table2, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { demoMode } from "../demo-api";
 import type { PointerEvent } from "react";
 import { api, downloadCsv, downloadJson } from "../api";
 import { downloadPngFigure, downloadSvgFigure } from "../figureExport";
@@ -87,6 +88,7 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
   const drag = useRef<{ pointerId: number; source: number; startY: number; y: number; active: boolean } | null>(null);
   const dragFrame = useRef(0);
   const selected = saved.filter((item) => item.selected);
+  const canReorder = !demoMode && saved.length > 1;
   const inspected = saved.find((item) => item.resultId === inspectId) || null;
   const renaming = saved.find((item) => item.resultId === renameId);
   const suggestedLabel = renaming ? uniqueResultLabel(shortBackboneLabel(renaming.result), saved, renaming.resultId) : "";
@@ -258,7 +260,7 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
               {selected.length < 2 && <small>Select at least two backbones.</small>}
               {message && <p className="error-text" role="alert">{message}</p>}
             </div>
-            {saved.length > 1 && <span className="visually-hidden" id="saved-order-help">Drag to move, or press Up or Down.</span>}
+            {canReorder && <span className="visually-hidden" id="saved-order-help">Drag to move, or press Up or Down.</span>}
             <span className="visually-hidden" role="status">{orderStatus}</span>
             <div className="saved-result-list" ref={savedList}>
               {saved.map((item, index) => {
@@ -271,8 +273,8 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
                   ? index < dropPosition.source ? "before" : index > dropPosition.source ? "after" : undefined
                   : undefined;
                 return (
-                  <article className={`saved-result${item.selected ? " is-selected" : ""}${saved.length > 1 ? " has-grip" : ""}${index === dropPosition?.source ? " is-dragging" : ""}`} data-drop-side={dropSide} key={item.resultId}>
-                    {saved.length > 1 && <button
+                  <article className={`saved-result${item.selected ? " is-selected" : ""}${canReorder ? " has-grip" : ""}${index === dropPosition?.source ? " is-dragging" : ""}`} data-drop-side={dropSide} key={item.resultId}>
+                    {canReorder && <button
                       type="button"
                       className="icon-button saved-result__grip"
                       title="Drag to move · Up/Down on keyboard"
@@ -308,9 +310,9 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
                     <button className="icon-button" title="Inspect saved result" aria-label={`Inspect ${item.label}`} onClick={() => { setInspectionView("settings"); setInspectId(item.resultId); }}>
                       <Settings2 size={16} />
                     </button>
-                    <button className="icon-button" title="Rename saved result" aria-label={`Rename ${item.label}`} disabled={busy} onClick={() => beginRename(item)}>
+                    {!demoMode && <button className="icon-button" title="Rename saved result" aria-label={`Rename ${item.label}`} disabled={busy} onClick={() => beginRename(item)}>
                       <Pencil size={16} />
-                    </button>
+                    </button>}
                     <button className="icon-button icon-button--danger" title="Remove saved result" aria-label={`Remove ${item.label}`} disabled={busy} onClick={() => removeResult(item.resultId)}>
                       <Trash2 size={16} />
                     </button>
