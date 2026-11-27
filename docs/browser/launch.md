@@ -18,12 +18,13 @@ build is only needed when developing the UI.
 
 ## Startup options
 
-`netbone-web --help` lists both startup settings.
+`netbone-web --help` lists the startup settings.
 
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `--host` | `127.0.0.1` | Address where the local server listens |
 | `--port` | `8765` | TCP port |
+| `--max-upload-mb` | `100` | Largest file the app accepts, in megabytes |
 
 If the default port is occupied, choose another local port.
 
@@ -32,6 +33,9 @@ netbone-web --port 8766
 ```
 
 Then open [127.0.0.1:8766](http://127.0.0.1:8766/).
+
+A larger upload is refused with a message naming the limit. Raise it with, for
+example, `netbone-web --max-upload-mb 500`.
 
 ## Where data is processed
 

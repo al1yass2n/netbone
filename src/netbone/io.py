@@ -212,6 +212,12 @@ def from_edgelist(
                 raise ValidationError(
                     f"Edge-list row {row_number} has a missing weight value."
                 )
+            if isinstance(weight_value, bool) or pd.api.types.is_bool(weight_value):
+                raise ValidationError(
+                    f"Edge-list row {row_number} has a boolean weight "
+                    f"{str(weight_value).lower()!r} in column {weight!r}. Use "
+                    "numbers, or pass weight=None for an unweighted network."
+                )
             try:
                 numeric_weight = float(weight_value)
             except (TypeError, ValueError) as exc:

@@ -227,8 +227,22 @@ def _endpoint_significance(
             if degree <= 1:
                 significance[edge_id][node_id] = None
                 continue
-            significance[edge_id][node_id] = (1.0 - value) ** ((degree - 1) ** c)
+            significance[edge_id][node_id] = _endpoint_statistic(value, degree, c=c)
     return significance
+
+
+def _endpoint_statistic(value: float, degree: int, *, c: float) -> float:
+    """Return ``(1 - value) ** ((degree - 1) ** c)`` without overflowing.
+
+    A large ``c`` can make the exponent exceed the float range. The limit is
+    then exact: 0 when the involvement is positive and 1 when it is zero.
+    """
+
+    try:
+        exponent = float(degree - 1) ** c
+    except OverflowError:
+        exponent = math.inf
+    return (1.0 - value) ** exponent
 
 
 def _aggregate_significance(

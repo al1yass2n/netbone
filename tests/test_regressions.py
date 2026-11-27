@@ -397,3 +397,114 @@ def test_web_csv_rejects_extra_values_and_accepts_trailing_delimiters() -> None:
     assert "CSV row 2 has 4 values" in str(extra["errors"])
     assert trailing["valid"] is True
     assert trailing["edge_count"] == 2
+
+
+def _raw_post(url: str, path: str, length: str, body: bytes) -> tuple[int, dict]:
+    import socket
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    request = (
+        f"POST {path} HTTP/1.1\r\nHost: {parsed.netloc}\r\n"
+        f"Content-Type: application/json\r\nContent-Length: {length}\r\n"
+        "Connection: close\r\n\r\n"
+    ).encode() + body
+    with socket.create_connection((parsed.hostname, parsed.port), timeout=5) as sock:
+        sock.sendall(request)
+        sock.shutdown(socket.SHUT_WR)
+        chunks = []
+        while chunk := sock.recv(65536):
+            chunks.append(chunk)
+    head, _, payload = b"".join(chunks).partition(b"\r\n\r\n")
+    return int(head.split()[1]), json.loads(payload)
+
+
+def test_server_rejects_bodies_over_the_upload_limit(server_url: str) -> None:
+    status, payload = _raw_post(server_url, "/api/preview", "99999999999", b"{}")
+
+    assert status == 413
+    assert "larger than the 100 MB limit" in payload["message"]
+    assert "--max-upload-mb" in payload["message"]
+
+
+@pytest.mark.parametrize("length", ["-1", "abc"])
+def test_server_rejects_bad_content_length_as_json(
+    server_url: str, length: str
+) -> None:
+    status, payload = _raw_post(server_url, "/api/preview", length, b"{}")
+
+    assert status == 400
+    assert payload["status"] == "error"
+
+
+def test_server_upload_limit_is_configurable() -> None:
+    from netbone.webapp import server as web_server
+
+    with pytest.raises(SystemExit):
+        web_server.main(["--max-upload-mb", "0"])
+    with pytest.raises(ValueError, match="positive"):
+        web_server.run(max_upload_mb=0)
+
+
+def test_edgelist_rejects_boolean_weights(tmp_path: Path) -> None:
+    path = tmp_path / "flags.csv"
+    path.write_text("source,target,weight\na,b,true\nb,c,false\n")
+
+    with pytest.raises(nb.ValidationError, match="boolean weight 'true'"):
+        nb.from_edgelist(path)
+
+
+def test_to_undirected_auto_merges_full_weights_and_keeps_ints() -> None:
+    graph = nx.DiGraph()
+    graph.add_edge("a", "b", weight=3)
+    graph.add_edge("b", "a", weight=1)
+    graph.add_edge("b", "c", weight=2)
+
+    projected = nb.to_undirected(graph)
+
+    edges = projected.to_original_graph().edges
+    assert edges["a", "b"]["weight"] == 4
+    assert isinstance(edges["a", "b"]["weight"], int)
+    assert projected.metadata["direction_conversion"]["reciprocal_merge"] == "sum"
+
+
+def test_to_undirected_none_drops_weights_everywhere() -> None:
+    graph = nx.DiGraph()
+    graph.add_edge("a", "b", weight=3)
+    graph.add_edge("b", "a", weight=1)
+    graph.add_edge("b", "c", weight=2)
+
+    projected = nb.to_undirected(graph, weight=None)
+
+    assert all(
+        "weight" not in data
+        for *_, data in projected.to_original_graph().edges(data=True)
+    )
+    assert projected.metadata["direction_conversion"]["removed_weight_arc_count"] == 3
+    assert nb.score(projected, method="edge_betweenness").parameters["weight"] is None
+
+
+def test_to_undirected_auto_rejects_partial_weights() -> None:
+    graph = nx.DiGraph()
+    graph.add_edge("a", "b", weight=3)
+    graph.add_edge("b", "c")
+
+    with pytest.raises(nb.ValidationError, match="Only 1 of 2 arcs"):
+        nb.to_undirected(graph)
+
+
+def test_to_undirected_unweighted_auto_needs_no_merge_rule() -> None:
+    projected = nb.to_undirected(nx.DiGraph([("a", "b"), ("b", "a")]))
+
+    assert projected.metadata["direction_conversion"]["weight_attribute"] is None
+
+
+@pytest.mark.parametrize("c", [50, 1000, 1e6])
+def test_glanb_large_c_returns_the_exact_limit(c: float) -> None:
+    graph = nx.karate_club_graph()
+
+    statistics = nb.score(graph, method="glanb", c=c).statistics
+
+    values = statistics["glanb_significance"]
+    assert values.notna().all()
+    assert values.between(0.0, 1.0).all()

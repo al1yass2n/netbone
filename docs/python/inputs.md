@@ -23,7 +23,7 @@ integers such as `1, 2, 10` becomes Python ints, and anything else, including
 `007`, `NA`, or `None`, stays a string label. Spaces after the delimiter are
 ignored, and so is a trailing delimiter at the end of each row. A row with more
 non-empty values than the header has columns is rejected with its row number,
-because its columns would not line up. Weights must be finite numbers, and a self-loop row is rejected with
+because its columns would not line up. Weights must be finite numbers (`true`/`false` are rejected), and a self-loop row is rejected with
 its row number. GraphML or a NetworkX graph can represent isolated nodes
 explicitly.
 
@@ -41,13 +41,17 @@ import netbone as nb
 
 flows = nx.DiGraph()
 flows.add_weighted_edges_from([("north", "south", 4), ("south", "north", 3)])
-projected = nb.to_undirected(flows, weight="weight", reciprocal_merge="sum")
+projected = nb.to_undirected(flows)
 assert projected.to_original_graph()["north"]["south"]["weight"] == 7
 ```
 
-The merge choices are `sum`, `mean`, `max`, and `min`. Use
-`weight=None, reciprocal_merge=None` for unweighted projection. Reciprocal
-attribute conflicts are recorded as directional provenance.
+The default `weight="auto"` follows the same rule as scoring: weights are
+merged when every arc has a `weight`, the projection is unweighted when none
+do, and an error names the count when only some do. Choose the merge with
+`reciprocal_merge`: `sum` (default), `mean`, `max`, or `min`. Pass
+`weight=None` for an unweighted projection; it removes `weight` from every
+edge, so the result is never partially weighted. Other reciprocal attribute
+conflicts are recorded as directional provenance.
 
 Parallel edges are unsupported. Most methods reject self-loops, so check
 compatibility before scoring data with loops. The

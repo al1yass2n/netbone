@@ -14,6 +14,9 @@ import networkx as nx
 
 from netbone.exceptions import CompatibilityError, ValidationError
 
+AUTO_WEIGHT = "auto"
+CANONICAL_WEIGHT = "weight"
+
 NODE_ORIGINAL_ATTR = "_netbone_original_id"
 EDGE_ID_ATTR = "_netbone_edge_id"
 RESERVED_NODE_ATTRIBUTES = frozenset({NODE_ORIGINAL_ATTR})
@@ -196,8 +199,8 @@ def ensure_network(graph_or_network: nx.Graph | Network) -> Network:
 def to_undirected(
     graph_or_network: nx.Graph | Network,
     *,
-    weight: str | None,
-    reciprocal_merge: ReciprocalMerge | None,
+    weight: str | None = "auto",
+    reciprocal_merge: ReciprocalMerge | None = None,
 ) -> Network:
     """Return a deterministic undirected projection of a directed network.
 
@@ -209,15 +212,20 @@ def to_undirected(
 
     Args:
         graph_or_network: Directed simple NetworkX graph or normalized network.
-        weight: Edge attribute to combine on reciprocal arcs, or ``None`` for
-            an unweighted projection.
+        weight: Edge attribute to combine on reciprocal arcs. The default
+            ``"auto"`` follows the scoring rule: it uses ``weight`` when every
+            arc has it, projects unweighted when no arc has it, and raises when
+            only some arcs have it. ``None`` projects an unweighted network and
+            removes the ``weight`` attribute from every edge, so the result is
+            never partially weighted.
         reciprocal_merge: Rule used for the selected weight on reciprocal arcs:
-            ``"sum"``, ``"mean"``, ``"max"``, or ``"min"``. Must be ``None``
-            when ``weight`` is ``None``.
+            ``"sum"``, ``"mean"``, ``"max"``, or ``"min"``. Defaults to
+            ``"sum"`` when a weight is used. Must be ``None`` for an unweighted
+            projection.
 
     Raises:
-        ValidationError: If the input is undirected or the merge rule is
-            unsupported.
+        ValidationError: If the input is undirected, weights are only partly
+            present, or the merge rule is unsupported.
     """
 
     network = ensure_network(graph_or_network)
@@ -227,10 +235,14 @@ def to_undirected(
         )
     if weight is not None and (not isinstance(weight, str) or not weight.strip()):
         raise ValidationError("weight must be a non-empty attribute name or None.")
+    if weight == AUTO_WEIGHT:
+        weight = _auto_projection_weight(network)
     if weight is None and reciprocal_merge is not None:
         raise ValidationError(
             "reciprocal_merge must be None when no weight attribute is selected."
         )
+    if weight is not None and reciprocal_merge is None:
+        reciprocal_merge = "sum"
     if weight is not None and reciprocal_merge not in RECIPROCAL_MERGES:
         raise ValidationError(
             "reciprocal_merge must be one of "
@@ -238,6 +250,14 @@ def to_undirected(
         )
 
     directed = network.to_original_graph()
+    removed_weight_count = 0
+    if weight is None:
+        # An unweighted projection drops weights everywhere, not only on the
+        # merged pairs, so the result is never partially weighted.
+        for _, _, attributes in directed.edges(data=True):
+            if CANONICAL_WEIGHT in attributes:
+                del attributes[CANONICAL_WEIGHT]
+                removed_weight_count += 1
     if weight is not None:
         for source, target, attributes in directed.edges(data=True):
             if weight not in attributes or not _is_finite_numeric(attributes[weight]):
@@ -294,6 +314,8 @@ def to_undirected(
         "reciprocal_pair_count": reciprocal_pair_count,
         "one_way_edge_count": projected.number_of_edges() - reciprocal_pair_count,
     }
+    if weight is None:
+        conversion["removed_weight_arc_count"] = removed_weight_count
     metadata["direction_conversion"] = conversion
     merge_description = (
         f"with {reciprocal_merge!r} for weight attribute {weight!r}"
@@ -306,6 +328,11 @@ def to_undirected(
         f"{merge_description}. Arc direction is not represented in the resulting "
         "network."
     )
+    if removed_weight_count:
+        warning += (
+            f" The {CANONICAL_WEIGHT!r} attribute was removed from "
+            f"{removed_weight_count} arc(s) because weight=None was requested."
+        )
     existing_warnings = metadata.get("netbone_warnings", ())
     warnings = (
         [str(value) for value in existing_warnings]
@@ -318,6 +345,23 @@ def to_undirected(
         context=network.context,
         source=network.source,
         metadata=metadata,
+    )
+
+
+def _auto_projection_weight(network: Network) -> str | None:
+    """Resolve ``weight="auto"`` with the same rule the scoring methods use."""
+
+    arcs = list(network.graph.edges(data=True))
+    weighted = sum(1 for _, _, attributes in arcs if CANONICAL_WEIGHT in attributes)
+    if weighted == 0:
+        return None
+    if weighted == len(arcs):
+        return CANONICAL_WEIGHT
+    raise ValidationError(
+        f"Only {weighted} of {len(arcs)} arcs have a {CANONICAL_WEIGHT!r} "
+        "attribute, so to_undirected() cannot tell whether the network is "
+        "weighted. Add the missing weights, pass weight=None to drop weights, or "
+        "pass weight='<attribute>' explicitly."
     )
 
 
@@ -345,10 +389,19 @@ def _merge_reciprocal_attributes(
             and _is_finite_numeric(second_value)
         ):
             assert reciprocal_merge is not None
-            merged[name] = _merge_numeric_values(
+            merged_value = _merge_numeric_values(
                 float(first_value),
                 float(second_value),
                 reciprocal_merge=reciprocal_merge,
+            )
+            # Keep integer weights integers unless the merge needs a fraction.
+            merged[name] = (
+                int(merged_value)
+                if isinstance(first_value, int)
+                and isinstance(second_value, int)
+                and merged_value.is_integer()
+                and reciprocal_merge != "mean"
+                else merged_value
             )
         elif first_present and second_present and first_value == second_value:
             merged[name] = first_value

@@ -67,7 +67,7 @@ from netbone.methods.primary_linkage import (
     PRIMARY_LINKAGE_METADATA,
     compute_primary_linkage,
 )
-from netbone.network import Network
+from netbone.network import AUTO_WEIGHT, CANONICAL_WEIGHT, Network
 from netbone.results import MethodResult
 
 MethodCompute = Callable[[Network, Mapping[str, object]], MethodResult]
@@ -87,8 +87,6 @@ class MethodDefinition:
         object.__setattr__(self, "metadata", MappingProxyType(dict(self.metadata)))
 
 
-AUTO_WEIGHT = "auto"
-CANONICAL_WEIGHT = "weight"
 WEIGHT_MODES = ("ignored", "optional", "required")
 _DISTANCE_METHODS = frozenset(
     {
