@@ -55,7 +55,6 @@ for (const input of ["weighted", "unweighted", "temporal"]) {
       }
       if (input === "temporal") await page.getByRole("button", { name: "Choose method", exact: true }).click();
       const picker = page.getByRole("dialog", { name: "Choose a scoring method" });
-      const filters = page.getByRole("dialog", { name: "Choose a filter" });
 
       for (const method of methods) {
         await test.step(method.label, async () => {
@@ -80,7 +79,8 @@ for (const input of ["weighted", "unweighted", "temporal"]) {
           const score = await scored.json();
           expect(scored.ok(), score.message).toBe(true);
           expect(score.pipeline.method.name).toBe(method.name);
-          await filters.getByRole("button", { name: /Recommended/ }).click();
+          // The recommended filter starts selected, so the backbone is ready without another choice.
+          await expect(page.locator(".filter-description")).toContainText("Recommended");
           await page.getByRole("button", { name: "Inspect & export" }).click();
           const inspect = page.getByRole("dialog", { name: "Inspect & export" });
           await expect(inspect.getByRole("table", { name: "Method statistics" }).getByRole("row").nth(1)).toBeVisible();

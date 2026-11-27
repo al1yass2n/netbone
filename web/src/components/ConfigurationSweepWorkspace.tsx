@@ -1,18 +1,21 @@
-import { ArrowLeft, ArrowRight, ChevronDown, Copy, Download, LoaderCircle, Pencil, Play, Plus, Settings2, Trash2, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDown, Copy, LoaderCircle, Pencil, Play, Plus, Settings2, Trash2, X } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { RefObject } from "react";
-import { api, downloadCsv, downloadJson } from "../api";
+import { api, downloadCsv, downloadJson, downloadWorkspaceExperiment } from "../api";
+import { describeConfiguration, filterLabel, formatMetric, mergeDescriptions, metricLabel } from "../labels";
 import {
-  compileSweep, fixedText, initialVariation, newSweepDraft, record, settingChoices,
-  splitSweepValues, sweepSettings,
+  compileSweep, defaultRange, fixedText, initialVariation, isPercentSetting, newSweepDraft, plannedRuns, settingChoices,
+  settingRange, splitSweepValues, sweepSettings, SWEEP_RUN_LIMIT, variationFor,
 } from "../sweepSetup";
-import type { SweepDraft, SweepEnvironment, SweepSetting, SweepVariation } from "../sweepSetup";
-import type { FilterName, JsonRecord, JsonValue, MethodSpec, SweepResponse, UiSchema } from "../types";
-import { filterOptions, formatValue, labelize, methodCompatibilityReason } from "../utils";
-import { sweepRunLabels } from "../sweepFigureData";
+import type { SweepDraft, SweepEnvironment, SweepRange, SweepSetting, SweepVariation } from "../sweepSetup";
+import type { FilterName, JsonRecord, MethodSpec, SweepResponse, UiSchema } from "../types";
+import { filterOptions, methodCompatibilityReason } from "../utils";
+import { BackLink } from "./BackLink";
+import { SettingsList } from "./BackboneDetails";
+import { DownloadMenu } from "./DownloadMenu";
+import type { DownloadItem } from "./DownloadMenu";
 import { Hint } from "./Hint";
-import { ExperimentExport } from "./ExperimentExport";
-import { SweepVisualizations } from "./SweepFigure";
+import { SweepVisualizations, useSweepFigure } from "./SweepFigure";
 import "./AnalysisWorkspaces.css";
 
 interface Props extends SweepEnvironment {
@@ -21,11 +24,10 @@ interface Props extends SweepEnvironment {
   filterName: FilterName;
   basePayload: JsonRecord;
   initialConfiguration?: JsonRecord | null;
+  onBack: () => void;
 }
 
-const runLimit = 100;
-
-export function SweepWorkspace({ schema, method, filterName, directed, weighted, positiveIntegerWeights, weightSign, basePayload, initialConfiguration }: Props) {
+export function SweepWorkspace({ schema, method, filterName, directed, weighted, positiveIntegerWeights, weightSign, basePayload, initialConfiguration, onBack }: Props) {
   const environment = { directed, weighted, positiveIntegerWeights, weightSign };
   const baseMethod = schema.methods.find((item) => item.name === method.name && methodIsCompatible(item, environment))
     ?? schema.methods.find((item) => methodIsCompatible(item, environment)) ?? method;
@@ -40,27 +42,26 @@ export function SweepWorkspace({ schema, method, filterName, directed, weighted,
     "node_retention",
     directed ? "weakly_connected_component_count" : "connected_component_count",
   ]);
-  const [preview, setPreview] = useState<SweepResponse | null>(null);
   const [result, setResult] = useState<SweepResponse | null>(null);
-  const [configurationDrawerOpen, setConfigurationDrawerOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const setupHeading = useRef<HTMLHeadingElement>(null);
   const focusSetup = useRef(false);
-  const stage = result ? "results" : preview ? "review" : "configure";
   const compiled = compileSweep(drafts, schema, environment);
   const activeDraft = drafts.find((draft) => draft.id === activeId) ?? drafts[0]!;
   const settings = sweepSettings(activeDraft, schema, environment);
   const availableMetrics = schema.comparison?.single_metrics.map((metric) => metric.name) ?? [];
-  const runCount = preview ? responseCount(preview) : compiled.count;
+  const runCount = compiled.count;
   const validation = compiled.error || (!metrics.length ? "Choose at least one measurement."
-    : runCount > runLimit ? "Reduce the sweep to 100 runs or fewer." : "");
+    : runCount > SWEEP_RUN_LIMIT ? `Reduce the sweep to ${SWEEP_RUN_LIMIT} runs or fewer.` : "");
+  // With one setting in one setup, the value line already lists every run.
+  const listRuns = !compiled.error && (drafts.length > 1 || drafts.some((draft) => draft.variations.length > 1));
 
   useEffect(() => {
     window.scrollTo(0, 0);
     heading.current?.focus({ preventScroll: true });
-  }, [stage]);
+  }, [result]);
 
   useEffect(() => {
     if (!focusSetup.current) return;
@@ -94,27 +95,17 @@ export function SweepWorkspace({ schema, method, filterName, directed, weighted,
     setError("");
   }
 
-  function editSweep() {
-    setResult(null);
-    setPreview(null);
-    setConfigurationDrawerOpen(false);
-    setError("");
-  }
-
-  async function execute(previewOnly: boolean) {
+  async function run() {
     if (busy || validation) return;
     setBusy(true);
     setError("");
     try {
-      const response = await api.sweep({
+      setResult(await api.sweep({
         ...basePayload,
         variation: { scope: "configurations" },
         configurations: compiled.configurations,
         metrics,
-        preview_only: previewOnly,
-      });
-      if (previewOnly) setPreview(response);
-      else setResult(response);
+      }));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Sweep failed.");
     } finally {
@@ -122,62 +113,66 @@ export function SweepWorkspace({ schema, method, filterName, directed, weighted,
     }
   }
 
-  if (result) return <SweepResultsView result={result} drawerOpen={configurationDrawerOpen} onDrawer={setConfigurationDrawerOpen} onEdit={editSweep} heading={heading} />;
+  if (result) return <SweepResults result={result} schema={schema} heading={heading} onBack={onBack} onEdit={() => { setResult(null); setError(""); }} />;
 
   return (
     <main className="workspace sweep-workspace sweep-setup-workspace" aria-labelledby="sweep-title">
+      <BackLink onClick={onBack} />
       <header className="workspace-header">
         <div>
-          <h1 id="sweep-title" ref={heading} tabIndex={-1}>{preview ? "Review sweep runs" : "Test a range of settings"}</h1>
-          <p>{preview ? "Check the values Netbone will use before running the sweep."
-            : "Choose a setting and enter the values you want to compare."}</p>
+          <h1 id="sweep-title" ref={heading} tabIndex={-1}>Test a range of settings</h1>
+          <p>Netbone builds a backbone for each value and measures how it changes.</p>
         </div>
       </header>
 
-      {preview ? <SweepReview preview={preview} drafts={drafts} schema={schema} environment={environment} metrics={metrics} /> : (
-        <div className="sweep-configure">
-          <section className="panel sweep-configure-panel" aria-labelledby="vary-settings-title">
-            {drafts.length > 1 && (
-              <label className="field sweep-setup-picker">
-                <span>Editing setup</span>
-                <select value={activeDraft.id} disabled={busy} onChange={(event) => setActiveId(Number(event.target.value))}>
-                  {drafts.map((draft, index) => <option key={draft.id} value={draft.id}>{(index + 1) + ". " + (draft.name.trim() || "Unnamed setup")}</option>)}
-                </select>
+      <div className="sweep-configure">
+        <section className="panel sweep-configure-panel" aria-labelledby="vary-settings-title">
+          {drafts.length > 1 && (
+            <label className="field sweep-setup-picker">
+              <span>Editing setup</span>
+              <select value={activeDraft.id} disabled={busy} onChange={(event) => setActiveId(Number(event.target.value))}>
+                {drafts.map((draft, index) => <option key={draft.id} value={draft.id}>{(index + 1) + ". " + (draft.name.trim() || "Unnamed setup")}</option>)}
+              </select>
+            </label>
+          )}
+          <SetupEditor
+            key={activeDraft.id}
+            draft={activeDraft}
+            settings={settings}
+            schema={schema}
+            environment={environment}
+            heading={setupHeading}
+            busy={busy}
+            onChange={update}
+            onDuplicate={() => addSetup(activeDraft)}
+            onRemove={drafts.length > 1 ? removeSetup : undefined}
+          />
+          <div className="sweep-add-setup">
+            <button className="button button--quiet" disabled={busy} onClick={() => addSetup()}><Plus size={16} aria-hidden="true" /> Add another setup</button>
+            <small>Use a separate setup for another method or filter.</small>
+          </div>
+        </section>
+        <details className="panel sweep-measurements">
+          <summary><span>Measurements</span><small>{metrics.length} selected</small><ChevronDown size={16} aria-hidden="true" /></summary>
+          <fieldset className="metric-checklist" aria-label="Backbone measurements" disabled={busy}>
+            {availableMetrics.map((name) => (
+              <label key={name}>
+                <input type="checkbox" checked={metrics.includes(name)} onChange={() => {
+                  setMetrics((current) => current.includes(name) ? current.filter((item) => item !== name) : [...current, name]);
+                  setError("");
+                }} />
+                <span>{metricLabel(name)}</span>
               </label>
-            )}
-            <SetupEditor
-              key={activeDraft.id}
-              draft={activeDraft}
-              settings={settings}
-              schema={schema}
-              environment={environment}
-              heading={setupHeading}
-              busy={busy}
-              onChange={update}
-              onDuplicate={() => addSetup(activeDraft)}
-              onRemove={drafts.length > 1 ? removeSetup : undefined}
-            />
-            <div className="sweep-add-setup">
-              <button className="button button--quiet" disabled={busy} onClick={() => addSetup()}><Plus size={16} /> Add another setup</button>
-              <small>Use a separate setup for another method, filter, or baseline.</small>
-            </div>
-          </section>
-          <details className="panel sweep-measurements">
-            <summary><span>Measurements</span><small>{metrics.length} selected</small><ChevronDown size={16} /></summary>
-            <fieldset className="metric-checklist" aria-label="Backbone measurements" disabled={busy}>
-              {availableMetrics.map((name) => (
-                <label key={name}>
-                  <input type="checkbox" checked={metrics.includes(name)} onChange={() => {
-                    setMetrics((current) => current.includes(name) ? current.filter((item) => item !== name) : [...current, name]);
-                    setError("");
-                  }} />
-                  <span>{labelize(name)}</span>
-                </label>
-              ))}
-            </fieldset>
+            ))}
+          </fieldset>
+        </details>
+        {listRuns && runCount > 0 && (
+          <details className="panel sweep-measurements sweep-planned-runs">
+            <summary><span>Runs</span><small>{runCount} planned</small><ChevronDown size={16} aria-hidden="true" /></summary>
+            <ol>{plannedRuns(drafts, schema, environment).map((line, index) => <li key={index}>{line}</li>)}</ol>
           </details>
-        </div>
-      )}
+        )}
+      </div>
 
       <footer className="sweep-action-bar" aria-label="Sweep actions">
         {error && <p className="error-text sweep-action-message" role="alert">{error}</p>}
@@ -185,15 +180,12 @@ export function SweepWorkspace({ schema, method, filterName, directed, weighted,
         <div className="sweep-action-row">
           <div className="sweep-run-count">
             <strong aria-live="polite">{runCount ? runCount + (runCount === 1 ? " run" : " runs") : "No runs planned"}</strong>
-            <Hint label="How sweep run counts work">Each setup runs every combination of its varying values. Two cutoffs and three method values in one setup make six runs. Netbone adds the runs from each setup, up to 100.</Hint>
+            <Hint label="How runs are counted">Netbone runs every combination of the values in a setup, so two cutoffs and three method values make six runs. A sweep can have up to {SWEEP_RUN_LIMIT} runs.</Hint>
           </div>
           <div className="sweep-stage-buttons">
-            {preview && <button className="button button--quiet" disabled={busy} onClick={editSweep}><ArrowLeft size={16} /> Edit settings</button>}
-            <button className="button button--save" disabled={busy || Boolean(validation)} onClick={() => void execute(!preview)}>
-              {busy ? <LoaderCircle className="spin" size={17} /> : preview ? <Play size={16} fill="currentColor" /> : <ArrowRight size={17} />}
-              {busy ? (preview ? "Running sweep…" : "Preparing runs…") : preview
-                ? "Run " + runCount + (runCount === 1 ? " configuration" : " configurations")
-                : "Review runs"}
+            <button className="button button--save" disabled={busy || Boolean(validation)} onClick={() => void run()}>
+              {busy ? <LoaderCircle className="spin" size={17} aria-hidden="true" /> : <Play size={16} fill="currentColor" aria-hidden="true" />}
+              {busy ? "Running sweep…" : "Run sweep"}
             </button>
           </div>
         </div>
@@ -214,7 +206,6 @@ function SetupEditor({ draft, settings, schema, environment, heading, busy, onCh
   onRemove?: () => void;
 }) {
   const method = schema.methods.find((item) => item.name === draft.method);
-  const filter = schema.filters.find((item) => item.name === draft.filter);
   const filterNames = method ? filterOptions(method) : [];
   const selectedKeys = new Set(draft.variations.map((item) => item.key));
   const remaining = settings.filter((item) => !selectedKeys.has(item.key));
@@ -249,7 +240,7 @@ function SetupEditor({ draft, settings, schema, environment, heading, busy, onCh
     <fieldset className="sweep-editor-fields" disabled={busy}>
       <div className="sweep-setup-context">
         <strong>{draft.name.trim() || "Unnamed setup"}</strong>
-        <span>{method?.label ?? labelize(draft.method)} · {filter?.label ?? labelize(draft.filter)}</span>
+        <span>{method?.label ?? draft.method} · {filterLabel(draft.filter)}</span>
       </div>
       <h2 id="vary-settings-title" ref={heading} tabIndex={-1}>What to vary?</h2>
       {draft.variations.length ? (
@@ -257,33 +248,33 @@ function SetupEditor({ draft, settings, schema, environment, heading, busy, onCh
           {draft.variations.map((variation, index) => (
             <VariationEditor
               key={variation.id}
-              index={index}
+              label={draft.variations.length > 1 ? "Setting " + (index + 1) : "Setting"}
               variation={variation}
               settings={settings.filter((item) => item.key === variation.key || !selectedKeys.has(item.key))}
               onSelect={(key) => {
                 const setting = settings.find((item) => item.key === key);
-                replaceVariation(variation.id, { key, text: setting ? fixedText(draft, setting) : "" });
+                replaceVariation(variation.id, setting ? variationFor(draft, setting, variation.id) : { key, text: "" });
               }}
-              onValues={(text) => replaceVariation(variation.id, { text })}
+              onChange={(patch) => replaceVariation(variation.id, patch)}
               onRemove={() => onChange({ ...draft, variations: draft.variations.filter((item) => item.id !== variation.id) })}
             />
           ))}
         </div>
       ) : <p className="sweep-fixed-message">{settings.length
         ? "This setup runs once with fixed settings. Add a setting to test more values."
-        : "This method and filter have no settings to vary. Change the base setup or add a separate setup."}</p>}
+        : "This method and filter have no settings to vary. Change the method or filter, or add another setup."}</p>}
       {remaining.length > 0 && !hasUnselectedRow && (
         <button className="button button--quiet sweep-add-setting" onClick={addVariation}>
-          <Plus size={16} /> {draft.variations.length ? "Add another setting" : "Add a varying setting"}
+          <Plus size={16} aria-hidden="true" /> {draft.variations.length ? "Add another setting" : "Add a setting to vary"}
         </button>
       )}
 
       <details className="advanced-options sweep-fixed-settings">
-        <summary>Base setup and fixed settings <ChevronDown size={16} /></summary>
+        <summary>Method, filter and fixed settings <ChevronDown size={16} aria-hidden="true" /></summary>
         <div className="sweep-fixed-fields">
           <label className="field"><span>Setup name</span><input value={draft.name} onChange={(event) => onChange({ ...draft, name: event.target.value })} /></label>
           <div className="field-grid">
-            <label className="field"><span>Scoring method</span><select value={draft.method} onChange={(event) => {
+            <label className="field"><span>Method</span><select value={draft.method} onChange={(event) => {
               const selected = schema.methods.find((item) => item.name === event.target.value);
               if (selected) changeBase(selected.name, selected.recommended_filter);
             }}>
@@ -292,15 +283,15 @@ function SetupEditor({ draft, settings, schema, environment, heading, busy, onCh
               </option>)}
             </select></label>
             <label className="field"><span>Filter</span><select value={draft.filter} onChange={(event) => changeBase(draft.method, event.target.value as FilterName)}>
-              {schema.filters.filter((item) => item.name === "default" || item.name === draft.filter || filterNames.includes(item.name)).map((item) => <option key={item.name} value={item.name}>{item.label}</option>)}
+              {schema.filters.filter((item) => item.name === "default" || item.name === draft.filter || filterNames.includes(item.name)).map((item) => <option key={item.name} value={item.name}>{filterLabel(item.name)}</option>)}
             </select></label>
           </div>
           {remaining.length > 0 && <div className="field-grid">{remaining.map((setting) => (
             <FixedSetting key={setting.key} setting={setting} value={fixedText(draft, setting)} onChange={(text) => onChange({ ...draft, fixed: { ...draft.fixed, [setting.key]: text } })} />
           ))}</div>}
           <div className="sweep-base-actions">
-            <button className="button button--quiet" onClick={onDuplicate}><Copy size={15} /> Duplicate setup</button>
-            {onRemove && <button className="button button--quiet" onClick={onRemove}><Trash2 size={15} /> Remove setup</button>}
+            <button className="button button--quiet" onClick={onDuplicate}><Copy size={15} aria-hidden="true" /> Duplicate setup</button>
+            {onRemove && <button className="button button--quiet" onClick={onRemove}><Trash2 size={15} aria-hidden="true" /> Remove setup</button>}
           </div>
         </div>
       </details>
@@ -308,28 +299,20 @@ function SetupEditor({ draft, settings, schema, environment, heading, busy, onCh
   );
 }
 
-function VariationEditor({ index, variation, settings, onSelect, onValues, onRemove }: {
-  index: number;
+function VariationEditor({ label, variation, settings, onSelect, onChange, onRemove }: {
+  label: string;
   variation: SweepVariation;
   settings: SweepSetting[];
   onSelect: (key: string) => void;
-  onValues: (text: string) => void;
+  onChange: (patch: Partial<SweepVariation>) => void;
   onRemove: () => void;
 }) {
-  const id = useId();
   const setting = settings.find((item) => item.key === variation.key);
-  const choices = setting ? settingChoices(setting) : [];
-  const values = splitSweepValues(variation.text);
-  const numericHint = setting?.name === "fraction"
-    ? "Enter at least two comma-separated fractions or percentages, such as 0.25, 0.5 or 25%, 50%."
-    : setting?.min !== undefined && setting.max !== undefined
-      ? "Enter at least two comma-separated values between " + setting.min + " and " + setting.max + "."
-      : "Enter at least two comma-separated values.";
   return (
     <div className="sweep-variation">
       <div className="sweep-variation-header">
         <label className="field">
-          <span>{"Setting " + (index + 1)}</span>
+          <span>{label}</span>
           <select value={variation.key} autoFocus={!variation.key} onChange={(event) => onSelect(event.target.value)}>
             <option value="" disabled>Choose a setting</option>
             {(["filter", "method"] as const).map((kind) => {
@@ -340,88 +323,114 @@ function VariationEditor({ index, variation, settings, onSelect, onValues, onRem
             })}
           </select>
         </label>
-        <button className="icon-button" title="Remove varying setting" aria-label={"Remove varying setting " + (index + 1)} onClick={onRemove}><X size={17} /></button>
+        <button className="icon-button" title="Remove this setting" aria-label={"Remove " + (setting?.label.toLowerCase() ?? "this setting")} onClick={onRemove}><X size={17} aria-hidden="true" /></button>
       </div>
-      {setting && (choices.length > 0 ? (
-        <div className="sweep-choice-fields">
-          <span id={id}>{"Values for " + setting.label.toLowerCase()}</span>
-          <div className="parameter-choices" role="group" aria-labelledby={id} aria-describedby={id + "-hint"}>
-            {choices.map((choice) => (
-              <button key={choice.value} aria-pressed={values.includes(choice.value)} onClick={() => onValues(
-                (values.includes(choice.value) ? values.filter((item) => item !== choice.value) : [...values, choice.value]).join(", "),
-              )}>{choice.label}</button>
-            ))}
-          </div>
-          <small id={id + "-hint"}>Choose two or more values to compare.</small>
-        </div>
-      ) : (
-        <label className="field">
-          <span>{"Values for " + setting.label.toLowerCase()}</span>
-          <input aria-describedby={id + "-hint"} value={variation.text} onChange={(event) => onValues(event.target.value)} placeholder={setting.name === "fraction" ? "25%, 50%, 75%" : "Value 1, value 2, value 3"} />
-          <small id={id + "-hint"}>{numericHint}</small>
-        </label>
-      ))}
+      {setting && (settingChoices(setting).length > 0
+        ? <ChoiceValues setting={setting} text={variation.text} onChange={(text) => onChange({ text })} />
+        : <NumberValues setting={setting} variation={variation} onChange={onChange} />)}
     </div>
   );
 }
 
+function ChoiceValues({ setting, text, onChange }: { setting: SweepSetting; text: string; onChange: (text: string) => void }) {
+  const id = useId();
+  const values = splitSweepValues(text);
+  return (
+    <div className="sweep-choice-fields">
+      <span id={id}>Values</span>
+      <div className="parameter-choices" role="group" aria-labelledby={id} aria-describedby={id + "-hint"}>
+        {settingChoices(setting).map((choice) => (
+          <button key={choice.value} aria-pressed={values.includes(choice.value)} onClick={() => onChange(
+            (values.includes(choice.value) ? values.filter((item) => item !== choice.value) : [...values, choice.value]).join(", "),
+          )}>{choice.label}</button>
+        ))}
+      </div>
+      <small id={id + "-hint"}>Choose two or more.</small>
+    </div>
+  );
+}
+
+const RANGE_PARTS = [["from", "From"], ["to", "To"], ["step", "Step"]] as const;
+
+/** Numbers start as a From/To/Step range. "List" takes any values, typed with commas. */
+function NumberValues({ setting, variation, onChange }: { setting: SweepSetting; variation: SweepVariation; onChange: (patch: Partial<SweepVariation>) => void }) {
+  const id = useId();
+  const percent = isPercentSetting(setting);
+  const mode = variation.mode ?? "list";
+  const range = variation.range ?? defaultRange(setting, splitSweepValues(variation.text)[0] ?? "");
+  const checked = settingRange(range, setting);
+
+  function setRange(next: SweepRange) {
+    onChange({ mode: "range", range: next, text: settingRange(next, setting).text || variation.text });
+  }
+
+  return (
+    <div className="sweep-number-values">
+      <div className="sweep-values-header">
+        <span id={id}>Values</span>
+        <div className="segmented segmented--small" role="group" aria-label={"How to enter " + setting.label.toLowerCase()}>
+          <button aria-pressed={mode === "range"} onClick={() => mode !== "range" && setRange(range)}>Range</button>
+          <button aria-pressed={mode === "list"} onClick={() => onChange({ mode: "list" })}>List</button>
+        </div>
+      </div>
+      {mode === "range" ? <>
+        <div className="sweep-range-fields" role="group" aria-labelledby={id}>
+          {RANGE_PARTS.map(([part, name]) => (
+            <label className="field" key={part}>
+              <span>{name}{percent && <span className="visually-hidden"> in percent</span>}</span>
+              <span className="number-with-unit">
+                <input type="number" inputMode="decimal" step="any" value={range[part]} onChange={(event) => setRange({ ...range, [part]: event.target.value })} />
+                {percent && <span aria-hidden="true">%</span>}
+              </span>
+            </label>
+          ))}
+        </div>
+        <p className={checked.error ? "sweep-values-line is-error" : "sweep-values-line"} aria-live="polite">
+          {checked.error || `${checked.values.length} values: ${checked.text}`}
+        </p>
+      </> : (
+        <label className="field">
+          <span className="visually-hidden">Values for {setting.label.toLowerCase()}</span>
+          <input aria-describedby={id + "-hint"} value={variation.text} onChange={(event) => onChange({ text: event.target.value })} placeholder={percent ? "25%, 50%, 75%" : "Value 1, value 2, value 3"} />
+          <small id={id + "-hint"}>{listHint(setting)}</small>
+        </label>
+      )}
+    </div>
+  );
+}
+
+function listHint(setting: SweepSetting): string {
+  if (isPercentSetting(setting)) return "Two or more percentages, separated by commas.";
+  if (setting.min !== undefined && setting.max !== undefined) return `Two or more values from ${setting.min} to ${setting.max}, separated by commas.`;
+  return "Two or more values, separated by commas.";
+}
+
 function FixedSetting({ setting, value, onChange }: { setting: SweepSetting; value: string; onChange: (text: string) => void }) {
   const choices = settingChoices(setting);
+  if (choices.length) {
+    return <label className="field">
+      <span>{setting.label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="">Use default</option>
+        {choices.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
+      </select>
+    </label>;
+  }
+  if (isPercentSetting(setting)) {
+    // A retained fraction is typed in percent here too.
+    const shown = value.trim().endsWith("%") ? value.trim().slice(0, -1).trim() : value.trim() ? String(Number((Number(value) * 100).toPrecision(12))) : "";
+    return <label className="field">
+      <span>{setting.label}<span className="visually-hidden"> in percent</span></span>
+      <span className="number-with-unit">
+        <input type="number" inputMode="decimal" step="any" min={0} max={100} value={shown} placeholder="Use default" onChange={(event) => onChange(event.target.value ? event.target.value + "%" : "")} />
+        <span aria-hidden="true">%</span>
+      </span>
+    </label>;
+  }
   return <label className="field">
     <span>{setting.label}</span>
-    {choices.length ? <select value={value} onChange={(event) => onChange(event.target.value)}>
-      <option value="">Use default</option>
-      {choices.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
-    </select> : <input type="number" step="any" min={setting.min} max={setting.max} value={value} onChange={(event) => onChange(event.target.value)} placeholder="Use default" />}
+    <input type="number" step="any" min={setting.min} max={setting.max} value={value} onChange={(event) => onChange(event.target.value)} placeholder="Use default" />
   </label>;
-}
-
-function SweepReview({ preview, drafts, schema, environment, metrics }: {
-  preview: SweepResponse;
-  drafts: SweepDraft[];
-  schema: UiSchema;
-  environment: SweepEnvironment;
-  metrics: string[];
-}) {
-  const configurations = record(preview.configuration.configurations) ?? {};
-  const setups = new Map(drafts.map((draft) => [draft.name.trim(), { draft, settings: sweepSettings(draft, schema, environment) }]));
-  return <section className="panel sweep-run-preview" aria-labelledby="sweep-preview-title">
-    <h2 id="sweep-preview-title">Runs to execute</h2>
-    <p className="sweep-measurement-summary">{"Measurements: " + metrics.map(labelize).join(", ")}</p>
-    <p>Open a run to see its complete method and filter settings.{Object.keys(configurations).length > 4 && " Scroll down to see all runs."}</p>
-    <div className="sweep-preview-list">
-      {Object.entries(configurations).map(([name, configuration]) => {
-        const setupName = preview.setup_names[name] ?? "Extraction setup";
-        const setup = setups.get(setupName);
-        const changes = setup ? variedSettings(configuration, setup.draft.variations, setup.settings) : [];
-        return <details key={name}>
-          <summary>
-            <span>
-              <strong>{setupName}</strong>
-              <small>{configurationSummary(configuration)}</small>
-              {changes.length > 0 ? <span className="sweep-reviewed-values">{changes.map(({ key, label, value }) => <span key={key}>{label}: {value}</span>)}</span> : <small>Fixed settings</small>}
-            </span>
-            <ChevronDown size={16} />
-          </summary>
-          <ConfigurationDetails value={configuration} />
-        </details>;
-      })}
-    </div>
-  </section>;
-}
-
-function variedSettings(configuration: JsonValue, variations: SweepVariation[], settings: SweepSetting[]) {
-  const config = record(configuration);
-  return variations.flatMap((variation) => {
-    const setting = settings.find((item) => item.key === variation.key);
-    if (!setting) return [];
-    const value = record(record(config?.[setting.kind])?.parameters)?.[setting.name];
-    const label = settingChoices(setting).find((item) => item.value === String(value))?.label;
-    const formatted = setting.name === "fraction" && typeof value === "number"
-      ? new Intl.NumberFormat("en", { style: "percent", maximumSignificantDigits: 16 }).format(value)
-      : typeof value === "number" ? String(value) : formatValue(value);
-    return [{ key: setting.key, label: setting.label, value: label ?? formatted }];
-  });
 }
 
 function methodIsCompatible(method: MethodSpec, environment: SweepEnvironment): boolean {
@@ -441,59 +450,110 @@ function uniqueSetupName(base: string, drafts: SweepDraft[]): string {
   return name;
 }
 
-function SweepResultsView({ result, drawerOpen, onDrawer, onEdit, heading }: { result: SweepResponse; drawerOpen: boolean; onDrawer: (open: boolean) => void; onEdit: () => void; heading: RefObject<HTMLHeadingElement | null> }) {
-  const configurations = (result.configuration.configurations || {}) as JsonRecord;
-  const runLabels = sweepRunLabels(result);
+function SweepResults({ result, schema, heading, onBack, onEdit }: {
+  result: SweepResponse;
+  schema: UiSchema;
+  heading: RefObject<HTMLHeadingElement | null>;
+  onBack: () => void;
+  onEdit: () => void;
+}) {
+  const figure = useSweepFigure(result, schema);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const settingsButton = useRef<HTMLButtonElement>(null);
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    settingsButton.current?.focus();
+  }, []);
+  const total = result.runs.length;
+  const failed = result.runs.filter((run) => run.status === "failed").length;
+  const experimentId = result.experiment_id;
+  const downloads: DownloadItem[] = [
+    { label: "Measurements (CSV)", onSelect: () => downloadCsv(result.metrics, "netbone-sweep-metrics.csv") },
+    { label: "Runs (CSV)", onSelect: () => downloadCsv(result.runs, "netbone-sweep-runs.csv") },
+    { label: "Settings (JSON)", onSelect: () => downloadJson(result.configuration, "netbone-sweep-config.json") },
+    ...figure.downloads,
+    ...(experimentId ? [{ label: "Full experiment (ZIP)", onSelect: () => downloadWorkspaceExperiment(experimentId) }] : []),
+  ];
   return <main className="workspace sweep-workspace sweep-results-workspace" aria-labelledby="sweep-results-title">
+    <BackLink onClick={onBack} />
     <header className="workspace-header">
-      <div><h1 id="sweep-results-title" ref={heading} tabIndex={-1}>Sweep results</h1><p>See how your settings affected retention and other backbone properties.</p></div>
+      <div>
+        <h1 id="sweep-results-title" ref={heading} tabIndex={-1}>Sweep results</h1>
+        <p>{failed ? `${total - failed} of ${total} runs finished. ${failed} failed; the table says why.` : `${total} ${total === 1 ? "run" : "runs"} finished.`}</p>
+      </div>
       <div className="figure-actions">
-        <button className="button button--quiet" onClick={() => onDrawer(true)}><Settings2 size={16} /> Run settings</button>
-        <button className="button button--primary" onClick={onEdit}><Pencil size={16} /> Edit sweep</button>
-        {result.experiment_id && <ExperimentExport key={result.experiment_id} experimentId={result.experiment_id} />}
+        <button ref={settingsButton} className="button button--quiet" onClick={() => setDrawerOpen(true)}><Settings2 size={16} aria-hidden="true" /> Run settings</button>
+        <button className="button button--quiet" onClick={onEdit}><Pencil size={16} aria-hidden="true" /> Edit sweep</button>
+        <DownloadMenu items={downloads} />
       </div>
     </header>
-    <div className="sweep-summary"><Summary label="Total runs" value={result.runs.length} /><Summary label="Successful runs" value={result.runs.filter((row) => row.status === "ok").length} /><Summary label="Failed runs" value={result.runs.filter((row) => row.status === "failed").length} /><Summary label="Runs reusing scores" value={result.score_cache_hits} /></div>
-    <SweepVisualizations result={result} />
-    <section className="panel sweep-table-panel"><header><div><h2>Run measurements</h2><p>Review each measured value and explanations for unavailable or failed results.</p></div><div className="figure-actions"><button className="button button--export" onClick={() => downloadCsv(result.metrics, "netbone-sweep-metrics.csv")}><Download size={15} /> Metrics CSV</button><button className="button button--export" onClick={() => downloadCsv(result.runs, "netbone-sweep-runs.csv")}><Download size={15} /> Runs CSV</button><button className="button button--export" onClick={() => downloadJson(result.configuration, "netbone-sweep-config.json")}><Download size={15} /> Settings JSON</button></div></header><SweepTable result={result} /></section>
-    {drawerOpen && <><button className="drawer-scrim" aria-label="Close configuration details" onClick={() => onDrawer(false)} /><aside className="configuration-drawer" aria-label="Generated configurations"><header><div><span className="eyebrow">SWEEP SETUP</span><h2>Generated configurations</h2></div><button className="icon-button" title="Close" aria-label="Close configuration details" onClick={() => onDrawer(false)}><X size={18} /></button></header><div className="configuration-drawer-list">{result.runs.map((run) => {
-      const name = String(run.pipeline_name);
-      const configuration = configurations[name];
-      return <section key={name}><b>{formatValue(run.run_id)}</b><div><strong>{runLabels.get(Number(run.run_id))}</strong><small>{configurationSummary(configuration)}</small><ConfigurationDetails value={configuration} /></div></section>;
-    })}</div></aside></>}
+    <SweepVisualizations figure={figure} />
+    <section className="panel sweep-table-panel" aria-labelledby="sweep-table-title">
+      <header><div><h2 id="sweep-table-title">Measurements</h2><p>One row for each run.</p></div></header>
+      <SweepTable result={result} labels={figure.runLabels} />
+    </section>
+    {drawerOpen && <RunSettingsDrawer result={result} schema={schema} onClose={closeDrawer} />}
   </main>;
 }
 
-function ConfigurationDetails({ value }: { value: unknown }) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const configuration = value as JsonRecord;
-  const method = configuration.method as JsonRecord | undefined;
-  const filter = configuration.filter as JsonRecord | undefined;
-  return <dl><div><dt>Method parameters</dt><dd>{compactParameters(method?.parameters)}</dd></div><div><dt>Filter parameters</dt><dd>{compactParameters(filter?.parameters)}</dd></div></dl>;
+/** The settings of every run, said once per setup. A setting the sweep changed lists each value it took. */
+function RunSettingsDrawer({ result, schema, onClose }: { result: SweepResponse; schema: UiSchema; onClose: () => void }) {
+  const close = useRef<HTMLButtonElement>(null);
+  const configurations = (result.configuration.configurations || {}) as JsonRecord;
+  const setups = new Map<string, JsonRecord[]>();
+  for (const run of result.runs) {
+    const name = String(run.pipeline_name);
+    const configuration = configurations[name];
+    const setup = result.setup_names[name] || name;
+    if (configuration && typeof configuration === "object" && !Array.isArray(configuration)) setups.set(setup, [...(setups.get(setup) ?? []), configuration]);
+  }
+  useEffect(() => {
+    close.current?.focus();
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return <>
+    <button className="drawer-scrim" tabIndex={-1} aria-hidden="true" onClick={onClose} />
+    <aside className="configuration-drawer" role="dialog" aria-modal="true" aria-labelledby="run-settings-title">
+      <header>
+        <h2 id="run-settings-title">Run settings</h2>
+        <button ref={close} className="icon-button" title="Close" aria-label="Close run settings" onClick={onClose}><X size={18} aria-hidden="true" /></button>
+      </header>
+      <div className="configuration-drawer-list">{[...setups].map(([setup, runs]) => (
+        <section key={setup}>
+          {setups.size > 1 && <h3>{setup} <small>· {runs.length} {runs.length === 1 ? "run" : "runs"}</small></h3>}
+          <SettingsList described={mergeDescriptions(runs.map((configuration) => describeConfiguration(configuration, schema)))} />
+        </section>
+      ))}</div>
+    </aside>
+  </>;
 }
 
-function compactParameters(value: unknown): string {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return "Registered defaults";
-  const entries = Object.entries(value as JsonRecord);
-  return entries.length ? entries.map(([name, parameter]) => labelize(name) + ": " + (typeof parameter === "number" ? String(parameter) : formatValue(parameter))).join(" · ") : "Registered defaults";
-}
-
-function Summary({ label, value }: { label: string; value: unknown }) { return <div><span>{label}</span><strong>{formatValue(value)}</strong></div>; }
-function SweepTable({ result }: { result: SweepResponse }) {
-  const labels = sweepRunLabels(result);
+/** One row per run and one column per measurement. Notes appear only when something is missing. */
+function SweepTable({ result, labels }: { result: SweepResponse; labels: Map<number, string> }) {
+  const metrics = [...new Set(result.metrics.map((row) => row.metric).filter((name): name is string => typeof name === "string"))];
+  const cells = new Map(result.metrics.filter((row) => typeof row.metric === "string").map((row) => [`${row.run_id}\u0000${row.metric}`, row]));
+  const rows = result.runs.map((run) => {
+    const id = Number(run.run_id);
+    const values = metrics.map((metric) => {
+      const cell = cells.get(`${id}\u0000${metric}`);
+      return cell?.status === "ok" && typeof cell.value === "number" && Number.isFinite(cell.value) ? cell.value : null;
+    });
+    const notes = run.status === "failed"
+      ? [String(run.explanation || run.failure_detail || "This run failed.")]
+      : metrics.flatMap((metric, index) => values[index] !== null ? [] : [`${metricLabel(metric)}: ${String(cells.get(`${id}\u0000${metric}`)?.explanation || "unavailable.")}`]);
+    return { id, label: labels.get(id) ?? `Run ${id}`, values, notes: notes.join(" ") };
+  });
+  const hasNotes = rows.some((row) => row.notes);
   return <div className="table-wrap"><table>
-    <thead><tr><th>Run</th><th>Metric</th><th>Value</th><th>Status</th><th>Explanation</th></tr></thead>
-    <tbody>{result.metrics.map((record, index) => (
-      <tr key={index}>
-        <td className="sweep-run-label">{labels.get(Number(record.run_id)) ?? `Run ${record.run_id}`}</td>
-        <td>{typeof record.metric === "string" ? labelize(record.metric) : "—"}</td>
-        <td>{formatValue(record.value)}</td>
-        <td>{formatValue(record.status)}</td>
-        <td>{typeof record.explanation === "string" && record.explanation ? record.explanation : "—"}</td>
+    <thead><tr><th>Run</th>{metrics.map((metric) => <th key={metric} className="is-numeric">{metricLabel(metric)}</th>)}{hasNotes && <th>Notes</th>}</tr></thead>
+    <tbody>{rows.map((row) => (
+      <tr key={row.id}>
+        <td className="sweep-run-label">{row.label}</td>
+        {row.values.map((value, index) => <td key={metrics[index]} className="is-numeric">{formatMetric(metrics[index] ?? "", value)}</td>)}
+        {hasNotes && <td>{row.notes}</td>}
       </tr>
     ))}</tbody>
   </table></div>;
 }
-
-function responseCount(response: SweepResponse): number { return Object.keys((response.configuration.configurations || {}) as JsonRecord).length; }
-function configurationSummary(value: unknown): string { if (!value || typeof value !== "object" || Array.isArray(value)) return "Resolved pipeline"; const config = value as JsonRecord; const method = config.method as JsonRecord | undefined; const filter = config.filter as JsonRecord | undefined; return `${labelize(String(method?.name || "method"))} · ${labelize(String(filter?.name || "filter"))}`; }

@@ -1,12 +1,11 @@
 import { useId, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { downloadCsv } from "../api";
 import type { JsonRecord } from "../types";
 import { formatValue } from "../utils";
 
 interface StatisticsTableProps {
   records: JsonRecord[];
-  filename: string;
   primaryStatistic?: string;
   heading?: string;
 }
@@ -20,14 +19,24 @@ export function columnLabel(column: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function StatisticsTable({ records, filename, primaryStatistic = "score", heading }: StatisticsTableProps) {
+/** Columns in reading order: endpoints, weight, the main score, the kept flag, then the rest, ids last. */
+export function statisticsColumns(records: JsonRecord[], primaryStatistic = "score"): string[] {
+  const available = new Set(records.flatMap((record) => Object.keys(record)));
+  const first = [...new Set(["source", "target", "node", "weight", primaryStatistic, "retained"])];
+  return [...first, ...[...available].filter((column) => !first.includes(column) && !ID_COLUMNS.includes(column)), ...ID_COLUMNS]
+    .filter((column) => available.has(column));
+}
+
+export function downloadStatistics(records: JsonRecord[], primaryStatistic: string, filename: string): void {
+  downloadCsv(records, filename, statisticsColumns(records, primaryStatistic));
+}
+
+export function StatisticsTable({ records, primaryStatistic = "score", heading }: StatisticsTableProps) {
   const switchLabel = useId();
   const [showIds, setShowIds] = useState(false);
   const [page, setPage] = useState(0);
   const available = new Set(records.flatMap((record) => Object.keys(record)));
-  const first = [...new Set(["source", "target", "node", "weight", primaryStatistic, "retained"])];
-  const allColumns = [...first, ...[...available].filter((column) => !first.includes(column) && !ID_COLUMNS.includes(column)), ...ID_COLUMNS]
-    .filter((column) => available.has(column));
+  const allColumns = statisticsColumns(records, primaryStatistic);
   const hasIds = allColumns.some((column) => ID_COLUMNS.includes(column));
   const columns = showIds ? allColumns : allColumns.filter((column) => !ID_COLUMNS.includes(column));
   const numeric = new Set(columns.filter((column) => column !== "retained" && records.every((record) => {
@@ -52,7 +61,6 @@ export function StatisticsTable({ records, filename, primaryStatistic = "score",
             <button type="button" className="switch" role="switch" aria-checked={showIds} aria-labelledby={switchLabel} onClick={() => setShowIds(!showIds)}><span /></button>
             <span id={switchLabel}>Show id columns</span>
           </span>}
-          <button className="button button--secondary" onClick={() => downloadCsv(records, filename, allColumns)}><Download size={16} aria-hidden="true" /> Download CSV</button>
         </div>
       </header>
       <div className="table-wrap statistics-scroll" role="region" aria-label="Scrollable statistics" tabIndex={0}>

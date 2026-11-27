@@ -1255,6 +1255,7 @@ def filter_preview_payload(payload: object) -> dict[str, JsonValue]:
             if result.graph.is_directed()
             else nx.number_connected_components(result.graph)
         ),
+        "backbone_isolated_node_count": nx.number_of_isolates(result.graph),
         "original_node_count": original_node_count,
         "backbone_node_fraction": (
             backbone_node_count / original_node_count if original_node_count else 0.0

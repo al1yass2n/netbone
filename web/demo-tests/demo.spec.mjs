@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { download } from "../browser-tests/downloads.mjs";
 
 test("the real workbench compares, changes and exports precomputed Karate Club runs", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
@@ -25,18 +26,16 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await expect(retention.getByText("Backbone edges", { exact: true })).toBeVisible();
   await expect(retention).toContainText("20");
 
-  await page.getByRole("button", { name: "Compare", exact: true }).click();
-  await page.getByRole("button", { name: "Compare 2 backbones" }).click();
+  await page.getByRole("button", { name: "Compare 2 saved backbones" }).click();
   await page.getByRole("button", { name: "Overlap & agreement" }).click();
   await page.getByRole("combobox", { name: "Metric", exact: true }).selectOption("edge_overlap");
   await page.getByRole("button", { name: "Table", exact: true }).click();
   await expect(page.getByRole("table").getByRole("cell", { name: "6", exact: true })).toBeVisible();
 
-  const comparisonZip = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export full experiment" }).click();
-  expect((await comparisonZip).suggestedFilename()).toMatch(/\.zip$/);
+  const comparisonZip = await download(page, page.getByRole("main"), "Full experiment (ZIP)");
+  expect(comparisonZip.suggestedFilename()).toMatch(/\.zip$/);
 
-  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
+  await page.getByRole("button", { name: "Back to analysis" }).click();
   await page.getByRole("button", { name: "Change method" }).click();
   await page.getByRole("dialog", { name: "Choose a scoring method" }).getByRole("button", { name: /^Edge Betweenness / }).click();
   await page.getByLabel("Retained fraction").selectOption("0.5");
@@ -44,22 +43,14 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspection = page.getByRole("dialog", { name: "Inspect & export" });
   await expect(inspection.getByRole("table", { name: "Method statistics" })).toBeVisible();
-  const inspectTab = inspection.getByRole("tab", { name: "Inspect" });
-  await expect(inspectTab).toHaveAttribute("aria-selected", "true");
-  await inspection.getByText("View run settings", { exact: true }).click();
-  const settings = page.waitForEvent("download");
-  await inspection.getByRole("button", { name: "Download settings (JSON)" }).click();
-  expect((await settings).suggestedFilename()).toBe("netbone-pipeline.json");
-  await inspectTab.press("ArrowRight");
-  await expect(inspection.getByRole("tab", { name: "Export" })).toBeFocused();
-  await expect(inspection.getByRole("table", { name: "Method statistics" })).toBeHidden();
-  await expect(inspection.getByRole("combobox", { name: "Graph", exact: true })).toHaveValue("backbone");
-  const graph = page.waitForEvent("download");
-  await inspection.getByRole("button", { name: "Download GraphML" }).click();
-  expect((await graph).suggestedFilename()).toMatch(/\.graphml$/);
-  const extractionZip = page.waitForEvent("download");
-  await inspection.getByRole("button", { name: "Download ZIP" }).click();
-  expect((await extractionZip).suggestedFilename()).toMatch(/\.zip$/);
+  await inspection.getByText("Run settings", { exact: true }).click();
+  await expect(inspection.locator(".run-settings")).toContainText("Edge Betweenness");
+  const settings = await download(page, inspection, "Settings (JSON)");
+  expect(settings.suggestedFilename()).toBe("netbone-pipeline.json");
+  const graph = await download(page, inspection, "Backbone (GraphML)");
+  expect(graph.suggestedFilename()).toMatch(/\.graphml$/);
+  const extractionZip = await download(page, inspection, "Full experiment (ZIP)");
+  expect(extractionZip.suggestedFilename()).toMatch(/\.zip$/);
 
   expect(apiRequests).toEqual([]);
   expect(errors).toEqual([]);

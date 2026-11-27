@@ -29,8 +29,20 @@ function runSettings(run: JsonRecord): Array<[string, string, unknown]> {
 
 const fractionFormat = new Intl.NumberFormat("en", { style: "percent", maximumSignificantDigits: 16 });
 
-export function sweepRunLabels(result: SweepResponse): Map<number, string> {
+/** The name of a varied setting. Pass the schema's labels; the fallbacks cover the common ones. */
+export type SettingLabeler = (scope: string, name: string) => string | undefined;
+
+function defaultSettingLabel(scope: string, name: string): string {
+  if (scope === "filter" && name === "fraction") return "Retained fraction";
+  if (name === "pvalue_aggregation") return "Endpoint p-value";
+  const text = name.replaceAll("_", " ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Run names from the settings that change, such as "Retained fraction: 10%". The setup name leads only when there are several. */
+export function sweepRunLabels(result: SweepResponse, labeler?: SettingLabeler): Map<number, string> {
   const runs = result.runs.map((run) => ({ id: Number(run.run_id), setup: sweepSetupName(result, run), settings: runSettings(run) }));
+  const severalSetups = new Set(runs.map((run) => run.setup)).size > 1;
   const options = new Map<string, Set<string>>();
   const optionKey = (setup: string, scope: string, name: string) => JSON.stringify([setup, scope, name]);
   for (const { setup, settings } of runs) {
@@ -45,15 +57,13 @@ export function sweepRunLabels(result: SweepResponse): Map<number, string> {
     const changing = settings.filter(([scope, name]) => (options.get(optionKey(setup, scope, name))?.size ?? 0) > 1);
     const suffix = changing.map(([scope, name, value]) => {
       const fraction = scope === "filter" && name === "fraction";
-      const label = fraction ? "retained fraction"
-        : name === "pvalue_aggregation" ? "endpoint p-value"
-          : name.replaceAll("_", " ");
+      const label = labeler?.(scope, name) ?? defaultSettingLabel(scope, name);
       const ambiguous = changing.some(([otherScope, otherName]) => otherScope !== scope && otherName === name);
       const formatted = fraction && typeof value === "number" ? fractionFormat.format(value)
         : typeof value === "string" ? value : JSON.stringify(value);
-      return `${ambiguous ? `${scope} ` : ""}${label} = ${formatted}`;
+      return `${ambiguous ? `${scope === "filter" ? "Filter" : "Method"} ${label.charAt(0).toLowerCase()}${label.slice(1)}` : label}: ${formatted}`;
     });
-    return [id, [setup, ...suffix].join(" · ")];
+    return [id, [...(severalSetups || !suffix.length ? [setup] : []), ...suffix].join(" · ")];
   }));
 }
 
@@ -68,9 +78,8 @@ export function numericSweepParameters(runs: JsonRecord[]): string[] {
   return [...values].filter(([, options]) => options.size > 1).map(([name]) => name);
 }
 
-export function trajectoryRows(result: SweepResponse, parameter: string, metric: string, setup = "all"): SweepPlotRow[] {
+export function trajectoryRows(result: SweepResponse, parameter: string, metric: string, setup = "all", labels = sweepRunLabels(result)): SweepPlotRow[] {
   const metrics = metricLookup(result.metrics);
-  const labels = sweepRunLabels(result);
   return result.runs.flatMap((run) => {
     const runId = Number(run.run_id);
     const name = String(run.pipeline_name);
@@ -81,7 +90,10 @@ export function trajectoryRows(result: SweepResponse, parameter: string, metric:
     const metricRow = metrics.get(`${runId}\u0000${metric}`);
     const y = validMetric(metricRow);
     const other = Object.entries(values).filter(([key]) => key !== parameter);
-    const context = other.map(([key, value]) => `${key}=${value}`).join(", ");
+    const context = other.map(([key, value]) => {
+      const [scope = "", name = key] = key.split(".");
+      return `${defaultSettingLabel(scope, name)}: ${value}`;
+    }).join(", ");
     const series = context ? `${setupName} · ${context}` : setupName;
     return [{
       runId, name, runLabel: labels.get(runId) ?? setupName, setup: setupName, series, x, y,
@@ -91,9 +103,8 @@ export function trajectoryRows(result: SweepResponse, parameter: string, metric:
   });
 }
 
-export function tradeoffRows(result: SweepResponse, xMetric: string, yMetric: string, setup = "all"): SweepPlotRow[] {
+export function tradeoffRows(result: SweepResponse, xMetric: string, yMetric: string, setup = "all", labels = sweepRunLabels(result)): SweepPlotRow[] {
   const metrics = metricLookup(result.metrics);
-  const labels = sweepRunLabels(result);
   return result.runs.flatMap((run) => {
     const runId = Number(run.run_id);
     const name = String(run.pipeline_name);

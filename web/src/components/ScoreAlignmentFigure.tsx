@@ -1,5 +1,7 @@
 import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { rankTicks } from "../chart";
+import { formatMetric, metricLabel } from "../labels";
 import type { AlignmentRecord, MetricRecord } from "../types";
 import { formatValue } from "../utils";
 
@@ -23,14 +25,16 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
     const [view, setView] = useState({ xMin: 1, xMax: maximum, yMin: 1, yMax: maximum });
     const drag = useRef<{ x: number; y: number; view: typeof view } | null>(null);
     useEffect(() => setView({ xMin: 1, xMax: maximum, yMin: 1, yMax: maximum }), [alignment, maximum]);
-    const xTicks = ticks(view.xMin, view.xMax);
-    const yTicks = ticks(view.yMin, view.yMax);
+    const xTicks = rankTicks(view.xMin, view.xMax);
+    const yTicks = rankTicks(view.yMin, view.yMax);
     const titleId = "score-alignment-title";
     const descriptionId = "score-alignment-description";
     const title = `${alignment.result_a} and ${alignment.result_b}`;
     const description = "Each mark is one aligned item. Points near the diagonal have similar importance ranks in both methods.";
-    const scaleX = (rank: number) => margin.left + ((rank - view.xMin) / Math.max(1, view.xMax - view.xMin)) * plotWidth;
-    const scaleY = (rank: number) => margin.top + plotHeight - ((rank - view.yMin) / Math.max(1, view.yMax - view.yMin)) * plotHeight;
+    // Dots at the first and last rank stay whole inside the plot.
+    const inset = 8;
+    const scaleX = (rank: number) => margin.left + inset + ((rank - view.xMin) / Math.max(1, view.xMax - view.xMin)) * (plotWidth - 2 * inset);
+    const scaleY = (rank: number) => margin.top + plotHeight - inset - ((rank - view.yMin) / Math.max(1, view.yMax - view.yMin)) * (plotHeight - 2 * inset);
 
     function zoom(factor: number, centerX = (view.xMin + view.xMax) / 2, centerY = (view.yMin + view.yMax) / 2) {
       if (maximum <= 1) return;
@@ -99,8 +103,8 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
         <text x={24} y={59} fill="#586863" fontSize={13}>{title}</text>
         <text x={24} y={82} fill="#41534e" fontSize={12}>
           {alignment.points.length} aligned {alignment.target === "node" ? "nodes" : "edges"}
-          {spearman?.status === "ok" && Number.isFinite(spearman.value) ? ` · Spearman ${formatValue(spearman.value)}` : ""}
-          {overlap?.status === "ok" && Number.isFinite(overlap.value) ? ` · Backbone Jaccard ${formatValue(overlap.value)}` : ""}
+          {spearman?.status === "ok" && Number.isFinite(spearman.value) ? ` · ${metricLabel("score_spearman")} ${formatMetric("score_spearman", spearman.value)}` : ""}
+          {overlap?.status === "ok" && Number.isFinite(overlap.value) ? ` · ${metricLabel(overlap.metric)} ${formatMetric(overlap.metric, overlap.value)}` : ""}
         </text>
         {xTicks.map((tick) => {
           const x = scaleX(tick);
@@ -137,11 +141,6 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
     );
   },
 );
-
-function ticks(minimum: number, maximum: number): number[] {
-  if (minimum === maximum) return [minimum];
-  return Array.from({ length: 6 }, (_, index) => minimum + ((maximum - minimum) * index) / 5);
-}
 
 function zoomAxis(minimum: number, maximum: number, center: number, factor: number, limit: number): [number, number] {
   const minimumRange = Math.max(1, (limit - 1) / 100);

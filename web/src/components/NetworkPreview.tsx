@@ -1,4 +1,5 @@
-import { useId, useMemo } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { RefObject } from "react";
 import { LockKeyhole } from "lucide-react";
 import type { ExtractionResponse, JsonValue } from "../types";
 
@@ -12,10 +13,18 @@ export function componentColor(component: number): string {
   return COMPONENT_COLORS[((component % COMPONENT_COLORS.length) + COMPONENT_COLORS.length) % COMPONENT_COLORS.length] ?? "var(--accent)";
 }
 
+type Point = { x: number; y: number };
+
 export function NetworkPreview({ graph }: NetworkPreviewProps) {
   const markerId = useId();
-  const positions = useMemo(() => graph.truncated || graph.nodes.length > 80 ? new Map<string, { x: number; y: number }>() : forceLayout(graph), [graph]);
-  if (graph.truncated || graph.nodes.length > 80) {
+  const svg = useRef<SVGSVGElement>(null);
+  const large = graph.truncated || graph.nodes.length > 80;
+  const { width, height } = useBoxSize(svg, !large);
+  const layout = useMemo(() => large ? new Map<string, Point>() : forceLayout(graph), [graph, large]);
+  const labelled = graph.nodes.length <= 24;
+  const labelSpace = labelled ? Math.min(112, 7 * Math.max(0, ...graph.nodes.map((node) => shortLabel(node.id).length))) + 16 : 0;
+  const positions = useMemo(() => fitLayout(layout, width, height, labelSpace), [layout, width, height, labelSpace]);
+  if (large) {
     return (
       <div className="graph-preview-locked" role="status">
         <LockKeyhole size={22} aria-hidden="true" />
@@ -34,7 +43,7 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
 
   return (
     <div className="graph-preview">
-      <svg viewBox="0 0 520 520" role="img" aria-label="Backbone graph preview">
+      <svg ref={svg} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Backbone graph preview">
         {graph.directed && (
           <defs>
             <marker id={`${markerId}-context`} viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="9" refY="5" orient="auto">
@@ -81,7 +90,7 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
               <circle r="9" className={node.isolated ? "graph-node is-isolated" : node.retained ? "graph-node is-retained" : "graph-node"} style={node.isolated || node.component == null ? undefined : { fill: componentColor(componentOrder.indexOf(Number(node.component))) }}>
                 <title>{shortLabel(node.id)}{node.isolated ? " · Isolated in backbone" : node.component != null ? ` · Component ${node.component}` : ""}</title>
               </circle>
-              {nodes.length <= 24 && <text x="13" y="4">{shortLabel(node.id)}</text>}
+              {labelled && <text x="10" y="-10">{shortLabel(node.id)}</text>}
             </g>
           );
         })}
@@ -100,8 +109,8 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
   );
 }
 
-/** Deterministic Fruchterman-Reingold layout inside a 520 × 520 box. */
-export function forceLayout(graph: NetworkPreviewProps["graph"]): Map<string, { x: number; y: number }> {
+/** Deterministic Fruchterman-Reingold layout. fitLayout turns and scales it into the drawing. */
+export function forceLayout(graph: NetworkPreviewProps["graph"]): Map<string, Point> {
   const ids = graph.nodes.map((node) => String(node.id));
   const index = new Map(ids.map((id, i) => [id, i]));
   const links = graph.edges
@@ -146,11 +155,70 @@ export function forceLayout(graph: NetworkPreviewProps["graph"]): Map<string, { 
     }
     temperature *= 0.985;
   }
-  const minX = Math.min(...x), maxX = Math.max(...x), minY = Math.min(...y), maxY = Math.max(...y);
-  const scale = Math.min(size / Math.max(maxX - minX, 1), size / Math.max(maxY - minY, 1));
-  const offsetX = 260 - ((minX + maxX) / 2) * scale;
-  const offsetY = 260 - ((minY + maxY) / 2) * scale;
-  return new Map(ids.map((id, i) => [id, { x: count === 1 ? 260 : x[i]! * scale + offsetX, y: count === 1 ? 260 : y[i]! * scale + offsetY }]));
+  return new Map(ids.map((id, i) => [id, { x: x[i]!, y: y[i]! }]));
+}
+
+/**
+ * Places a layout in a width × height drawing, one unit per screen pixel, so
+ * labels keep their size. The layout is turned so its longest spread runs
+ * along the longer side, then scaled evenly to fit.
+ */
+export function fitLayout(layout: Map<string, Point>, width: number, height: number, labelSpace = 0): Map<string, Point> {
+  const points = [...layout.values()];
+  if (!points.length) return new Map();
+  const margin = 22;
+  const left = margin;
+  const right = Math.max(left + 1, width - margin - labelSpace);
+  // Labels sit above their node, so the top keeps room for one line.
+  const top = margin + (labelSpace ? 12 : 0);
+  const bottom = Math.max(top + 1, height - margin);
+  if (points.length === 1) return new Map([...layout.keys()].map((id) => [id, { x: (left + right) / 2, y: (top + bottom) / 2 }]));
+  const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+  const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+  let xx = 0, yy = 0, xy = 0;
+  for (const point of points) {
+    xx += (point.x - meanX) ** 2;
+    yy += (point.y - meanY) ** 2;
+    xy += (point.x - meanX) * (point.y - meanY);
+  }
+  const angle = 0.5 * Math.atan2(2 * xy, xx - yy) - (height > width ? Math.PI / 2 : 0);
+  const cos = Math.cos(-angle);
+  const sin = Math.sin(-angle);
+  const turned = new Map([...layout].map(([id, point]) => {
+    const dx = point.x - meanX;
+    const dy = point.y - meanY;
+    return [id, { x: dx * cos - dy * sin, y: dx * sin + dy * cos }];
+  }));
+  const xs = [...turned.values()].map((point) => point.x);
+  const ys = [...turned.values()].map((point) => point.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  // Small networks keep close to their natural size instead of stretching across a wide panel.
+  const scale = Math.min(1.5, (right - left) / Math.max(maxX - minX, 1e-9), (bottom - top) / Math.max(maxY - minY, 1e-9));
+  const offsetX = (left + right) / 2 - ((minX + maxX) / 2) * scale;
+  const offsetY = (top + bottom) / 2 - ((minY + maxY) / 2) * scale;
+  return new Map([...turned].map(([id, point]) => [id, { x: point.x * scale + offsetX, y: point.y * scale + offsetY }]));
+}
+
+/** The element's size in CSS pixels, rounded to 4 px so tiny shifts do not redraw it. */
+function useBoxSize(ref: RefObject<Element | null>, shown: boolean): { width: number; height: number } {
+  const [size, setSize] = useState({ width: 520, height: 360 });
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const measure = () => {
+      const box = element.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      const width = Math.max(160, Math.round(box.width / 4) * 4);
+      const height = Math.max(160, Math.round(box.height / 4) * 4);
+      setSize((current) => current.width === width && current.height === height ? current : { width, height });
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, shown]);
+  return size;
 }
 
 function add(values: number[], index: number, amount: number): void {

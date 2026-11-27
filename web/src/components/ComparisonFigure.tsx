@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
+import { figureColor, niceTicks } from "../chart";
+import { formatMetric, isRatioMetric } from "../labels";
 import type { MetricRecord } from "../types";
-import { formatPercent, formatValue } from "../utils";
 
 interface ComparisonFigureProps {
   records: MetricRecord[];
@@ -10,8 +11,6 @@ interface ComparisonFigureProps {
   title: string;
   description: string;
 }
-
-const colors = ["#136b56", "#c2410c", "#6d4fc2", "#a16207", "#1d6fa5", "#be185d"];
 
 export const ComparisonFigure = forwardRef<SVGSVGElement, ComparisonFigureProps>(
   function ComparisonFigure({ records, metric, scope, labels, title, description }, ref) {
@@ -30,9 +29,10 @@ const BarFigure = forwardRef<SVGSVGElement, Omit<ComparisonFigureProps, "scope" 
     const validValues = records
       .filter((record) => record.status === "ok" && Number.isFinite(record.value))
       .map((record) => Number(record.value));
-    const maximum = isRatio(metric) ? 1 : Math.max(1, ...validValues);
+    // The bar chart shows shares or counts, and counts step by whole numbers.
+    const ticks = isRatioMetric(metric) ? [0, 0.25, 0.5, 0.75, 1] : niceTicks(0, Math.max(1, ...validValues), 4, true);
+    const maximum = ticks.at(-1) ?? 1;
     const plotWidth = width - margin.left - margin.right;
-    const ticks = Array.from({ length: 5 }, (_, index) => (maximum * index) / 4);
     const titleId = `comparison-${safeId(metric)}-title`;
     const descriptionId = `comparison-${safeId(metric)}-description`;
 
@@ -63,7 +63,7 @@ const BarFigure = forwardRef<SVGSVGElement, Omit<ComparisonFigureProps, "scope" 
               <text x={margin.left - 12} y={y + 22} fill="#41534e" fontSize={13} fontWeight={650} textAnchor="end">{truncate(String(record.result || "Result"), 31)}</text>
               {valid ? (
                 <>
-                  <rect x={margin.left} y={y + 6} width={barWidth} height={25} rx={3} fill={colors[index % colors.length]} />
+                  <rect x={margin.left} y={y + 6} width={barWidth} height={25} rx={3} fill={figureColor(index)} />
                   <text x={margin.left + barWidth + 9} y={y + 23} fill="#16302b" fontSize={12} fontWeight={700}>{displayValue(metric, value)}</text>
                 </>
               ) : (
@@ -75,7 +75,7 @@ const BarFigure = forwardRef<SVGSVGElement, Omit<ComparisonFigureProps, "scope" 
             </g>
           );
         })}
-        <text x={margin.left + plotWidth / 2} y={height - 8} fill="#41534e" fontSize={12} fontWeight={650} textAnchor="middle">{isRatio(metric) ? "Proportion" : title}</text>
+        <text x={margin.left + plotWidth / 2} y={height - 8} fill="#41534e" fontSize={12} fontWeight={650} textAnchor="middle">{title}</text>
       </svg>
     );
   },
@@ -95,7 +95,7 @@ const MatrixFigure = forwardRef<SVGSVGElement, Omit<ComparisonFigureProps, "scop
     const validValues = records
       .filter((record) => record.status === "ok" && Number.isFinite(record.value))
       .map((record) => Number(record.value));
-    const maximum = isRatio(metric) || metric === "score_spearman" ? 1 : Math.max(1, ...validValues);
+    const maximum = isRatioMetric(metric) || metric === "score_spearman" ? 1 : Math.max(1, ...validValues);
 
     return (
       <svg ref={ref} className="comparison-figure" viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby={`${titleId} ${descriptionId}`}>
@@ -157,16 +157,12 @@ function pairKey(left: unknown, right: unknown): string {
   return [String(left), String(right)].sort().join("\u0000");
 }
 
-function isRatio(metric: string): boolean {
-  return metric.includes("retention") || metric.includes("jaccard") || metric.includes("coefficient");
-}
-
 function displayValue(metric: string, value: number): string {
-  return isRatio(metric) ? formatPercent(value) : formatValue(value);
+  return formatMetric(metric, value);
 }
 
 function axisValue(metric: string, value: number): string {
-  return isRatio(metric) ? `${Math.round(value * 100)}%` : formatValue(value);
+  return isRatioMetric(metric) ? `${Math.round(value * 100)}%` : formatMetric(metric, value);
 }
 
 function colorStrength(metric: string, value: number, maximum: number): number {

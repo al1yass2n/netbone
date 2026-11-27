@@ -14,13 +14,13 @@
   background: var(--accent-soft);
 }
 
-.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):not(:disabled) {
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success):not(:disabled) {
   color: var(--dialog-action-ink);
   border-color: var(--dialog-action);
   background: var(--dialog-action);
 }
 
-.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):hover:not(:disabled) {
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success):hover:not(:disabled) {
   background: var(--dialog-action-hover);
 }
 

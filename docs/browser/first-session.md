@@ -17,23 +17,24 @@ try extraction and export without preparing a file.
 
     [![The Choose a scoring method dialog listing Disparity, Doubly Stochastic, Edge Betweenness, and Edge Weight](../assets/screens/app-choose-method.png){ .docs-shot loading=lazy }](../assets/screens/app-choose-method.png){ .docs-shot-link title="Open the full-size screenshot" }
 
-4. In **Choose a filter**, select **Keep a fraction**. Set **Retained
-   fraction** to 0.5. With these distinct weights, the two strongest links
-   are retained.
+4. Under **Filter**, the filter recommended for the method is already
+   selected. Switch to **Keep a fraction** and set **Retained fraction** to
+   50%. With these distinct weights, the two strongest links are retained.
 5. Check **Network preview**. Teal edges belong to the backbone and gray edges
    were left out. **Backbone edges** counts retained links. Node coverage
    counts nodes incident to those links, which can differ from the number of
    output nodes when the result retains isolates.
 
-    [![The analysis view with Edge Weight, a retained fraction of 0.5, and a preview that keeps 2 of the 4 edges](../assets/screens/app-backbone-preview.png){ .docs-shot loading=lazy }](../assets/screens/app-backbone-preview.png){ .docs-shot-link title="Open the full-size screenshot" }
+    [![The analysis view with Edge Weight, a retained fraction of 50%, and a preview that keeps 2 of the 4 edges](../assets/screens/app-backbone-preview.png){ .docs-shot loading=lazy }](../assets/screens/app-backbone-preview.png){ .docs-shot-link title="Open the full-size screenshot" }
 
-6. Open **Inspect & export**. In **Inspect**, review the method statistics
-   and open **View run settings** to download the pipeline JSON.
+6. Open **Inspect & export** to review the method statistics. **Run
+   settings** lists the method and filter settings in plain words.
 
-    [![The Inspect tab listing each edge with its weight, score, and whether it was retained](../assets/screens/app-inspect.png){ .docs-shot loading=lazy }](../assets/screens/app-inspect.png){ .docs-shot-link title="Open the full-size screenshot" }
+    [![The Inspect & export dialog listing each edge with its weight, score, and whether it was kept](../assets/screens/app-inspect.png){ .docs-shot loading=lazy }](../assets/screens/app-inspect.png){ .docs-shot-link title="Open the full-size screenshot" }
 
-7. Switch to **Export** for a GraphML or GEXF download. **Backbone only** is
-   selected by default. Choose **Download ZIP** for the full experiment.
+7. Open **Download** to save the statistics as CSV, the backbone or the full
+   network with scores as GraphML or GEXF, the settings as JSON, or the full
+   experiment as a ZIP.
 
 Use **Copy BibTeX** in the app footer to copy the Netbone citation.
 

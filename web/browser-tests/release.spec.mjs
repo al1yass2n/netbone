@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { download } from "./downloads.mjs";
 
 async function uploadCsv(page, name, data) {
   await page.locator('input[type="file"]').setInputFiles({
@@ -72,7 +73,7 @@ test("large networks keep counts and downloads available without a graph preview
   await mapping.getByRole("button", { name: "Use this mapping" }).click();
   const scoringStarted = performance.now();
   await page.getByRole("dialog").getByRole("button", { name: /^Edge Weight / }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  await page.getByRole("radiogroup", { name: "Filter" }).getByRole("radio", { name: "Keep a fraction" }).check();
   const preview = page.getByRole("region", { name: "Network preview" });
   await expect(preview.getByText("Preview unavailable for large networks")).toBeVisible();
   await expect(preview.getByText("Backbone edges", { exact: true })).toBeVisible();
@@ -89,16 +90,11 @@ test("large networks keep counts and downloads available without a graph preview
     await page.keyboard.press("ArrowRight");
     await expect.poll(() => statistics.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   }
-  await inspect.getByRole("tab", { name: "Export" }).click();
-  await expect(inspect.getByRole("combobox", { name: "Graph", exact: true })).toHaveValue("backbone");
-  const pendingDownload = page.waitForEvent("download");
-  await inspect.getByRole("button", { name: "Download GraphML" }).click();
-  const download = await pendingDownload;
-  expect(download.suggestedFilename()).toBe("netbone-edge-weight-backbone.graphml");
-  expect(await download.failure()).toBeNull();
+  const graph = await download(page, inspect, "Backbone (GraphML)");
+  expect(graph.suggestedFilename()).toBe("netbone-edge-weight-backbone.graphml");
 });
 
-test("edge betweenness shows progress and opens the filter when scores are ready", async ({ page }, testInfo) => {
+test("edge betweenness shows progress and then its recommended filter", async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   const nodes = 700;
   const rows = ["source,target,weight"];
@@ -132,15 +128,10 @@ test("edge betweenness shows progress and opens the filter when scores are ready
   } finally {
     releaseScore();
   }
-  const filter = page.getByRole("dialog", { name: "Choose a filter" });
+  const filter = page.getByRole("radiogroup", { name: "Filter" });
   await expect(filter).toBeVisible({ timeout: 45_000 });
-  await expect(filter).toMatchAriaSnapshot(`
-    - dialog "Choose a filter":
-      - heading "Choose a filter" [level=2]
-      - button "Close"
-      - button /Keep a fraction.*Recommended/
-  `);
-  await filter.getByRole("button", { name: /^Keep a fraction/ }).click();
+  await expect(filter.getByRole("radio", { name: "Keep a fraction" })).toBeChecked();
+  await expect(page.locator(".filter-description")).toContainText("Recommended");
   await expect(page.getByRole("region", { name: "Network preview" }).getByText("Backbone edges", { exact: true })).toBeVisible();
   testInfo.annotations.push({ type: "edge betweenness", description: `${computeMs} ms for the scoring request` });
 });

@@ -1,74 +1,31 @@
-import { BarChart3, Check, Download, GitCompareArrows, GripVertical, Pencil, Settings2, Table2, Trash2, X } from "lucide-react";
+import { BarChart3, GitCompareArrows, LoaderCircle, MoreHorizontal, Table2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { demoMode } from "../demo-api";
-import type { PointerEvent } from "react";
-import { api, downloadCsv, downloadJson } from "../api";
+import { api, downloadCsv, downloadWorkspaceExperiment } from "../api";
+import { figureColor } from "../chart";
 import { downloadPngFigure, downloadSvgFigure } from "../figureExport";
-import { moveSavedBackbone, shortBackboneLabel, uniqueResultLabel } from "../savedBackbones";
-import type { ComparisonResponse, ExtractionResponse, JsonValue, MetricRecord, SavedResult } from "../types";
-import { formatPercent, formatValue, labelize } from "../utils";
+import { formatMetric, metricDescription, metricLabel, sentenceCase } from "../labels";
+import { moveSavedBackbone, uniqueResultLabel } from "../savedBackbones";
+import type { ComparisonResponse, MetricRecord, SavedResult, UiSchema } from "../types";
+import { formatPercent, formatValue } from "../utils";
+import { BackboneDetails } from "./BackboneDetails";
+import { BackLink } from "./BackLink";
 import { ComparisonFigure } from "./ComparisonFigure";
-import { ExperimentExport } from "./ExperimentExport";
 import { DownloadMenu } from "./DownloadMenu";
+import type { DownloadItem } from "./DownloadMenu";
 import { Hint } from "./Hint";
+import { useMenu } from "./useMenu";
 import { ScoreAlignmentFigure } from "./ScoreAlignmentFigure";
-import { StatisticsTable } from "./StatisticsTable";
 import "./AnalysisWorkspaces.css";
 
 interface ComparisonWorkspaceProps {
+  schema: UiSchema;
   saved: SavedResult[];
   onChange: (saved: SavedResult[]) => void;
-  onExtract: () => void;
+  onBack: () => void;
 }
 
-function ExtractionSettings({ result }: { result: ExtractionResponse }) {
-  const extraction = result.extraction;
-  const config = result.resolved_config;
-  return <div className="saved-extraction-settings">
-    <ExtractionParameters title="Scoring method" name={extraction.method} parameters={extraction.method_parameters} />
-    <ExtractionParameters title="Filter" name={extraction.filter} parameters={extraction.filter_parameters} />
-    {config.temporal_aggregation && <ExtractionParameters title="Temporal aggregation" parameters={config.temporal_aggregation} />}
-    {config.direction_conversion && <ExtractionParameters title="Direction conversion" parameters={config.direction_conversion} />}
-  </div>;
-}
-
-function ExtractionParameters({ title, name, parameters }: { title: string; name?: JsonValue; parameters?: JsonValue }) {
-  const entries = parameters && typeof parameters === "object" && !Array.isArray(parameters) ? Object.entries(parameters) : [];
-  return <section>
-    <h3>{title}</h3>
-    {typeof name === "string" && <strong>{name === "default" ? "Recommended selection" : labelize(name)}</strong>}
-    {entries.length ? <dl>
-      {entries.map(([key, value]) => <div key={key}>
-        <dt>{labelize(key)}</dt>
-        <dd>{typeof value === "string" ? value : JSON.stringify(value)}</dd>
-      </div>)}
-    </dl> : <p>No parameters recorded.</p>}
-  </section>;
-}
-
-const metricDetails: Record<string, { label: string; description: string }> = {
-  connected_component_count: {
-    label: "Connected components",
-    description: "Disconnected groups remaining in each backbone.",
-  },
-  edge_count: { label: "Retained edges", description: "Edges present in each backbone." },
-  edge_retention: { label: "Edge retention", description: "Share of original edges preserved." },
-  isolated_node_count: { label: "Isolated nodes", description: "Output nodes without a retained connection." },
-  node_count: { label: "Output nodes", description: "Nodes present in each backbone output." },
-  node_retention: { label: "Node retention", description: "Share of original nodes preserved." },
-  strongly_connected_component_count: { label: "Strong components", description: "Mutually reachable groups in a directed backbone." },
-  weakly_connected_component_count: { label: "Weak components", description: "Connected groups after ignoring direction." },
-  weight_retention: { label: "Weight retention", description: "Share of total original edge weight preserved." },
-  edge_jaccard: { label: "Shared-edge similarity", description: "Shared edges divided by all distinct retained edges." },
-  edge_overlap: { label: "Shared edges", description: "Retained edges in common." },
-  edge_overlap_coefficient: { label: "Edge overlap coefficient", description: "Shared edges relative to the smaller backbone." },
-  node_jaccard: { label: "Shared-node similarity", description: "Shared nodes divided by all distinct output nodes." },
-  node_overlap: { label: "Shared nodes", description: "Output nodes in common." },
-  node_overlap_coefficient: { label: "Node overlap coefficient", description: "Shared nodes relative to the smaller backbone." },
-  score_spearman: { label: "Importance-rank agreement", description: "Agreement between importance rankings, from -1 to 1." },
-};
-
-export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWorkspaceProps) {
+export function ComparisonWorkspace({ schema, saved, onChange, onBack }: ComparisonWorkspaceProps) {
   const [comparison, setComparison] = useState<ComparisonResponse | null>(null);
   const [scope, setScope] = useState<"single" | "pairwise" | "alignment">("single");
   const [view, setView] = useState<"chart" | "table">("chart");
@@ -77,22 +34,15 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [inspectId, setInspectId] = useState<string | null>(null);
-  const [inspectionView, setInspectionView] = useState<"settings" | "statistics">("settings");
-  const [dropPosition, setDropPosition] = useState<{ source: number; destination: number } | null>(null);
   const [orderStatus, setOrderStatus] = useState("");
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameLabel, setRenameLabel] = useState("");
   const [figureError, setFigureError] = useState("");
   const figureRef = useRef<SVGSVGElement>(null);
-  const comparisonSection = useRef<HTMLElement>(null);
-  const savedList = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ pointerId: number; source: number; startY: number; y: number; active: boolean } | null>(null);
-  const dragFrame = useRef(0);
   const selected = saved.filter((item) => item.selected);
-  const canReorder = !demoMode && saved.length > 1;
   const inspected = saved.find((item) => item.resultId === inspectId) || null;
-  const renaming = saved.find((item) => item.resultId === renameId);
-  const suggestedLabel = renaming ? uniqueResultLabel(shortBackboneLabel(renaming.result), saved, renaming.resultId) : "";
+  // The comparison follows the ticked backbones, their names and their order.
+  const selectionKey = JSON.stringify(selected.map((item) => [item.resultId, item.label]));
   const records = scope === "single" ? comparison?.single_metrics || [] : scope === "pairwise" ? comparison?.pairwise_metrics || [] : [];
   const metrics = useMemo(() => [...new Set(records.map((record) => record.metric))], [records]);
   const activeMetric = metrics.includes(metric)
@@ -101,10 +51,10 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
       ? (scope === "single" ? "edge_retention" : "edge_jaccard")
       : metrics[0] || "";
   const activeRecords = records.filter((record) => record.metric === activeMetric);
-  const metricTitle = scope === "alignment" ? "Importance-rank alignment" : detail(activeMetric).label;
-  const metricDescription = scope === "alignment"
-    ? "See whether two methods assign similar importance to the same nodes or edges."
-    : detail(activeMetric).description;
+  const metricTitle = scope === "alignment" ? "Importance-rank alignment" : metricLabel(activeMetric);
+  const metricText = scope === "alignment"
+    ? "See whether two methods give the same nodes or edges similar importance."
+    : metricDescription(activeMetric);
   const alignments = comparison?.alignments || [];
   const activeAlignment = alignments.find((alignment) => pairKey(alignment.result_a, alignment.result_b) === alignmentPair) || alignments[0];
   const activePairKey = activeAlignment ? pairKey(activeAlignment.result_a, activeAlignment.result_b) : "";
@@ -114,344 +64,275 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
   const alignmentOverlap = activeAlignment
     ? comparison?.pairwise_metrics.find((record) => record.metric === `${activeAlignment.target}_jaccard` && pairKey(record.result_a, record.result_b) === activePairKey)
     : undefined;
+  const figureName = scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`;
+  const alignmentReady = scope !== "alignment" || activeAlignment?.status === "ok";
 
   useEffect(() => {
-    if (comparison) comparisonSection.current?.focus();
-  }, [comparison]);
-
-  useEffect(() => () => cancelAnimationFrame(dragFrame.current), []);
-
-  async function runComparison() {
-    if (selected.length < 2) return;
+    const entries = JSON.parse(selectionKey) as Array<[string, string]>;
+    if (entries.length < 2) {
+      setComparison(null);
+      setBusy(false);
+      return;
+    }
+    let cancelled = false;
     setBusy(true);
     setMessage("");
-    setOrderStatus("");
-    try {
-      const result = await api.compare({
-        results: selected.map((item) => ({ result_id: item.resultId, label: item.label })),
+    api.compare({ results: entries.map(([resultId, label]) => ({ result_id: resultId, label })) })
+      .then((response) => {
+        if (cancelled) return;
+        setComparison(response);
+        setAlignmentPair((current) => response.alignments.some((alignment) => pairKey(alignment.result_a, alignment.result_b) === current)
+          ? current
+          : response.alignments[0] ? pairKey(response.alignments[0].result_a, response.alignments[0].result_b) : "");
+        setFigureError("");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setComparison(null);
+        setMessage(error instanceof Error ? error.message : "Comparison failed.");
+      })
+      .finally(() => {
+        if (!cancelled) setBusy(false);
       });
-      setComparison(result);
-      setAlignmentPair(result.alignments[0] ? pairKey(result.alignments[0].result_a, result.alignments[0].result_b) : "");
-      setFigureError("");
-    } catch (error) {
-      setComparison(null);
-      setMessage(error instanceof Error ? error.message : "Comparison failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [selectionKey]);
 
   function toggleResult(resultId: string) {
-    setComparison(null);
-    setMessage("");
-    onChange(saved.map((item) => item.resultId === resultId
-      ? { ...item, selected: !item.selected }
-      : item));
+    onChange(saved.map((item) => item.resultId === resultId ? { ...item, selected: !item.selected } : item));
   }
 
-  function removeResult(resultId: string) {
-    setComparison(null);
-    setMessage("");
-    onChange(saved.filter((item) => item.resultId !== resultId));
+  function removeResult(item: SavedResult) {
+    setOrderStatus(`${item.label} removed.`);
+    onChange(saved.filter((entry) => entry.resultId !== item.resultId));
   }
 
   function moveResult(item: SavedResult, destination: number) {
     const reordered = moveSavedBackbone(saved, item.resultId, destination);
     if (reordered === saved) return;
-    setOrderStatus(`${item.label} moved to position ${reordered.indexOf(item) + 1}.${comparison ? " Compare again to update the results." : ""}`);
-    setComparison(null);
-    setMessage("");
+    setOrderStatus(`${item.label} moved to position ${reordered.indexOf(item) + 1}.`);
     onChange(reordered);
-  }
-
-  function dropIndex(source: number, y: number) {
-    let destination = 0;
-    for (const [index, row] of Array.from(savedList.current?.children ?? []).entries()) {
-      if (index === source) continue;
-      const rect = row.getBoundingClientRect();
-      if (y < rect.top + rect.height / 2) break;
-      destination += 1;
-    }
-    return destination;
-  }
-
-  function updateDrag() {
-    const active = drag.current;
-    if (!active?.active) return;
-    const edge = 48;
-    const scrollTop = window.scrollY;
-    if (active.y < edge) window.scrollBy(0, -10);
-    else if (active.y > window.innerHeight - edge) window.scrollBy(0, 10);
-    const destination = dropIndex(active.source, active.y);
-    setDropPosition((previous) => previous?.destination === destination ? previous : { source: active.source, destination });
-    if (window.scrollY !== scrollTop) dragFrame.current = requestAnimationFrame(updateDrag);
-  }
-
-  function startDrag(event: PointerEvent<HTMLButtonElement>, source: number) {
-    if (!event.isPrimary || event.button !== 0 || drag.current || busy) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointerId: event.pointerId, source, startY: event.clientY, y: event.clientY, active: false };
-  }
-
-  function trackDrag(event: PointerEvent<HTMLButtonElement>) {
-    const active = drag.current;
-    if (!active || active.pointerId !== event.pointerId) return;
-    active.y = event.clientY;
-    if (!active.active && Math.abs(active.y - active.startY) < 5) return;
-    active.active = true;
-    cancelAnimationFrame(dragFrame.current);
-    updateDrag();
-  }
-
-  function endDrag(pointerId: number) {
-    const active = drag.current;
-    if (!active || active.pointerId !== pointerId) return null;
-    drag.current = null;
-    cancelAnimationFrame(dragFrame.current);
-    setDropPosition(null);
-    return active;
-  }
-
-  function beginRename(item: SavedResult) {
-    setRenameId(item.resultId);
-    setRenameLabel(item.label);
   }
 
   function applyRename() {
     if (!renameId || !renameLabel.trim()) return;
     const nextLabel = uniqueResultLabel(renameLabel.trim(), saved, renameId);
-    setComparison(null);
-    setMessage("");
     onChange(saved.map((item) => item.resultId === renameId ? { ...item, label: nextLabel } : item));
     setRenameId(null);
   }
 
+  const downloads: DownloadItem[] = comparison ? [
+    {
+      label: "Data (CSV)",
+      disabled: !alignmentReady,
+      onSelect: () => downloadCsv(scope === "alignment" ? (activeAlignment?.points.map((point) => ({ ...point })) || []) : activeRecords, `${figureName}.csv`),
+    },
+    ...(view === "chart" ? [
+      { label: "Figure (SVG)", disabled: !alignmentReady, onSelect: () => { if (figureRef.current) downloadSvgFigure(figureRef.current, figureName); } },
+      { label: "Figure (PNG)", disabled: !alignmentReady, onSelect: () => figureRef.current ? downloadPngFigure(figureRef.current, figureName) : undefined },
+    ] : []),
+    { label: "Full experiment (ZIP)", disabled: busy, onSelect: () => downloadWorkspaceExperiment(comparison.experiment_id) },
+  ] : [];
+
   return (
     <main className="workspace compare-workspace" aria-labelledby="compare-title">
+      <BackLink onClick={onBack} />
       <header className="workspace-header">
         <div>
-          <h1 id="compare-title">Compare backbones</h1>
+          <h1 id="compare-title" tabIndex={-1}>Compare backbones</h1>
           <p>See what each backbone keeps, where they overlap, and how their scores agree.</p>
         </div>
-        {comparison?.experiment_id && <ExperimentExport key={comparison.experiment_id} experimentId={comparison.experiment_id} disabled={busy} />}
+        {comparison && <DownloadMenu items={downloads} />}
       </header>
 
       {!saved.length ? (
         <section className="empty-state">
-          <GitCompareArrows size={34} />
+          <GitCompareArrows size={34} aria-hidden="true" />
           <h2>No saved backbones</h2>
-          <p>Create a backbone and add it to your comparison from the result. You’ll need at least two to see how they differ.</p>
-          <button className="button button--primary" onClick={onExtract}>Extract a backbone</button>
+          <p>Save backbones in the analysis to compare them here. You need at least two from the same network.</p>
         </section>
       ) : (
         <div className="compare-layout">
           <aside className="selection-pane" aria-label="Saved backbones">
             <div className="pane-heading">
-              <div>
-                <h2>Saved backbones</h2>
-              </div>
-              <span className="compare-selection-count" role="status">{selected.length} of {saved.length} selected</span>
+              <h2>Saved backbones</h2>
+              <span className="compare-selection-count">{selected.length} of {saved.length} selected</span>
             </div>
-            <div className="compare-selection-action">
-              <button className="button button--save" disabled={selected.length < 2 || busy} onClick={runComparison}>
-                <GitCompareArrows size={17} />
-                {busy ? "Comparing…" : selected.length < 2 ? "Compare backbones" : `Compare ${selected.length} backbones`}
-              </button>
-              {selected.length < 2 && <small>Select at least two backbones.</small>}
-              {message && <p className="error-text" role="alert">{message}</p>}
-            </div>
-            {canReorder && <span className="visually-hidden" id="saved-order-help">Drag to move, or press Up or Down.</span>}
             <span className="visually-hidden" role="status">{orderStatus}</span>
-            <div className="saved-result-list" ref={savedList}>
-              {saved.map((item, index) => {
-                const summary = item.result.summary;
-                const extraction = item.result.extraction;
-                const retention = extraction.target === "node"
-                  ? summary.node_fraction
-                  : summary.edge_fraction;
-                const dropSide = index === dropPosition?.destination
-                  ? index < dropPosition.source ? "before" : index > dropPosition.source ? "after" : undefined
-                  : undefined;
-                return (
-                  <article className={`saved-result${item.selected ? " is-selected" : ""}${canReorder ? " has-grip" : ""}${index === dropPosition?.source ? " is-dragging" : ""}`} data-drop-side={dropSide} key={item.resultId}>
-                    {canReorder && <button
-                      type="button"
-                      className="icon-button saved-result__grip"
-                      title="Drag to move · Up/Down on keyboard"
-                      aria-label={`Move ${item.label}`}
-                      aria-describedby="saved-order-help"
-                      disabled={busy}
-                      onPointerDown={(event) => startDrag(event, index)}
-                      onPointerMove={trackDrag}
-                      onPointerUp={(event) => {
-                        const active = endDrag(event.pointerId);
-                        if (active?.active) moveResult(item, dropIndex(active.source, event.clientY));
-                      }}
-                      onPointerCancel={(event) => endDrag(event.pointerId)}
-                      onLostPointerCapture={(event) => endDrag(event.pointerId)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Escape" && drag.current) {
-                          endDrag(drag.current.pointerId);
-                        } else if (!drag.current && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
-                          event.preventDefault();
-                          const handle = event.currentTarget;
-                          moveResult(item, index + (event.key === "ArrowUp" ? -1 : 1));
-                          requestAnimationFrame(() => handle.focus());
-                        }
-                      }}
-                    ><GripVertical size={16} aria-hidden="true" /></button>}
-                    <button className="saved-result__select" aria-pressed={item.selected} disabled={busy} onClick={() => toggleResult(item.resultId)}>
-                      <span>
-                        <strong title={item.label}>{item.label}</strong>
-                        <small>{labelize(String(extraction.method))} · {formatPercent(retention)} {extraction.target === "node" ? "nodes" : "edges"} kept</small>
-                      </span>
-                      <b aria-hidden="true">{item.selected && <Check size={15} />}</b>
-                    </button>
-                    <button className="icon-button" title="Inspect saved result" aria-label={`Inspect ${item.label}`} onClick={() => { setInspectionView("settings"); setInspectId(item.resultId); }}>
-                      <Settings2 size={16} />
-                    </button>
-                    {!demoMode && <button className="icon-button" title="Rename saved result" aria-label={`Rename ${item.label}`} disabled={busy} onClick={() => beginRename(item)}>
-                      <Pencil size={16} />
-                    </button>}
-                    <button className="icon-button icon-button--danger" title="Remove saved result" aria-label={`Remove ${item.label}`} disabled={busy} onClick={() => removeResult(item.resultId)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </article>
-                );
-              })}
+            <div className="saved-result-list">
+              {saved.map((item, index) => (
+                <SavedCard
+                  key={item.resultId}
+                  item={item}
+                  schema={schema}
+                  color={item.selected ? figureColor(selected.indexOf(item)) : undefined}
+                  first={index === 0}
+                  last={index === saved.length - 1}
+                  onToggle={() => toggleResult(item.resultId)}
+                  onDetails={() => setInspectId(item.resultId)}
+                  onRename={demoMode ? undefined : () => { setRenameId(item.resultId); setRenameLabel(item.label); }}
+                  onMove={(step) => moveResult(item, index + step)}
+                  onRemove={() => removeResult(item)}
+                />
+              ))}
             </div>
           </aside>
 
-          <section className="comparison-canvas" ref={comparisonSection} tabIndex={-1} aria-label="Comparison results" aria-busy={busy}>
+          <section className="comparison-canvas" aria-label="Comparison results" aria-busy={busy}>
+            {message && <p className="error-text" role="alert">{message}</p>}
             {!comparison ? (
               <div className="empty-state empty-state--quiet">
-                <GitCompareArrows size={36} />
-                <h2>{busy ? "Comparing your backbones…" : selected.length >= 2 ? "Ready to compare" : "Choose backbones to compare"}</h2>
-                <p>{selected.length >= 2 ? "Compare your selection to explore retention, overlap, and score agreement." : saved.length < 2 ? "Create and save one more backbone from the same network." : "Select two or more saved backbones to get started."}</p>
+                {busy ? <LoaderCircle className="spin" size={34} aria-hidden="true" /> : <GitCompareArrows size={36} aria-hidden="true" />}
+                <h2 role="status">{busy ? "Comparing your backbones…" : saved.length < 2 ? "Save one more backbone" : "Select two or more backbones"}</h2>
+                {!busy && <p>{saved.length < 2 ? "Save another backbone from the same network to compare the two." : "Tick the backbones you want to compare."}</p>}
               </div>
             ) : (
-              <>
+              <div className="comparison-results" data-updating={busy || undefined}>
                 <div className="comparison-toolbar">
                   <div className="segmented" role="group" aria-label="Comparison scope">
-                    <button aria-pressed={scope === "single"} onClick={() => { setScope("single"); setMetric("edge_retention"); setFigureError(""); }}>
-                      Properties
-                    </button>
-                    <button aria-pressed={scope === "pairwise"} onClick={() => { setScope("pairwise"); setMetric("edge_jaccard"); setFigureError(""); }}>
-                      Overlap & agreement
-                    </button>
-                    <button aria-pressed={scope === "alignment"} onClick={() => { setScope("alignment"); setFigureError(""); }}>
-                      Score alignment
-                    </button>
+                    <button aria-pressed={scope === "single"} onClick={() => { setScope("single"); setMetric("edge_retention"); setFigureError(""); }}>Properties</button>
+                    <button aria-pressed={scope === "pairwise"} onClick={() => { setScope("pairwise"); setMetric("edge_jaccard"); setFigureError(""); }}>Overlap &amp; agreement</button>
+                    <button aria-pressed={scope === "alignment"} onClick={() => { setScope("alignment"); setFigureError(""); }}>Score alignment</button>
                   </div>
                   <div className="segmented compare-view-toggle" role="group" aria-label="Comparison view">
-                    <button aria-pressed={view === "chart"} onClick={() => setView("chart")}><BarChart3 size={16} /> Chart</button>
-                    <button aria-pressed={view === "table"} onClick={() => setView("table")}><Table2 size={16} /> Table</button>
+                    <button aria-pressed={view === "chart"} onClick={() => setView("chart")}><BarChart3 size={16} aria-hidden="true" /> Chart</button>
+                    <button aria-pressed={view === "table"} onClick={() => setView("table")}><Table2 size={16} aria-hidden="true" /> Table</button>
                   </div>
                 </div>
                 <div className="property-view">
+                  <div className="field compare-metric-field">
+                    <div className="label-with-hint">
+                      <label htmlFor="compare-metric">{scope === "alignment" ? "Backbone pair" : "Metric"}</label>
+                      <Hint label={`What ${metricTitle} means`}>{metricText}</Hint>
+                    </div>
                     {scope === "alignment" ? (
-                      <label className="field compare-metric-field">
-                        <span>Backbone pair</span>
-                        <select value={activePairKey} disabled={!alignments.length} onChange={(event) => { setAlignmentPair(event.target.value); setFigureError(""); }}>
-                          {alignments.map((alignment) => {
-                            const key = pairKey(alignment.result_a, alignment.result_b);
-                            return <option value={key} key={key}>{alignment.result_a} ↔ {alignment.result_b}{alignment.status !== "ok" ? " (unavailable)" : ""}</option>;
-                          })}
-                        </select>
-                      </label>
+                      <select id="compare-metric" value={activePairKey} disabled={!alignments.length} onChange={(event) => { setAlignmentPair(event.target.value); setFigureError(""); }}>
+                        {alignments.map((alignment) => {
+                          const key = pairKey(alignment.result_a, alignment.result_b);
+                          return <option value={key} key={key}>{alignment.result_a} ↔ {alignment.result_b}{alignment.status !== "ok" ? " (unavailable)" : ""}</option>;
+                        })}
+                      </select>
                     ) : (
-                      <label className="field compare-metric-field">
-                        <span>Metric</span>
-                        <select value={activeMetric} onChange={(event) => { setMetric(event.target.value); setFigureError(""); }}>
-                          {metrics.map((name) => {
-                            const unavailable = records.filter((record) => record.metric === name && record.status !== "ok").length;
-                            return <option value={name} key={name}>{detail(name).label}{unavailable ? ` (${unavailable} unavailable)` : ""}</option>;
-                          })}
-                        </select>
-                      </label>
+                      <select id="compare-metric" value={activeMetric} onChange={(event) => { setMetric(event.target.value); setFigureError(""); }}>
+                        {metrics.map((name) => {
+                          const unavailable = records.filter((record) => record.metric === name && record.status !== "ok").length;
+                          return <option value={name} key={name}>{metricLabel(name)}{unavailable ? ` (${unavailable} unavailable)` : ""}</option>;
+                        })}
+                      </select>
                     )}
-                    <header>
-                      <div className="analysis-heading-with-hint">
-                        <h2>{metricTitle}</h2>
-                        <Hint label={`What ${metricTitle} means`}>{metricDescription}</Hint>
-                      </div>
-                      <div className="figure-actions">
-                        <DownloadMenu items={[
-                          { label: "Data (CSV)", disabled: scope === "alignment" && (!activeAlignment || activeAlignment.status !== "ok"), onSelect: () => downloadCsv(scope === "alignment" ? (activeAlignment?.points.map((point) => ({ ...point })) || []) : activeRecords, scope === "alignment" ? "netbone-score-alignment.csv" : `netbone-comparison-${activeMetric}.csv`) },
-                          ...(view === "chart" ? [
-                            { label: "Figure (SVG)", disabled: scope === "alignment" && activeAlignment?.status !== "ok", onSelect: () => { if (figureRef.current) downloadSvgFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`); } },
-                            { label: "Figure (PNG)", disabled: scope === "alignment" && activeAlignment?.status !== "ok", onSelect: () => { if (figureRef.current) void downloadPngFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`).catch((error: unknown) => setFigureError(error instanceof Error ? error.message : "PNG export failed.")); } },
-                          ] : []),
-                        ]} />
-                      </div>
-                    </header>
-                    {scope === "alignment" ? (
-                      activeAlignment?.status === "ok" ? (
-                        view === "chart"
-                          ? <ScoreAlignmentFigure ref={figureRef} alignment={activeAlignment} spearman={alignmentSpearman} overlap={alignmentOverlap} />
-                          : <AlignmentTable alignment={activeAlignment} />
-                      ) : <div className="empty-state empty-state--quiet"><h3>Alignment unavailable</h3><p>{activeAlignment?.explanation || "No result pair is available."}</p></div>
-                    ) : view === "chart"
-                      ? <ComparisonFigure ref={figureRef} records={activeRecords} metric={activeMetric} scope={scope} labels={comparison.results.map((item) => item.label)} title={metricTitle} description={metricDescription} />
-                      : <MetricTable records={activeRecords} scope={scope} />}
-                    {figureError && <p className="error-text">{figureError}</p>}
-                    {scope !== "alignment" && activeRecords.some((record) => record.status !== "ok") && <p className="comparison-note">See the table for explanations of unavailable values.</p>}
+                  </div>
+                  {scope === "alignment" ? (
+                    activeAlignment?.status === "ok" ? (
+                      view === "chart"
+                        ? <ScoreAlignmentFigure ref={figureRef} alignment={activeAlignment} spearman={alignmentSpearman} overlap={alignmentOverlap} />
+                        : <AlignmentTable alignment={activeAlignment} />
+                    ) : <div className="empty-state empty-state--quiet"><h3>Alignment unavailable</h3><p>{activeAlignment?.explanation || "No result pair is available."}</p></div>
+                  ) : view === "chart"
+                    ? <div className="figure-scroll"><ComparisonFigure ref={figureRef} records={activeRecords} metric={activeMetric} scope={scope} labels={comparison.results.map((item) => item.label)} title={metricTitle} description={metricText} /></div>
+                    : <MetricTable records={activeRecords} scope={scope} metric={activeMetric} />}
+                  {figureError && <p className="error-text">{figureError}</p>}
+                  {scope !== "alignment" && view === "chart" && activeRecords.some((record) => record.status !== "ok") && <p className="comparison-note">Open the table to read why some values are unavailable.</p>}
                 </div>
-              </>
+              </div>
             )}
           </section>
         </div>
       )}
       {inspected && (
-        <div className="dialog-backdrop" onMouseDown={() => setInspectId(null)}>
+        <div className="dialog-backdrop" onMouseDown={() => setInspectId(null)} onKeyDown={(event) => { if (event.key === "Escape") setInspectId(null); }}>
           <section className="inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="inspection-title" onMouseDown={(event) => event.stopPropagation()}>
             <header>
               <h2 id="inspection-title">{inspected.label}</h2>
-              <button className="icon-button dialog-close" title="Close inspection" aria-label="Close inspection" onClick={() => setInspectId(null)}><X size={18} /></button>
+              <button className="icon-button dialog-close" title="Close" aria-label="Close" autoFocus onClick={() => setInspectId(null)}><X size={18} aria-hidden="true" /></button>
             </header>
             <div className="inspection-content">
-              <div className="inspection-toolbar">
-                <div className="segmented" role="group" aria-label="Saved backbone details">
-                  <button aria-pressed={inspectionView === "settings"} onClick={() => setInspectionView("settings")}>Extraction settings</button>
-                  <button aria-pressed={inspectionView === "statistics"} onClick={() => setInspectionView("statistics")}>Statistics</button>
-                </div>
-                {inspectionView === "settings" && <button className="button button--export" onClick={() => {
-                  const stem = inspected.label.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
-                  downloadJson(inspected.result.resolved_config, `netbone-${stem ? `${stem}-` : ""}pipeline.json`);
-                }}><Download size={16} aria-hidden="true" /> Download configuration</button>}
-              </div>
-              {inspectionView === "settings" ? <ExtractionSettings result={inspected.result} /> : <StatisticsTable records={inspected.result.statistics} primaryStatistic={String(inspected.result.extraction.primary_statistic ?? "score")} filename={`${inspected.label}-statistics.csv`} />}
+              <BackboneDetails result={inspected.result} schema={schema} label={inspected.label} />
             </div>
           </section>
         </div>
       )}
       {renameId && (
         <div className="dialog-backdrop" onMouseDown={() => setRenameId(null)}>
-          <section className="rename-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-title" onMouseDown={(event) => event.stopPropagation()}>
-            <header><div><span className="eyebrow">COMPARISON LABEL</span><h2 id="rename-title">Rename saved backbone</h2></div><button className="icon-button dialog-close" title="Close rename dialog" aria-label="Close rename dialog" onClick={() => setRenameId(null)}><X size={18} /></button></header>
-            <label className="field"><span>Label</span><input autoFocus maxLength={120} value={renameLabel} onChange={(event) => setRenameLabel(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") applyRename(); }} /></label>
-            {suggestedLabel && <button className="button button--quiet" onClick={() => setRenameLabel(suggestedLabel)}>Use suggested label · {suggestedLabel}</button>}
-            <button className="button button--save" disabled={!renameLabel.trim()} onClick={applyRename}>Save label</button>
-          </section>
+          <form className="rename-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-title" onMouseDown={(event) => event.stopPropagation()} onSubmit={(event) => { event.preventDefault(); applyRename(); }} onKeyDown={(event) => { if (event.key === "Escape") setRenameId(null); }}>
+            <header><h2 id="rename-title">Rename backbone</h2><button type="button" className="icon-button dialog-close" title="Close" aria-label="Close" onClick={() => setRenameId(null)}><X size={18} aria-hidden="true" /></button></header>
+            <label className="field"><span>Name</span><input autoFocus maxLength={120} value={renameLabel} onChange={(event) => setRenameLabel(event.target.value)} /></label>
+            <div className="rename-actions">
+              <button type="button" className="button button--quiet" onClick={() => setRenameId(null)}>Cancel</button>
+              <button type="submit" className="button button--primary" disabled={!renameLabel.trim()}>Save name</button>
+            </div>
+          </form>
         </div>
       )}
     </main>
   );
 }
-function detail(metric: string) {
-  return metricDetails[metric] || { label: labelize(metric), description: "Deterministic package comparison record." };
+
+function SavedCard({ item, schema, color, first, last, onToggle, onDetails, onRename, onMove, onRemove }: {
+  item: SavedResult;
+  schema: UiSchema;
+  color?: string;
+  first: boolean;
+  last: boolean;
+  onToggle: () => void;
+  onDetails: () => void;
+  onRename?: () => void;
+  onMove: (step: -1 | 1) => void;
+  onRemove: () => void;
+}) {
+  const menu = useMenu();
+  const extraction = item.result.extraction;
+  const summary = item.result.summary;
+  const nodes = extraction.target === "node";
+  const methodLabel = schema.methods.find((method) => method.name === extraction.method)?.label ?? sentenceCase(String(extraction.method ?? ""));
+  const kept = `${formatPercent(nodes ? summary.node_fraction : summary.edge_fraction)} of ${nodes ? "nodes" : "edges"} kept`;
+  // A renamed backbone no longer says which method made it, so the line below does.
+  const detail = item.label.toLowerCase().startsWith(methodLabel.toLowerCase()) ? kept : `${methodLabel} · ${kept}`;
+  const choose = (action: () => void) => () => { menu.close(); action(); };
+  return (
+    <article className={`saved-result${item.selected ? " is-selected" : ""}`}>
+      <label className="saved-result__pick">
+        <input type="checkbox" checked={item.selected} onChange={onToggle} />
+        <span className="saved-result__dot" style={color ? { background: color } : undefined} aria-hidden="true" />
+        <span className="saved-result__text">
+          <strong title={item.label}>{item.label}</strong>
+          <small>{detail}</small>
+        </span>
+      </label>
+      <details className="saved-result__menu" {...menu.props}>
+        <summary className="icon-button" aria-label={`Options for ${item.label}`} title="Options"><MoreHorizontal size={18} aria-hidden="true" /></summary>
+        <div className="menu-list" role="group" aria-label={`Options for ${item.label}`}>
+          <button type="button" onClick={choose(onDetails)}>Details</button>
+          {onRename && <button type="button" onClick={choose(onRename)}>Rename</button>}
+          <button type="button" disabled={first} onClick={choose(() => onMove(-1))}>Move up</button>
+          <button type="button" disabled={last} onClick={choose(() => onMove(1))}>Move down</button>
+          <button type="button" className="is-danger" onClick={choose(onRemove)}>Remove</button>
+        </div>
+      </details>
+    </article>
+  );
 }
 
-function MetricTable({ records, scope }: { records: MetricRecord[]; scope: "single" | "pairwise" }) {
-  const columns = scope === "single"
-    ? ["result", "value", "status", "explanation"]
-    : ["result_a", "result_b", "value", "status", "explanation"];
+function MetricTable({ records, scope, metric }: { records: MetricRecord[]; scope: "single" | "pairwise"; metric: string }) {
+  // Status and explanation columns only appear when a value is missing.
+  const problems = records.some((record) => record.status !== "ok");
+  const columns = [...(scope === "single" ? ["result"] : ["result_a", "result_b"]), "value", ...(problems ? ["status", "explanation"] : [])];
+  const headings: Record<string, string> = {
+    result: "Backbone", result_a: "Backbone A", result_b: "Backbone B", value: metricLabel(metric), status: "Status", explanation: "Explanation",
+  };
   return (
     <div className="table-wrap">
       <table>
-        <thead><tr>{columns.map((column) => <th key={column}>{labelize(column)}</th>)}</tr></thead>
+        <thead><tr>{columns.map((column) => <th key={column} className={column === "value" ? "is-numeric" : undefined}>{headings[column]}</th>)}</tr></thead>
         <tbody>{records.map((record, index) => (
-          <tr key={index}>{columns.map((column) => <td key={column}>{formatValue(record[column])}</td>)}</tr>
+          <tr key={index}>{columns.map((column) => (
+            <td key={column} className={column === "value" ? "is-numeric" : undefined}>
+              {column === "value" ? (record.status === "ok" ? formatMetric(metric, record.value) : "—")
+                : column === "status" ? sentenceCase(record.status)
+                  : column === "explanation" ? record.explanation || "—"
+                    : formatValue(record[column])}
+            </td>
+          ))}</tr>
         ))}</tbody>
       </table>
     </div>
@@ -462,10 +343,19 @@ function AlignmentTable({ alignment }: { alignment: ComparisonResponse["alignmen
   const columns = alignment.target === "node"
     ? ["node", "value_a", "importance_rank_a", "value_b", "importance_rank_b"]
     : ["source", "target", "value_a", "importance_rank_a", "value_b", "importance_rank_b"];
+  const headings: Record<string, string> = {
+    node: "Node",
+    source: "Source",
+    target: "Target",
+    value_a: `${alignment.result_a} score`,
+    importance_rank_a: `${alignment.result_a} rank`,
+    value_b: `${alignment.result_b} score`,
+    importance_rank_b: `${alignment.result_b} rank`,
+  };
   return (
     <div className="table-wrap">
       <table>
-        <thead><tr>{columns.map((column) => <th key={column}>{labelize(column)}</th>)}</tr></thead>
+        <thead><tr>{columns.map((column) => <th key={column}>{headings[column]}</th>)}</tr></thead>
         <tbody>{alignment.points.map((point, index) => (
           <tr key={index}>{columns.map((column) => <td key={column}>{formatValue(point[column as keyof typeof point])}</td>)}</tr>
         ))}</tbody>

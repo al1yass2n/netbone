@@ -64,7 +64,7 @@ try {
   await methods.getByText(/Checking network compatibility/).waitFor({ state: "hidden" });
   await captureDialog(page, methods, "app-choose-method");
   await methods.getByRole("button", { name: /^Edge Weight / }).click();
-  await keepFraction(page, "0.5");
+  await keepFraction(page, "50");
   await capturePage(page, "app-backbone-preview");
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
@@ -102,26 +102,23 @@ try {
       .getByRole("dialog", { name: "Choose a scoring method" })
       .getByRole("button", { name: new RegExp(`^${method} `) })
       .click();
-    await keepFraction(page, "0.25");
+    await keepFraction(page, "25");
     await page.getByRole("button", { name: "Save this backbone" }).click();
     await page.getByRole("button", { name: "Backbone saved" }).waitFor();
   }
-  await page.getByRole("button", { name: "Compare", exact: true }).click();
-  await page.getByRole("button", { name: "Compare 2 backbones" }).click();
+  await page.getByRole("button", { name: "Compare 2 saved backbones" }).click();
   await page.getByRole("button", { name: "Overlap & agreement" }).click();
   await page.getByRole("combobox", { name: "Metric", exact: true }).selectOption("edge_overlap");
   await capturePage(page, "app-compare");
 
-  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
+  await page.getByRole("button", { name: "Back to analysis" }).click();
   await page.getByRole("button", { name: /^Sweep:/ }).click();
-  await page.getByRole("combobox", { name: "Setting 1" }).selectOption("filter.fraction");
-  await page.getByRole("textbox", { name: /Values for retained fraction/ }).fill("10%, 30%, 50%, 70%, 90%");
-  await page.getByRole("button", { name: "Review runs" }).click();
-  await page.getByRole("button", { name: "Run 5 configurations" }).click();
+  // A new sweep varies the retained fraction from 10% to 90%, which is the run the guide shows.
+  await page.getByText("5 values: 10%, 30%, 50%, 70%, 90%").waitFor();
+  await page.getByRole("button", { name: "Run sweep" }).click();
   await page.getByRole("heading", { name: "Sweep results" }).waitFor();
-  await page.getByRole("combobox", { name: "Measured property" }).selectOption({ label: "Connected Component Count" });
-  const figures = page.locator("section").filter({ has: page.getByRole("heading", { name: "Sweep figures" }) });
-  await capture(page, figures.last(), "app-sweep");
+  await page.getByRole("combobox", { name: "Measurement" }).selectOption("connected_component_count");
+  await capture(page, page.getByRole("region", { name: "Sweep chart" }), "app-sweep");
 
   // Try the web demo: the precomputed Karate Club workbench.
   await page.goto(demo.url);
@@ -195,11 +192,10 @@ async function openMethods(page) {
   return methods;
 }
 
-async function keepFraction(page, value) {
-  const filters = page.getByRole("dialog", { name: "Choose a filter" });
-  await filters.getByRole("button", { name: /^Keep a fraction/ }).click();
-  const fraction = page.getByRole("spinbutton", { name: /Retained fraction/ });
-  await fraction.fill(value);
+async function keepFraction(page, percent) {
+  await page.getByRole("radiogroup", { name: "Filter" }).getByRole("radio", { name: "Keep a fraction" }).check();
+  const fraction = page.getByRole("spinbutton", { name: "Retained fraction in percent" });
+  await fraction.fill(percent);
   await fraction.press("Tab");
   await page.waitForTimeout(300);
   await page.locator(".analysis-dock-status").filter({ hasText: /Preview ready|saved|counts ready/ }).waitFor();
