@@ -1,16 +1,42 @@
 # Edge Weight
 
-Registered name `edge_weight`
+Keeps the links with the largest observed weights. It is the baseline the
+other methods are compared against.
+{: .lede }
 
-Keep links with the largest observed weights. The score is the value of the
-chosen edge attribute. The default `weight="auto"` reads the `weight`
-attribute when every edge has one. On an unweighted graph, or with
-`weight=None`, every edge receives 1.0, so ranking reduces to tie handling.
-Directed arcs keep their own weights.
+<dl class="method-facts">
+<div><dt>Registered name</dt><dd><code>edge_weight</code></dd></div>
+<div><dt>Scores</dt><dd>Edges</dd></div>
+<div><dt>Statistic</dt><dd><code>score</code>, higher is stronger</dd></div>
+<div><dt>Directed graphs</dt><dd>Supported</dd></div>
+<div><dt>Weights</dt><dd>Optional, finite numbers</dd></div>
+<div><dt>Suggested filter</dt><dd>Threshold or fraction</dd></div>
+</dl>
 
-| Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
-| --- | --- | --- | --- | --- |
-| edge | `score` | higher | Supported | Finite numeric or unit weights |
+## How it works
+
+The score of an edge is the value of its weight attribute. Directed arcs
+keep their own weights. On an unweighted graph, or with `weight=None`, every
+edge scores 1.0, so the ranking reduces to tie handling.
+
+## Parameters
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `weight` | `"auto"` | Edge attribute to read. `"auto"` uses `weight` when every edge has it and runs unweighted otherwise; `None` always runs unweighted. See [how weights are chosen](../reference/methods.md#how-weights-are-chosen). |
+
+## Output columns
+
+| Column | Meaning |
+| --- | --- |
+| `score` | The edge weight, or 1.0 when unweighted. |
+
+Every row also has `edge_id`, `source`, and `target`, plus Netbone's internal
+`source_id` and `target_id`.
+
+## Cost
+
+Linear in the number of edges.
 
 ## Run the method
 
@@ -25,4 +51,5 @@ print(result.summary())
 
 ## References
 
-Edge Weight is a baseline that ranks edges by their own weight, so it has no single source paper.
+Edge Weight is a baseline that ranks edges by their own weight, so it has no
+single source paper.

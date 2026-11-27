@@ -46,8 +46,30 @@ def test_every_method_page_lists_the_metadata_references(name: str) -> None:
     for reference in metadata["references"]:
         assert reference["citation"] in page
         assert f"({reference['url']})" in page
+        assert reference["bibtex"] in page
     if metadata.get("reference_note"):
-        assert str(metadata["reference_note"]) in page
+        assert str(metadata["reference_note"]) in " ".join(page.split())
+
+
+@pytest.mark.parametrize("name", nb.list_methods())
+def test_every_method_page_facts_match_the_metadata(name: str) -> None:
+    page = (DOCS / f"{name}.md").read_text(encoding="utf-8")
+    facts = page.split('<dl class="method-facts">', 1)[1].split("</dl>", 1)[0]
+    metadata = nb.describe_method(name)
+    direction = (
+        "lower is stronger"
+        if metadata["preferred_direction"] == "lower"
+        else "higher is stronger"
+    )
+
+    assert f"<dd><code>{name}</code></dd>" in facts
+    assert f"<dd>{'Edges' if metadata['target'] == 'edge' else 'Nodes'}</dd>" in facts
+    assert f"<code>{metadata['primary_statistic']}</code>, {direction}" in facts
+    directed = "Supported" if metadata["supports_directed"] else "Not supported"
+    assert f"<dt>Directed graphs</dt><dd>{directed}</dd>" in facts
+    weights = facts.split("<dt>Weights</dt><dd>", 1)[1].split("</dd>", 1)[0]
+    expected = {"required": "Required", "optional": "Optional", "ignored": "Ignored"}
+    assert weights.startswith(expected[str(metadata["weight_mode"])])
 
 
 def test_web_method_cards_carry_the_references() -> None:

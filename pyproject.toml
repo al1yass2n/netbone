@@ -43,6 +43,8 @@ docs = [
   "mkdocs>=1.6",
   "mkdocstrings[python]>=0.25",
   "pygments>=2.18",
+  "pymdown-extensions>=10.0",
+  "latex2mathml>=3.77",
 ]
 dev = [
   "build>=1.2",

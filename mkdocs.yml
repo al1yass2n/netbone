@@ -80,6 +80,9 @@ plugins:
             show_source: false
             filters: ["!^_"]
 
+hooks:
+  - docs_hooks/mathml.py
+
 markdown_extensions:
   - attr_list
   - fenced_code
@@ -89,6 +92,8 @@ markdown_extensions:
   - codehilite:
       guess_lang: false
       noclasses: false
+  - pymdownx.arithmatex:
+      generic: true
 
 extra_css:
   - assets/docs-syntax.css

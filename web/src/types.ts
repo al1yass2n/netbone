@@ -70,6 +70,7 @@ export interface MethodReference {
   citation: string;
   doi: string;
   url: string;
+  bibtex: string;
 }
 
 export type FilterName = "default" | "fraction" | "significance" | "threshold";

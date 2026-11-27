@@ -1787,7 +1787,11 @@ def _method_references(metadata: Mapping[str, object]) -> list[dict[str, str]]:
     if not isinstance(references, list | tuple):
         return []
     return [
-        {key: str(item[key]) for key in ("citation", "doi", "url") if key in item}
+        {
+            key: str(item[key])
+            for key in ("citation", "doi", "url", "bibtex")
+            if key in item
+        }
         for item in references
         if isinstance(item, Mapping)
     ]
