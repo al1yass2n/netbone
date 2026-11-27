@@ -14,9 +14,11 @@ on normalized networks or computed method results. Most workflows can use
 
 `describe_method(name)` names the papers behind each method. `reference` and
 `doi` describe the paper that defines the method, and `references` lists every
-paper with its `citation`, `doi`, and `url`. A [report](measurement.md) copies
-the list into its method section. Edge Weight is a baseline, so its list is
-empty and `reference_note` explains why.
+paper with its `citation`, `doi`, `url`, and `bibtex`. A
+[report](measurement.md) copies the list into its method section. Edge Weight
+is a baseline, so its list is empty and `reference_note` explains why.
+`describe_temporal_weighting(name)` returns the same keys for the
+[temporal weightings](../python/temporal.md#references).
 
 ```python
 for paper in nb.describe_method("node_betweenness")["references"]:

@@ -12,7 +12,9 @@ import netbone as nb
 from netbone.webapp.bridge import ui_schema_payload
 
 DOCS = Path(__file__).resolve().parents[1] / "docs" / "methods"
+TEMPORAL_DOCS = Path(__file__).resolve().parents[1] / "docs" / "python" / "temporal.md"
 BASELINES = {"edge_weight"}
+TEMPORAL_FRAMEWORK_DOI = "10.1109/COMPENG69955.2026.11766128"
 
 
 @pytest.mark.parametrize("name", nb.list_methods())
@@ -109,3 +111,38 @@ def test_docs_and_app_share_one_bibtex_entry() -> None:
     app_entry = footer.split("const bibtex = `", 1)[1].split("`;", 1)[0]
 
     assert docs_entry == app_entry.replace("${doi}", doi)
+
+
+@pytest.mark.parametrize("name", nb.list_temporal_weightings())
+def test_every_temporal_weighting_cites_its_source(name: str) -> None:
+    metadata = nb.describe_temporal_weighting(name)
+    page = TEMPORAL_DOCS.read_text(encoding="utf-8")
+
+    if name == "baseline":
+        assert metadata["references"] == ()
+        assert metadata["reference"] is None
+        assert metadata["reference_note"]
+        return
+
+    assert [reference["doi"] for reference in metadata["references"]] == [
+        TEMPORAL_FRAMEWORK_DOI
+    ]
+    assert metadata["reference"] == metadata["references"][0]["citation"]
+    for reference in metadata["references"]:
+        assert reference["citation"] in page
+        assert f"({reference['url']})" in page
+        assert reference["bibtex"] in page
+    json.dumps(metadata)
+
+
+def test_web_temporal_weightings_carry_the_references() -> None:
+    weightings = {
+        item["name"]: item for item in ui_schema_payload()["temporal"]["weightings"]
+    }
+
+    for name in nb.list_temporal_weightings():
+        metadata = nb.describe_temporal_weighting(name)
+        assert weightings[name]["references"] == [
+            dict(reference) for reference in metadata["references"]
+        ]
+        assert weightings[name]["reference_note"] == metadata.get("reference_note")

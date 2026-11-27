@@ -49,9 +49,10 @@ ported. It adds:
 - Node Strength and Edge Weight support directed graphs. Node Strength takes
   `direction="total"`, `"in"`, or `"out"`.
 - `to_undirected` defaults to `weight="auto"` and sums reciprocal weights.
-- `describe_method()` returns a `references` list, and reports copy it.
+- `describe_method()` and `describe_temporal_weighting()` return a `references`
+  list, and reports copy the method references.
 - The web app offers the Holm correction, the seeded random tie policy, and a
-  link to each method's paper. `netbone-web --max-upload-mb` sets the largest
+  link to the paper behind each method and temporal weighting. `netbone-web --max-upload-mb` sets the largest
   accepted upload.
 
 **Stricter input checks**

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from numbers import Real
 from types import MappingProxyType
 
+from netbone._references import Paper, reference_metadata
 from netbone.exceptions import ConfigurationError, ValidationError
 
 TemporalWeight = Callable[[float, Mapping[str, object]], float]
@@ -46,7 +47,11 @@ def list_temporal_weightings() -> tuple[str, ...]:
 
 
 def describe_temporal_weighting(name: str) -> dict[str, object]:
-    """Return JSON-compatible metadata for a temporal weighting."""
+    """Return JSON-compatible metadata for a temporal weighting.
+
+    The metadata names the formula, the parameters, and the source paper in
+    ``reference``, ``doi``, and ``references``, as method metadata does.
+    """
 
     return dict(get_temporal_weighting(name).metadata)
 
@@ -312,6 +317,27 @@ def _resolved_float(
     return _finite_real(parameters[name], name=name, weighting=weighting)
 
 
+_FRAMEWORK_PAPER = Paper(
+    authors=(
+        ("Yassin", "A."),
+        ("Cherifi", "H."),
+        ("Seba", "H."),
+        ("Togni", "O."),
+    ),
+    year=2026,
+    title=(
+        "A framework for backbone extraction from temporal networks: "
+        "An ASF-based case study"
+    ),
+    booktitle="2026 IEEE Workshop on Complexity in Engineering (COMPENG)",
+    publisher="IEEE",
+    doi="10.1109/COMPENG69955.2026.11766128",
+)
+_BASELINE_NOTE = (
+    "The baseline sums event magnitudes without temporal decay, so it has no "
+    "single source paper."
+)
+
 _WEIGHTINGS = {
     "baseline": TemporalWeightingDefinition(
         name="baseline",
@@ -324,6 +350,7 @@ _WEIGHTINGS = {
             "default_parameters": {},
             "required_parameters": (),
             "parameters": {},
+            **reference_metadata((), _BASELINE_NOTE),
         },
         age_basis="snapshot",
         resolve_parameters=_baseline_parameters,
@@ -344,6 +371,7 @@ _WEIGHTINGS = {
                 "q": "non-negative number",
                 "a": "finite number",
             },
+            **reference_metadata((_FRAMEWORK_PAPER,)),
         },
         age_basis="snapshot",
         resolve_parameters=_asf_parameters,
@@ -368,6 +396,7 @@ _WEIGHTINGS = {
                 "persistent_level": "number from 0 to 1 inclusive",
                 "decay_rate": "non-negative number",
             },
+            **reference_metadata((_FRAMEWORK_PAPER,)),
         },
         age_basis="elapsed",
         resolve_parameters=_persistent_exponential_parameters,
@@ -395,6 +424,7 @@ _WEIGHTINGS = {
                 "scale": "positive number in elapsed-time units",
                 "shape": "positive number",
             },
+            **reference_metadata((_FRAMEWORK_PAPER,)),
         },
         age_basis="elapsed",
         resolve_parameters=_persistent_weibull_parameters,
@@ -422,6 +452,7 @@ _WEIGHTINGS = {
                 "scale": "positive number in elapsed-time units",
                 "shape": "positive number",
             },
+            **reference_metadata((_FRAMEWORK_PAPER,)),
         },
         age_basis="elapsed",
         resolve_parameters=_persistent_log_logistic_parameters,

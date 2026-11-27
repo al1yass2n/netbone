@@ -36,3 +36,20 @@ test("a chosen method links to the paper that defines it", async ({ page }) => {
   await expect(paper).toHaveAttribute("target", "_blank");
   await expect(paper).toHaveAttribute("title", /^Freeman, L\. C\. \(1977\)/);
 });
+
+test("a temporal weighting links to the paper that defines it", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Try an example", { exact: true }).click();
+  await page.getByRole("button", { name: /^Temporal interactions / }).click();
+  await expect(page.getByRole("button", { name: "Choose method", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Network settings" }).click();
+  const change = page.getByRole("button", { name: "Change mapping" });
+  if (await change.isVisible()) await change.click();
+  const weighting = page.getByRole("combobox", { name: /^Weighting/ });
+  await weighting.selectOption("asf");
+  const paper = page.getByRole("link", { name: "Paper for ASF (opens in a new tab)" });
+  await expect(paper).toHaveAttribute("href", "https://doi.org/10.1109/COMPENG69955.2026.11766128");
+  await expect(paper).toHaveAttribute("title", /^Yassin, A\., Cherifi, H\., Seba, H\., & Togni, O\. \(2026\)/);
+  await weighting.selectOption("baseline");
+  await expect(page.getByRole("link", { name: /^Paper for / })).toHaveCount(0);
+});

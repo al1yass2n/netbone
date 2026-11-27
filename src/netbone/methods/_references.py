@@ -8,122 +8,19 @@ structured fields, and rendered both as a citation and as a BibTeX record.
 
 from __future__ import annotations
 
-import unicodedata
 from collections.abc import Mapping
-from dataclasses import dataclass
 from types import MappingProxyType
 
-_TITLE_STOPWORDS = frozenset({"a", "an", "the", "on", "of"})
-
-
-@dataclass(frozen=True)
-class _Paper:
-    authors: tuple[tuple[str, str], ...]
-    year: int
-    title: str
-    doi: str
-    journal: str | None = None
-    volume: str | None = None
-    number: str | None = None
-    pages: str | None = None
-    booktitle: str | None = None
-    series: str | None = None
-    publisher: str | None = None
-
-    @property
-    def is_article(self) -> bool:
-        return self.journal is not None
-
-    def citation(self) -> str:
-        """Render an APA-style citation."""
-
-        names = [f"{family}, {given}" for family, given in self.authors]
-        if len(names) == 1:
-            authors = names[0]
-        elif len(names) == 2:
-            authors = f"{names[0]}, & {names[1]}"
-        else:
-            authors = ", ".join(names[:-1]) + f", & {names[-1]}"
-        head = f"{authors} ({self.year}). {self.title}."
-        if self.is_article:
-            source = str(self.journal)
-            if self.volume:
-                source += f", {self.volume}"
-                if self.number:
-                    source += f"({self.number})"
-            if self.pages:
-                source += f", {self.pages}"
-            return f"{head} {source}."
-        source = f"In {self.booktitle}"
-        if self.series:
-            source += f", {self.series} {self.volume}"
-        if self.pages:
-            source += f", {self.pages}"
-        return f"{head} {source}. {self.publisher}."
-
-    def bibtex_key(self) -> str:
-        family = _ascii(self.authors[0][0]).lower().replace(" ", "")
-        words = [
-            "".join(character for character in word if character.isalnum())
-            for word in _ascii(self.title).lower().split()
-        ]
-        first_word = next(
-            word for word in words if word and word not in _TITLE_STOPWORDS
-        )
-        return f"{family}{self.year}{first_word}"
-
-    def bibtex(self) -> str:
-        """Render a BibTeX record."""
-
-        authors = " and ".join(f"{family}, {given}" for family, given in self.authors)
-        fields: list[tuple[str, str | None]] = [
-            ("author", authors),
-            ("title", self.title),
-        ]
-        if self.is_article:
-            kind = "article"
-            fields += [
-                ("journal", self.journal),
-                ("year", str(self.year)),
-                ("volume", self.volume),
-                ("number", self.number),
-            ]
-        else:
-            kind = "inproceedings"
-            fields += [
-                ("booktitle", self.booktitle),
-                ("series", self.series),
-                ("volume", self.volume if self.series else None),
-                ("year", str(self.year)),
-                ("publisher", self.publisher),
-            ]
-        fields += [
-            ("pages", self.pages.replace("–", "--") if self.pages else None),
-            ("doi", self.doi),
-        ]
-        body = ",\n".join(f"  {name} = {{{value}}}" for name, value in fields if value)
-        return f"@{kind}{{{self.bibtex_key()},\n{body}\n}}"
-
-    def as_metadata(self) -> dict[str, str]:
-        return {
-            "citation": self.citation(),
-            "doi": self.doi,
-            "url": f"https://doi.org/{self.doi}",
-            "bibtex": self.bibtex(),
-        }
-
-
-def _ascii(text: str) -> str:
-    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-
+from netbone._references import Paper
+from netbone._references import reference_metadata as _reference_metadata
 
 PNAS = "Proceedings of the National Academy of Sciences"
 
-METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
+METHOD_PAPERS: Mapping[str, tuple[Paper, ...]] = MappingProxyType(
     {
         "edge_weight": (),
         "edge_betweenness": (
-            _Paper(
+            Paper(
                 authors=(("Girvan", "M."), ("Newman", "M. E. J.")),
                 year=2002,
                 title="Community structure in social and biological networks",
@@ -135,7 +32,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "disparity": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Serrano", "M. Á."),
                     ("Boguñá", "M."),
@@ -151,7 +48,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "lans": (
-            _Paper(
+            Paper(
                 authors=(("Foti", "N. J."), ("Hughes", "J. M."), ("Rockmore", "D. N.")),
                 year=2011,
                 title="Nonparametric sparsification of complex multiscale networks",
@@ -163,7 +60,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "link_salience": (
-            _Paper(
+            Paper(
                 authors=(("Grady", "D."), ("Thiemann", "C."), ("Brockmann", "D.")),
                 year=2012,
                 title="Robust classification of salient links in complex networks",
@@ -174,7 +71,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "link_prediction": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Yassin", "A."),
                     ("Cherifi", "H."),
@@ -193,7 +90,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "link_prediction_iforest": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Yassin", "A."),
                     ("Cherifi", "H."),
@@ -212,7 +109,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
                 publisher="Springer",
                 doi="10.1007/978-3-031-92898-7_13",
             ),
-            _Paper(
+            Paper(
                 authors=(("Liu", "F. T."), ("Ting", "K. M."), ("Zhou", "Z.-H.")),
                 year=2008,
                 title="Isolation forest",
@@ -223,7 +120,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "gspar": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Satuluri", "V."),
                     ("Parthasarathy", "S."),
@@ -241,7 +138,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "maximum_spanning_forest": (
-            _Paper(
+            Paper(
                 authors=(("Kruskal", "J. B."),),
                 year=1956,
                 title=(
@@ -254,7 +151,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
                 pages="48–50",
                 doi="10.1090/S0002-9939-1956-0078686-7",
             ),
-            _Paper(
+            Paper(
                 authors=(("Mantegna", "R. N."),),
                 year=1999,
                 title="Hierarchical structure in financial markets",
@@ -266,7 +163,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "primary_linkage": (
-            _Paper(
+            Paper(
                 authors=(("Nystuen", "J. D."), ("Dacey", "M. F.")),
                 year=1961,
                 title="A graph theory interpretation of nodal regions",
@@ -278,7 +175,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "multiple_linkage": (
-            _Paper(
+            Paper(
                 authors=(("Van Nuffel", "N."),),
                 year=2007,
                 title=(
@@ -294,7 +191,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "planar_maximally_filtered_graph": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Tumminello", "M."),
                     ("Aste", "T."),
@@ -311,7 +208,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "h_backbone": (
-            _Paper(
+            Paper(
                 authors=(("Zhang", "R. J."), ("Stanley", "H. E."), ("Ye", "F. Y.")),
                 year=2018,
                 title="Extracting h-backbone as a core structure in weighted networks",
@@ -322,7 +219,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "doubly_stochastic": (
-            _Paper(
+            Paper(
                 authors=(("Slater", "P. B."),),
                 year=2009,
                 title=(
@@ -337,7 +234,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "marginal_likelihood": (
-            _Paper(
+            Paper(
                 authors=(("Dianati", "N."),),
                 year=2016,
                 title=(
@@ -352,7 +249,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "noise_corrected": (
-            _Paper(
+            Paper(
                 authors=(("Coscia", "M."), ("Neffke", "F. M. H.")),
                 year=2017,
                 title="Network backboning with noisy data",
@@ -365,7 +262,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "glanb": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Zhang", "X."),
                     ("Zhang", "Z."),
@@ -386,7 +283,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "node_degree": (
-            _Paper(
+            Paper(
                 authors=(("Freeman", "L. C."),),
                 year=1978,
                 title="Centrality in social networks: Conceptual clarification",
@@ -398,7 +295,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "node_strength": (
-            _Paper(
+            Paper(
                 authors=(
                     ("Barrat", "A."),
                     ("Barthélemy", "M."),
@@ -415,7 +312,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
             ),
         ),
         "node_betweenness": (
-            _Paper(
+            Paper(
                 authors=(("Freeman", "L. C."),),
                 year=1977,
                 title="A set of measures of centrality based on betweenness",
@@ -425,7 +322,7 @@ METHOD_PAPERS: Mapping[str, tuple[_Paper, ...]] = MappingProxyType(
                 pages="35–41",
                 doi="10.2307/3033543",
             ),
-            _Paper(
+            Paper(
                 authors=(("Brandes", "U."),),
                 year=2001,
                 title="A faster algorithm for betweenness centrality",
@@ -457,13 +354,4 @@ def reference_metadata(name: str) -> dict[str, object]:
     entries.
     """
 
-    references = tuple(paper.as_metadata() for paper in METHOD_PAPERS[name])
-    primary = references[0] if references else None
-    metadata: dict[str, object] = {
-        "reference": primary["citation"] if primary else None,
-        "doi": primary["doi"] if primary else None,
-        "references": references,
-    }
-    if name in REFERENCE_NOTES:
-        metadata["reference_note"] = REFERENCE_NOTES[name]
-    return metadata
+    return _reference_metadata(METHOD_PAPERS[name], REFERENCE_NOTES.get(name))

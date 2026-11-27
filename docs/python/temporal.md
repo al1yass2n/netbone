@@ -70,3 +70,32 @@ Save aggregation settings via `TemporalAggregationConfig.to_json()`, then
 load them with `TemporalAggregationConfig.from_json()` and pass the config to
 `aggregate_temporal(events, config)`. Use the same events, column mapping,
 direction, and evaluation settings when rerunning the analysis.
+
+## References
+
+The `asf` weighting and the three persistent weightings come from the
+temporal backbone framework below. The `baseline` weighting sums event
+magnitudes without temporal decay, so it has no single source paper.
+`nb.describe_temporal_weighting(name)["references"]` returns the same entry.
+
+<div class="method-references" markdown="1">
+
+- Yassin, A., Cherifi, H., Seba, H., & Togni, O. (2026). A framework for backbone extraction from temporal networks: An ASF-based case study. In 2026 IEEE Workshop on Complexity in Engineering (COMPENG). IEEE. [doi:10.1109/COMPENG69955.2026.11766128](https://doi.org/10.1109/COMPENG69955.2026.11766128)
+
+<details class="bibtex" markdown="1">
+<summary>BibTeX</summary>
+
+```bibtex
+@inproceedings{yassin2026framework,
+  author = {Yassin, A. and Cherifi, H. and Seba, H. and Togni, O.},
+  title = {A framework for backbone extraction from temporal networks: An ASF-based case study},
+  booktitle = {2026 IEEE Workshop on Complexity in Engineering (COMPENG)},
+  year = {2026},
+  publisher = {IEEE},
+  doi = {10.1109/COMPENG69955.2026.11766128}
+}
+```
+
+</details>
+
+</div>

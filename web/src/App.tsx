@@ -729,6 +729,7 @@ function NetworkSettings({ data, context, preview, busy, schema, onData, onConte
                 const weighting = schema.temporal.weightings.find((item) => item.name === event.target.value);
                 onData({ temporalWeighting: event.target.value, temporalParameters: { ...(weighting?.default_parameters || {}) } });
               }}>{schema.temporal.weightings.map((item) => <option key={item.name} value={item.name}>{item.label}</option>)}</select><small>{temporalSpec?.description}</small></label>
+              {temporalSpec?.references?.[0] && <p className="temporal-paper">Source <a className="method-paper-link" href={temporalSpec.references[0].url} target="_blank" rel="noreferrer" title={temporalSpec.references[0].citation}>Paper<span className="visually-hidden"> for {temporalSpec.label} (opens in a new tab)</span></a></p>}
               <div className="field-grid">{temporalControls.map((control) => <ControlField key={control.name} control={control} value={data.temporalParameters[control.name]} onChange={(name, value) => onData({ temporalParameters: { ...data.temporalParameters, [name]: value } })} />)}</div>
             </div>
           )}

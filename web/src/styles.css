@@ -3145,3 +3145,4 @@ html:has(.analysis-dock) { scroll-padding-block-end: 128px; }
 
 .method-paper-link:hover { border-color: var(--accent); background: var(--accent-soft); }
 .method-paper-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.temporal-paper { margin: -4px 0 0; color: var(--muted); font-size: var(--text-small); }

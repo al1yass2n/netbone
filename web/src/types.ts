@@ -90,6 +90,8 @@ export interface TemporalWeightingSpec {
   uses_age: boolean;
   default_parameters: Record<string, number>;
   required_parameters: string[];
+  references?: MethodReference[];
+  reference_note?: string | null;
 }
 
 export interface UiSchema {

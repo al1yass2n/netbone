@@ -1905,6 +1905,8 @@ def _temporal_schema() -> dict[str, object]:
                     if isinstance(required_parameters, list | tuple)
                     else []
                 ),
+                "references": _method_references(metadata),
+                "reference_note": metadata.get("reference_note"),
             }
         )
         controls[name] = _temporal_weighting_controls(name)
