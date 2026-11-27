@@ -16,6 +16,7 @@ export interface OptionSpec {
   label: string;
   description?: string;
   disabled?: boolean;
+  directed_only?: boolean;
   illustration?: Record<string, JsonValue>;
 }
 

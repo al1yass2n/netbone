@@ -12,7 +12,8 @@ from netbone.exceptions import ConfigurationError, ValidationError
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
-P_VALUE_AGGREGATIONS = frozenset({"average", "max", "min"})
+P_VALUE_AGGREGATIONS = frozenset({"average", "in", "max", "min", "out"})
+DIRECTED_ONLY_AGGREGATIONS = frozenset({"in", "out"})
 LEAF_POLICIES = frozenset({"ignore", "zero"})
 
 DISPARITY_METADATA: dict[str, object] = {
@@ -60,8 +61,11 @@ def compute_disparity(
     Args:
         network: Normalized simple directed or undirected network to score.
         weight: Edge attribute containing finite positive weights.
-        pvalue_aggregation: How to combine endpoint p-values: `min`, `max`, or
-            `average`.
+        pvalue_aggregation: How to combine endpoint p-values. `min` keeps an
+            edge that is significant for at least one endpoint, `max` requires
+            both, and `average` takes their mean. On directed graphs, `out`
+            uses only the source's outgoing test (important for the sender) and
+            `in` only the target's incoming test (important for the receiver).
         leaf_policy: How degree-one endpoints contribute. `zero` (default)
             gives a leaf endpoint p-value `0.0`, while `ignore` leaves it out
             of the aggregation when the other endpoint is available.
@@ -76,6 +80,12 @@ def compute_disparity(
         allowed = ", ".join(sorted(P_VALUE_AGGREGATIONS))
         raise ConfigurationError(
             f"disparity parameter 'pvalue_aggregation' must be one of: {allowed}."
+        )
+    if pvalue_aggregation in DIRECTED_ONLY_AGGREGATIONS and not network.directed:
+        raise ConfigurationError(
+            f"disparity pvalue_aggregation={pvalue_aggregation!r} needs a directed "
+            "graph; an undirected edge has no source or target end. Use 'min', "
+            "'max', or 'average'."
         )
     if leaf_policy not in LEAF_POLICIES:
         allowed = ", ".join(sorted(LEAF_POLICIES))
@@ -222,6 +232,10 @@ def _aggregate_pvalues(
     *,
     pvalue_aggregation: str,
 ) -> float:
+    if pvalue_aggregation == "out":
+        pvalues = (pvalues[0], None)
+    elif pvalue_aggregation == "in":
+        pvalues = (None, pvalues[1])
     available = [pvalue for pvalue in pvalues if pvalue is not None]
     if not available:
         return 1.0

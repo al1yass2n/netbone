@@ -319,6 +319,38 @@ METHOD_CONTROL_GUIDANCE: dict[str, dict[str, object]] = {
                     "result": "edge p = 0.21",
                 },
             },
+            "out": {
+                "description": (
+                    "Directed graphs only. Use the source's outgoing test, so the "
+                    "arc is kept when it matters to the sender."
+                ),
+                "directed_only": True,
+                "illustration": {
+                    "kind": "endpoint",
+                    "left": "i",
+                    "left_value": "p out = 0.02",
+                    "rule": "OUT",
+                    "right": "j",
+                    "right_value": "p in = 0.40",
+                    "result": "arc p = 0.02",
+                },
+            },
+            "in": {
+                "description": (
+                    "Directed graphs only. Use the target's incoming test, so the "
+                    "arc is kept when it matters to the receiver."
+                ),
+                "directed_only": True,
+                "illustration": {
+                    "kind": "endpoint",
+                    "left": "i",
+                    "left_value": "p out = 0.02",
+                    "rule": "IN",
+                    "right": "j",
+                    "right_value": "p in = 0.40",
+                    "result": "arc p = 0.40",
+                },
+            },
         },
     },
     "leaf_policy": {
@@ -2000,6 +2032,8 @@ def _method_controls(
                 ("min", "minimum"),
                 ("max", "maximum"),
                 ("average", "average"),
+                ("out", "outgoing only"),
+                ("in", "incoming only"),
             ),
             advanced=True,
         )
@@ -2326,7 +2360,7 @@ def _guided_method_parameters(
     if method_name in P_VALUE_AGGREGATION_METHODS:
         parameters["pvalue_aggregation"] = _option(
             controls.get("pvalue_aggregation"),
-            allowed={"min", "max", "average"},
+            allowed={"min", "max", "average", "out", "in"},
             default="min",
             field="pvalue_aggregation",
         )

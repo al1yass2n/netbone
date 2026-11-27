@@ -218,3 +218,62 @@ def test_disparity_significance_filter_uses_primary_statistic_by_default() -> No
     assert result.selection.statistic == "disparity_pvalue"
     assert result.selection.parameters["statistic"] == "disparity_pvalue"
     assert sorted(result.graph.edges()) == [("a", "b")]
+
+
+@pytest.mark.parametrize("method", ["disparity", "lans"])
+def test_directed_out_and_in_aggregation_use_one_arc_end(method: str) -> None:
+    graph = nx.DiGraph()
+    graph.add_edge("a", "b", weight=3.0)
+    graph.add_edge("a", "c", weight=1.0)
+    graph.add_edge("b", "c", weight=2.0)
+    graph.add_edge("d", "c", weight=5.0)
+    graph.add_edge("d", "b", weight=1.0)
+
+    def table(aggregation: str) -> object:
+        return nb.score(
+            graph, method=method, pvalue_aggregation=aggregation
+        ).statistics.set_index(["source", "target"])
+
+    column = f"{method}_pvalue"
+    outgoing = table("out")
+    incoming = table("in")
+    both_or = table("min")
+    both_and = table("max")
+    assert outgoing[column].tolist() == pytest.approx(
+        outgoing[f"{method}_source_pvalue"].tolist()
+    )
+    assert incoming[column].tolist() == pytest.approx(
+        incoming[f"{method}_target_pvalue"].tolist()
+    )
+    for key in outgoing.index:
+        pair = (outgoing.loc[key, column], incoming.loc[key, column])
+        assert both_or.loc[key, column] == pytest.approx(min(pair))
+        assert both_and.loc[key, column] == pytest.approx(max(pair))
+
+
+@pytest.mark.parametrize("method", ["disparity", "lans"])
+@pytest.mark.parametrize("aggregation", ["out", "in"])
+def test_out_and_in_aggregation_reject_undirected_graphs(
+    method: str, aggregation: str
+) -> None:
+    graph = nx.Graph()
+    graph.add_edge("a", "b", weight=3.0)
+    graph.add_edge("b", "c", weight=1.0)
+
+    with pytest.raises(nb.ConfigurationError, match="needs a directed graph"):
+        nb.score(graph, method=method, pvalue_aggregation=aggregation)
+
+
+@pytest.mark.parametrize("aggregation", ["out", "in"])
+def test_out_and_in_aggregation_ignore_leaf_gives_one(aggregation: str) -> None:
+    graph = nx.DiGraph()
+    graph.add_edge("a", "b", weight=1.0)
+
+    result = nb.score(
+        graph,
+        method="disparity",
+        pvalue_aggregation=aggregation,
+        leaf_policy="ignore",
+    )
+
+    assert result.statistics["disparity_pvalue"].tolist() == [1.0]

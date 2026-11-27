@@ -83,3 +83,21 @@ test("cutoffs follow score units and weight-only settings are omitted for unweig
   assert.equal(plan.count, 2);
   assert.deepEqual(plan.configurations[0].filter.parameters, { value: [-2, 3000] });
 });
+
+test("outgoing and incoming aggregation are offered only on directed networks", async () => {
+  const { withDirectedOnlyOptions } = await import("../src/sweepSetup.ts");
+  const control = {
+    name: "pvalue_aggregation",
+    label: "Endpoint p-value",
+    control: "select",
+    default: "min",
+    options: [
+      { value: "min", label: "minimum" },
+      { value: "out", label: "outgoing only", directed_only: true },
+      { value: "in", label: "incoming only", directed_only: true },
+    ],
+  };
+  const undirected = withDirectedOnlyOptions(control, false);
+  assert.deepEqual(undirected.options.filter((option) => option.disabled).map((option) => option.value), ["out", "in"]);
+  assert.equal(withDirectedOnlyOptions(control, true), control);
+});

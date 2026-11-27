@@ -35,6 +35,12 @@ export function record(value: JsonValue | undefined): JsonRecord | undefined {
   return value && typeof value === "object" && !Array.isArray(value) ? value : undefined;
 }
 
+/** Disable options that only make sense on directed graphs, such as outgoing-only aggregation. */
+export function withDirectedOnlyOptions(control: ControlSpec, directed: boolean): ControlSpec {
+  if (directed || !control.options?.some((option) => option.directed_only)) return control;
+  return { ...control, options: control.options.map((option) => option.directed_only ? { ...option, disabled: true } : option) };
+}
+
 export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, weighted }: SweepEnvironment): SweepSetting[] {
   const method = schema.methods.find((item) => item.name === draft.method);
   const methodControls = (schema.controls.methods[draft.method] || []).filter(
@@ -43,7 +49,7 @@ export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, w
       && !(!directed && control.ignored_when_undirected)
       && !(control.name === "distance_transform" && !weighted)
       && control.name !== "link_prediction_mode" && !control.name.startsWith("iforest_similarity_"),
-  );
+  ).map((control) => withDirectedOnlyOptions(control, directed));
   const filterControls = (schema.controls.filters[draft.filter] || []).filter(
     (control) => !control.disabled && control.control !== "notice"
       && control.name !== "statistic" && !(control.name === "drop_isolates" && method?.target === "node"),

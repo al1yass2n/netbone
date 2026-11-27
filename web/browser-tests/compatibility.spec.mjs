@@ -183,3 +183,42 @@ test("Node Strength offers in, out and total strength on directed networks", asy
   const configuration = JSON.parse(await inspect.locator("pre").textContent());
   expect(configuration.method.parameters).toMatchObject({ direction: "in" });
 });
+
+test("outgoing-only and incoming-only aggregation unlock on directed networks", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Try an example", { exact: true }).click();
+  await page.getByRole("button", { name: /^Weighted relationships / }).click();
+  const methods = await openMethods(page);
+  await methods.getByRole("button", { name: /^Disparity / }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  const openScoringSettings = async () => {
+    await expect(page.getByText(/edge scores are ready/)).toBeVisible();
+    const details = page.locator("details.analysis-score-settings");
+    if (await details.count() && !(await details.evaluate((element) => element.open))) await details.locator("summary").click();
+    const advanced = page.locator("details.advanced-method-settings");
+    if (await advanced.count() && !(await advanced.evaluate((element) => element.open))) await advanced.locator("summary").click();
+  };
+  await openScoringSettings();
+  await expect(page.getByRole("radio", { name: /^outgoing only/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /^incoming only/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /^minimum/ })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Network settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Network settings" });
+  await settings.getByRole("button", { name: "Change mapping" }).click();
+  await settings.getByRole("checkbox", { name: /^Directed network/ }).check();
+  await settings.getByRole("button", { name: "Done" }).click();
+  await expect(page.getByLabel("Network summary")).toContainText("Directed");
+  await openScoringSettings();
+  const incoming = page.getByRole("radio", { name: /^incoming only/ });
+  await expect(incoming).toBeEnabled();
+  await incoming.check();
+  await page.getByRole("button", { name: "Compute scores" }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Inspect & export" }).click();
+  const inspect = page.getByRole("dialog", { name: "Inspect & export" });
+  await inspect.getByText("View run settings", { exact: true }).click();
+  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  expect(configuration.method.parameters).toMatchObject({ pvalue_aggregation: "in" });
+});

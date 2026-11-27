@@ -28,6 +28,7 @@ import { api, downloadExperiment, downloadGraph, downloadJson } from "./api";
 import { CitationFooter } from "./components/CitationFooter";
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
 import { ControlField } from "./components/ControlField";
+import { withDirectedOnlyOptions } from "./sweepSetup";
 import { Hint } from "./components/Hint";
 import LauncherBackdrop from "./components/LauncherBackdrop";
 import { NetworkPreview } from "./components/NetworkPreview";
@@ -148,6 +149,17 @@ export default function App() {
   const methodCompatibility = useCallback((candidate: MethodSpec) => methodCompatibilityReason(
     candidate, { directed: effectiveDirected, weighted, positiveIntegerWeights, weightSign },
   ), [effectiveDirected, weighted, positiveIntegerWeights, weightSign]);
+
+  useEffect(() => {
+    // Outgoing- or incoming-only choices have no meaning once the network is undirected.
+    if (effectiveDirected || !schema || !methodName) return;
+    const reset: Record<string, ControlValue> = {};
+    for (const control of schema.controls.methods[methodName] || []) {
+      const chosen = control.options?.find((option) => option.value === String(methodControls[control.name]));
+      if (chosen?.directed_only && control.default != null) reset[control.name] = control.default;
+    }
+    if (Object.keys(reset).length) setMethodControls((current) => ({ ...current, ...reset }));
+  }, [effectiveDirected, schema, methodName, methodControls]);
 
   const combinedControls = useMemo(
     () => ({ ...methodControls, ...filterControls }),
@@ -1329,6 +1341,7 @@ function resolvedControls(controls: ControlSpec[], data: DataDraft, directed: bo
       next = { ...next, default: semantics === "distance" ? "identity" : semantics === "strength" ? "inverse" : null };
     }
     if (directed && control.ignored_when_directed) next = { ...next, disabled: true, disabled_reason: control.ignored_when_directed_reason };
+    next = withDirectedOnlyOptions(next, directed);
     if (!directed && control.ignored_when_undirected) next = { ...next, disabled: true, disabled_reason: control.ignored_when_undirected_reason };
     return next;
   });

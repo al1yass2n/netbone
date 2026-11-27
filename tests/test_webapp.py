@@ -348,9 +348,19 @@ def test_webapp_ui_schema_method_choices_match_registered_implementations() -> N
 
     assert _option_values(disparity["pvalue_aggregation"]) == {
         "average",
+        "in",
         "max",
         "min",
+        "out",
     }
+    assert _option_values(lans["pvalue_aggregation"]) == _option_values(
+        disparity["pvalue_aggregation"]
+    )
+    assert {
+        option["value"]
+        for option in disparity["pvalue_aggregation"]["options"]
+        if option.get("directed_only")
+    } == {"in", "out"}
     aggregation_options = {
         option["value"]: option for option in disparity["pvalue_aggregation"]["options"]
     }
