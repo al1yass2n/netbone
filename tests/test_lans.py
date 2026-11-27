@@ -52,34 +52,53 @@ def test_lans_can_choose_endpoint_pvalue_aggregation() -> None:
     assert result.parameters["pvalue_aggregation"] == "max"
 
 
-def test_lans_directed_uses_only_source_outgoing_distribution() -> None:
+def test_lans_directed_checks_source_outgoing_and_target_incoming() -> None:
     graph = nx.DiGraph()
     graph.add_edge("a", "b", weight=3.0)
     graph.add_edge("a", "c", weight=1.0)
     graph.add_edge("b", "c", weight=2.0)
+    graph.add_edge("d", "c", weight=5.0)
 
-    result = nb.score(graph, method="lans", weight="weight")
+    result = nb.score(graph, method="lans", pvalue_aggregation="max")
+    statistics = result.statistics
 
-    assert result.statistics["lans_source_fraction"].tolist() == pytest.approx(
-        [0.75, 0.25, 1.0]
+    assert statistics["lans_source_fraction"].tolist() == pytest.approx(
+        [0.75, 0.25, 1.0, 1.0]
     )
-    assert result.statistics["lans_target_fraction"].isna().all()
-    assert result.statistics["lans_target_pvalue"].isna().all()
-    assert result.statistics["lans_pvalue"].tolist() == pytest.approx([0.0, 0.5, 0.0])
-
-
-def test_lans_directed_reports_ignored_endpoint_aggregation() -> None:
-    graph = nx.DiGraph()
-    graph.add_edge("a", "b", weight=1.0)
-
-    result = nb.score(
-        graph,
-        method="lans",
-        weight="weight",
-        pvalue_aggregation="max",
+    assert statistics["lans_target_fraction"].tolist() == pytest.approx(
+        [1.0, 0.125, 0.25, 0.625]
     )
+    assert statistics["lans_source_pvalue"].tolist() == pytest.approx(
+        [0.0, 0.5, 0.0, 0.0]
+    )
+    assert statistics["lans_target_pvalue"].tolist() == pytest.approx(
+        [0.0, 2 / 3, 1 / 3, 0.0]
+    )
+    assert statistics["lans_pvalue"].tolist() == pytest.approx([0.0, 2 / 3, 1 / 3, 0.0])
+    assert result.warnings == ()
 
-    assert "ignored for directed graphs" in result.warnings[0]
+
+def test_lans_symmetric_digraph_matches_undirected_scores() -> None:
+    graph = nx.karate_club_graph()
+    for index, (source, target) in enumerate(graph.edges()):
+        graph[source][target]["weight"] = float((index * 7) % 11 + 1)
+
+    undirected = nb.score(graph, method="lans").statistics
+    directed = nb.score(graph.to_directed(), method="lans").statistics
+    expected = {
+        frozenset((source, target)): value
+        for source, target, value in zip(
+            undirected["source"],
+            undirected["target"],
+            undirected["lans_pvalue"],
+            strict=False,
+        )
+    }
+
+    for source, target, value in zip(
+        directed["source"], directed["target"], directed["lans_pvalue"], strict=False
+    ):
+        assert value == pytest.approx(expected[frozenset((source, target))])
 
 
 def test_lans_leaf_policy_zero_is_default() -> None:

@@ -34,6 +34,8 @@ export interface ControlSpec {
   disabled_reason?: string;
   ignored_when_directed?: boolean;
   ignored_when_directed_reason?: string;
+  ignored_when_undirected?: boolean;
+  ignored_when_undirected_reason?: string;
   options?: OptionSpec[];
 }
 

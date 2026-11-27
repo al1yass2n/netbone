@@ -40,6 +40,7 @@ export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, w
   const methodControls = (schema.controls.methods[draft.method] || []).filter(
     (control) => !control.disabled && control.control !== "notice"
       && !(directed && control.ignored_when_directed)
+      && !(!directed && control.ignored_when_undirected)
       && !(control.name === "distance_transform" && !weighted)
       && control.name !== "link_prediction_mode" && !control.name.startsWith("iforest_similarity_"),
   );

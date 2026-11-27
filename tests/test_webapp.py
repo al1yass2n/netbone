@@ -369,10 +369,9 @@ def test_webapp_ui_schema_method_choices_match_registered_implementations() -> N
         disparity["pvalue_aggregation"]["description"]
     )
     assert "source out-degree-one" in str(disparity["leaf_policy"]["description"])
-    assert lans["pvalue_aggregation"]["ignored_when_directed"] is True
-    assert "source only" in str(
-        lans["pvalue_aggregation"]["ignored_when_directed_reason"]
-    )
+    assert "ignored_when_directed" not in lans["pvalue_aggregation"]
+    assert disparity["leaf_policy"]["default"] == "zero"
+    assert lans["leaf_policy"]["default"] == "zero"
     assert aggregation_options["average"]["illustration"]["result"] == ("edge p = 0.21")
     assert _option_values(disparity["leaf_policy"]) == {"ignore", "zero"}
     leaf_options = {

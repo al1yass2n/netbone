@@ -8,9 +8,14 @@ which defaults to `"auto"` and reads the `weight` attribute. Weights are
 required. This measure can rank a node with a few strong
 links ahead of a node with many weak links.
 
+On a directed graph, `direction` chooses which arcs count. The default
+`"total"` adds incoming and outgoing weights, `"in"` gives in-strength, and
+`"out"` gives out-strength. An undirected graph has one strength per node, so
+`"in"` and `"out"` give the total and add a warning.
+
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
 | --- | --- | --- | --- | --- |
-| node | `node_strength` | higher | Unsupported | Finite numeric |
+| node | `node_strength` | higher | Supported | Finite numeric |
 
 ## Run the method
 
@@ -19,6 +24,7 @@ compatible graph of your own.
 
 ```python
 candidate = nb.pipeline().score("node_strength", weight="weight")
+# On a directed graph: nb.pipeline().score("node_strength", direction="in")
 result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").run(
     graph
 )

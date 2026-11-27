@@ -63,7 +63,7 @@ def test_directed_disparity_uses_outgoing_and_incoming_distributions() -> None:
     graph.add_edge("b", "x", weight=1.0)
     graph.add_edge("c", "x", weight=3.0)
 
-    result = nb.score(graph, method="disparity", weight="weight")
+    result = nb.score(graph, method="disparity", weight="weight", leaf_policy="ignore")
     rows = result.statistics.set_index(["source", "target"])
 
     assert result.metadata["supports_directed"] is True
@@ -109,9 +109,9 @@ def test_directed_disparity_scores_reciprocal_arcs_independently() -> None:
     graph.add_edge("a", "c", weight=1.0)
     graph.add_edge("c", "a", weight=1.0)
 
-    rows = nb.score(graph, method="disparity").statistics.set_index(
-        ["source", "target"]
-    )
+    rows = nb.score(
+        graph, method="disparity", leaf_policy="ignore"
+    ).statistics.set_index(["source", "target"])
 
     assert len(rows) == 4
     assert rows.loc[("a", "b"), "disparity_pvalue"] == pytest.approx(0.2)
@@ -127,7 +127,7 @@ def test_directed_disparity_significance_filter_keeps_significant_arcs() -> None
 
     result = (
         nb.pipeline()
-        .score("disparity")
+        .score("disparity", leaf_policy="ignore")
         .filter("significance", alpha=0.21, drop_isolates=True)
         .run(graph)
     )
@@ -141,9 +141,9 @@ def test_directed_disparity_leaf_policy_uses_non_leaf_arc_endpoint() -> None:
     graph.add_edge("a", "x", weight=4.0)
     graph.add_edge("a", "y", weight=1.0)
 
-    ignored = nb.score(graph, method="disparity").statistics.set_index(
-        ["source", "target"]
-    )
+    ignored = nb.score(
+        graph, method="disparity", leaf_policy="ignore"
+    ).statistics.set_index(["source", "target"])
     zeroed = nb.score(
         graph,
         method="disparity",
@@ -160,7 +160,9 @@ def test_disparity_leaf_policy_ignore_uses_non_leaf_endpoint() -> None:
     graph.add_edge("center", "leaf_a", weight=3.0)
     graph.add_edge("center", "leaf_b", weight=1.0)
 
-    ignore_leaf = nb.score(graph, method="disparity", weight="weight")
+    ignore_leaf = nb.score(
+        graph, method="disparity", weight="weight", leaf_policy="ignore"
+    )
     zero_leaf = nb.score(
         graph,
         method="disparity",
@@ -168,7 +170,7 @@ def test_disparity_leaf_policy_ignore_uses_non_leaf_endpoint() -> None:
         leaf_policy="zero",
     )
 
-    assert ignore_leaf.parameters["leaf_policy"] == "ignore"
+    assert zero_leaf.parameters["leaf_policy"] == "zero"
     assert ignore_leaf.statistics["disparity_pvalue"].tolist() == pytest.approx(
         [0.25, 0.75]
     )
@@ -189,7 +191,10 @@ def test_disparity_default_filter_resolves_to_significance() -> None:
     graph.add_edge("center", "leaf_b", weight=1.0)
 
     result = (
-        nb.pipeline().score("disparity", weight="weight").filter("default").run(graph)
+        nb.pipeline()
+        .score("disparity", weight="weight", leaf_policy="ignore")
+        .filter("default")
+        .run(graph)
     )
 
     assert result.selection.parameters["strategy"] == "significance"
@@ -205,7 +210,7 @@ def test_disparity_significance_filter_uses_primary_statistic_by_default() -> No
 
     result = (
         nb.pipeline()
-        .score("disparity")
+        .score("disparity", leaf_policy="ignore")
         .filter("significance", alpha=0.3, drop_isolates=False)
         .run(graph)
     )

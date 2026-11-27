@@ -489,6 +489,57 @@ METHOD_PARAMETER_GUIDANCE: dict[tuple[str, str], dict[str, object]] = {
             "graphs."
         ),
     },
+    ("lans", "pvalue_aggregation"): {
+        "description": (
+            "Combine the two endpoint tests. On directed graphs these are the "
+            "source-outgoing and target-incoming p-values."
+        ),
+    },
+    ("lans", "leaf_policy"): {
+        "description": (
+            "Control source out-degree-one and target in-degree-one endpoint tests "
+            "on directed graphs, or ordinary degree-one endpoints on undirected "
+            "graphs."
+        ),
+    },
+    ("node_strength", "direction"): {
+        "description": (
+            "On directed graphs, choose which arcs count toward a node's "
+            "strength: incoming, outgoing, or both."
+        ),
+        "options": {
+            "total": {
+                "description": "Add incoming and outgoing arc weights.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "in 3",
+                    "center": "+ out 1",
+                    "right": "node b",
+                    "result": "strength = 4",
+                },
+            },
+            "in": {
+                "description": "Add only the weights of arcs that point to the node.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "in 3",
+                    "center": "ignore out 1",
+                    "right": "node b",
+                    "result": "strength = 3",
+                },
+            },
+            "out": {
+                "description": "Add only the weights of arcs that leave the node.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "out 1",
+                    "center": "ignore in 3",
+                    "right": "node b",
+                    "result": "strength = 1",
+                },
+            },
+        },
+    },
     ("glanb", "c"): {
         "description": (
             "Controls how strongly endpoint degree affects GLANB significance. "
@@ -1955,23 +2006,13 @@ def _method_controls(
         leaf_policy = _select_control(
             "leaf_policy",
             "Leaf policy",
-            "zero" if name == "lans" else "ignore",
+            "zero",
             (
                 ("zero", "zero"),
                 ("ignore", "ignore leaf endpoint"),
             ),
             advanced=True,
         )
-        if name == "lans":
-            pvalue_aggregation.update(
-                {
-                    "ignored_when_directed": True,
-                    "ignored_when_directed_reason": (
-                        "Directed LANS evaluates each arc at its source only, so "
-                        "there are no endpoint p-values to combine."
-                    ),
-                }
-            )
         controls.extend([pvalue_aggregation, leaf_policy])
     if name == "glanb":
         controls.append(
@@ -2076,6 +2117,26 @@ def _method_controls(
         controls.append(
             _checkbox_control("endpoints", "Count endpoints", False, advanced=True)
         )
+    if name == "node_strength":
+        direction = _select_control(
+            "direction",
+            "Strength direction",
+            "total",
+            (
+                ("total", "total (in + out)"),
+                ("in", "in-strength"),
+                ("out", "out-strength"),
+            ),
+        )
+        direction.update(
+            {
+                "ignored_when_undirected": True,
+                "ignored_when_undirected_reason": (
+                    "Undirected graphs have a single strength per node."
+                ),
+            }
+        )
+        controls.append(direction)
     if name in {"link_prediction", "link_prediction_iforest"}:
         controls.append(
             _number_control(
@@ -2272,7 +2333,7 @@ def _guided_method_parameters(
         parameters["leaf_policy"] = _option(
             controls.get("leaf_policy"),
             allowed={"zero", "ignore"},
-            default="zero" if method_name == "lans" else "ignore",
+            default="zero",
             field="leaf_policy",
         )
     if method_name == "glanb":
@@ -2349,6 +2410,13 @@ def _guided_method_parameters(
             controls.get("normalized"),
             default=True,
             field="normalized",
+        )
+    if method_name == "node_strength":
+        parameters["direction"] = _option(
+            controls.get("direction"),
+            allowed={"total", "in", "out"},
+            default="total",
+            field="direction",
         )
     if method_name == "node_betweenness":
         parameters["endpoints"] = _boolean(

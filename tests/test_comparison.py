@@ -441,11 +441,14 @@ def test_directed_comparison_keeps_reciprocal_arcs_distinct() -> None:
     graph.add_edge("b", "a", weight=1.0)
     graph.add_edge("a", "c", weight=1.0)
     significance = (
-        nb.pipeline().score("lans").filter("significance", alpha=0.1).run(graph)
+        nb.pipeline()
+        .score("lans", leaf_policy="ignore")
+        .filter("significance", alpha=0.6)
+        .run(graph)
     )
     fraction = (
         nb.pipeline()
-        .score("lans")
+        .score("lans", leaf_policy="ignore")
         .filter(
             "fraction",
             fraction=1 / 3,

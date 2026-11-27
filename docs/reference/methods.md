@@ -47,7 +47,7 @@ induced subgraph after filtering. The other methods select edges.
 | Method | Weights | Directed | Suggested selection |
 | --- | --- | --- | --- |
 | [Node Degree](../methods/node_degree.md) | Weights ignored | No | 10% fraction |
-| [Node Strength](../methods/node_strength.md) | Finite numeric | No | 10% fraction |
+| [Node Strength](../methods/node_strength.md) | Finite numeric | Yes | 10% fraction |
 | [Node Betweenness](../methods/node_betweenness.md) | Positive when weighted | No | 10% fraction |
 
 ## How weights are chosen

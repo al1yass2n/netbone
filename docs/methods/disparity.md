@@ -10,8 +10,8 @@ source's outgoing and target's incoming weight distributions.
 Weights are required; the default `weight="auto"` reads the `weight`
 attribute, or name another strength attribute. Combine the endpoint p-values
 with `pvalue_aggregation="min"` (default), `"max"`, or `"average"`.
-`leaf_policy="ignore"` omits a degree-one endpoint and `"zero"` assigns it
-p-value zero. When both endpoints are ignored, the primary p-value is 1. The
+The default `leaf_policy="zero"` assigns a degree-one endpoint p-value zero;
+choose `"ignore"` to omit that endpoint. When both endpoints are ignored, the primary p-value is 1. The
 table exposes the endpoint fractions and p-values for diagnosis.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |

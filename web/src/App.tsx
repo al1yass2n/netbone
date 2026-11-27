@@ -1329,6 +1329,7 @@ function resolvedControls(controls: ControlSpec[], data: DataDraft, directed: bo
       next = { ...next, default: semantics === "distance" ? "identity" : semantics === "strength" ? "inverse" : null };
     }
     if (directed && control.ignored_when_directed) next = { ...next, disabled: true, disabled_reason: control.ignored_when_directed_reason };
+    if (!directed && control.ignored_when_undirected) next = { ...next, disabled: true, disabled_reason: control.ignored_when_undirected_reason };
     return next;
   });
 }

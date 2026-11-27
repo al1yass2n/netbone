@@ -34,7 +34,7 @@ DISPARITY_METADATA: dict[str, object] = {
     "default_filter": "significance",
     "default_pvalue_aggregation": "min",
     "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
-    "default_leaf_policy": "ignore",
+    "default_leaf_policy": "zero",
     "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
     "reference": "Serrano, Boguna, and Vespignani, PNAS 106(16) (2009).",
     "doi": "10.1073/pnas.0808904106",
@@ -46,7 +46,7 @@ def compute_disparity(
     *,
     weight: str = "weight",
     pvalue_aggregation: str = "min",
-    leaf_policy: str = "ignore",
+    leaf_policy: str = "zero",
 ) -> MethodResult:
     """Compute edge p-values from the disparity filter.
 
@@ -62,10 +62,9 @@ def compute_disparity(
         weight: Edge attribute containing finite positive weights.
         pvalue_aggregation: How to combine endpoint p-values: `min`, `max`, or
             `average`.
-        leaf_policy: How degree-one endpoints contribute: `ignore` ignores
-            them during aggregation when another endpoint is available, while
-            `zero` uses the previous behavior where leaf endpoint p-values are
-            `0.0`.
+        leaf_policy: How degree-one endpoints contribute. `zero` (default)
+            gives a leaf endpoint p-value `0.0`, while `ignore` leaves it out
+            of the aggregation when the other endpoint is available.
 
     Raises:
         ConfigurationError: If a method parameter value is invalid.

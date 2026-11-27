@@ -283,7 +283,7 @@ def _compute_disparity(
     )
     weight = parameters.get("weight")
     pvalue_aggregation = parameters.get("pvalue_aggregation", "min")
-    leaf_policy = parameters.get("leaf_policy", "ignore")
+    leaf_policy = parameters.get("leaf_policy", "zero")
     if not isinstance(weight, str):
         raise ConfigurationError("disparity parameter 'weight' must be a string.")
     if not isinstance(pvalue_aggregation, str):
@@ -710,11 +710,16 @@ def _compute_node_strength(
     network: Network,
     parameters: Mapping[str, object],
 ) -> MethodResult:
-    _reject_unknown_parameters("node_strength", parameters, {"weight"})
+    _reject_unknown_parameters("node_strength", parameters, {"direction", "weight"})
     weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError("node_strength parameter 'weight' must be a string.")
-    return compute_node_strength(network, weight=weight)
+    direction = parameters.get("direction", "total")
+    if not isinstance(direction, str):
+        raise ConfigurationError(
+            "node_strength parameter 'direction' must be a string."
+        )
+    return compute_node_strength(network, weight=weight, direction=direction)
 
 
 def _compute_node_betweenness(
