@@ -27,7 +27,7 @@ DIRECTED_SEMANTICS_WARNING = (
 
 LINK_PREDICTION_METADATA: dict[str, object] = {
     "name": "link_prediction",
-    "display_name": "Link Prediction Backbone Framework",
+    "display_name": "Link Prediction",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "link_prediction_similarity",

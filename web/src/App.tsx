@@ -28,7 +28,7 @@ import { api, downloadExperiment, downloadGraph, downloadJson } from "./api";
 import { CitationFooter } from "./components/CitationFooter";
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
 import { ControlField } from "./components/ControlField";
-import { withDirectedOnlyOptions } from "./sweepSetup";
+import { isControlShown, withDirectedOnlyOptions } from "./sweepSetup";
 import { Hint } from "./components/Hint";
 import LauncherBackdrop from "./components/LauncherBackdrop";
 import { NetworkPreview } from "./components/NetworkPreview";
@@ -68,6 +68,8 @@ import {
 } from "./utils";
 
 import { demoMode, loadDemo } from "./demo-api";
+
+const BACKBONE_READY_MESSAGE = "Backbone ready to inspect and export.";
 
 export default function App() {
   const [schema, setSchema] = useState<UiSchema | null>(null);
@@ -234,6 +236,15 @@ export default function App() {
     };
   }, [score, method, filterChosen, filterName, filterControls, currentPayload]);
 
+  // The screen-reader status describes the current scores and backbone, so it
+  // must not keep announcing them after a change clears them.
+  useEffect(() => {
+    if (!score && busy !== "score") setMessage("");
+  }, [score, busy]);
+  useEffect(() => {
+    if (!result && busy !== "filter") setMessage((current) => current === BACKBONE_READY_MESSAGE ? "" : current);
+  }, [result, busy]);
+
   function selectMethod(selected: MethodSpec) {
     if (!schema || !preview?.can_run || previewBusy || busy || methodCompatibility(selected) || (weighted && !context.weightSemantics)) return;
     setMethodName(selected.name);
@@ -373,7 +384,7 @@ export default function App() {
       const extraction = await api.filter({ score_id: score.score_id, guided: currentPayload().guided! });
       setResult(extraction);
       if (save) saveBackbone(extraction);
-      else setMessage("Backbone ready to inspect and export.");
+      else setMessage(BACKBONE_READY_MESSAGE);
     } catch (reason) {
       setError(errorMessage(reason));
       setMessage("");
@@ -830,7 +841,9 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
   const methodSpecs = method ? resolvedControls(schema.controls.methods[method.name] || [], data, Boolean(preview?.directed), context) : [];
   const basicMethodSpecs = methodSpecs.filter((control) => !control.advanced);
   const advancedMethodSpecs = methodSpecs.filter((control) => control.advanced);
-  const filterSpecs = method && filterChosen ? adjustedFilterControls(schema.controls.filters[filterName] || [], score, method) : [];
+  const filterSpecs = method && filterChosen
+    ? adjustedFilterControls(schema.controls.filters[filterName] || [], score, method).filter((control) => isControlShown(control, (name) => filterControls[name]))
+    : [];
   const basicFilterSpecs = filterSpecs.filter((control) => !control.advanced && control.name !== "drop_isolates");
   const advancedFilterSpecs = filterSpecs.filter((control) => control.advanced || control.name === "drop_isolates");
   const searchTerms = methodSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);

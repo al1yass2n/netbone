@@ -101,3 +101,33 @@ test("outgoing and incoming aggregation are offered only on directed networks", 
   assert.deepEqual(undirected.options.filter((option) => option.disabled).map((option) => option.value), ["out", "in"]);
   assert.equal(withDirectedOnlyOptions(control, true), control);
 });
+
+test("the random seed appears only when ties are broken at random", () => {
+  const tieSchema = {
+    ...schema,
+    controls: {
+      ...schema.controls,
+      filters: {
+        fraction: [
+          { name: "fraction", label: "Retained fraction", control: "range", default: 0.1, min: 0, max: 1 },
+          { name: "tie_policy", label: "Ties at the cutoff", control: "select", default: "include_all_ties",
+            options: [{ value: "include_all_ties", label: "keep all ties" }, { value: "random_seeded", label: "random, seeded" }] },
+          { name: "random_seed", label: "Random seed", control: "number", default: 0, min: 0, step: 1, advanced: true,
+            shown_when: { tie_policy: "random_seeded" } },
+        ],
+      },
+    },
+  };
+  const keys = (draft) => sweepSettings(draft, tieSchema, environment).map((setting) => setting.key);
+  const draft = newSweepDraft(1, method, "fraction", tieSchema, environment);
+  assert.ok(!keys(draft).includes("filter.random_seed"));
+  draft.fixed["filter.tie_policy"] = "random_seeded";
+  assert.ok(keys(draft).includes("filter.random_seed"));
+  draft.fixed["filter.random_seed"] = "7";
+  draft.variations = [{ id: 1, key: "filter.fraction", text: "0.2, 0.4" }];
+  assert.deepEqual(compileSweep([draft], tieSchema, environment).configurations[0].filter.parameters,
+    { fraction: [0.2, 0.4], tie_policy: "random_seeded", random_seed: 7 });
+  // Varying the tie policy can pick the random one, so the seed stays available.
+  const varied = { ...draft, fixed: {}, variations: [{ id: 1, key: "filter.tie_policy", text: "include_all_ties, random_seeded" }] };
+  assert.ok(keys(varied).includes("filter.random_seed"));
+});

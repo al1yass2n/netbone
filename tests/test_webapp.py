@@ -322,6 +322,50 @@ def test_webapp_ui_schema_keeps_filter_details_advanced() -> None:
     assert fraction_controls["tie_policy"]["advanced"] is True
 
 
+def test_webapp_offers_holm_and_seeded_random_ties() -> None:
+    filter_controls = ui_schema_payload()["controls"]["filters"]
+    significance = _controls_by_name(filter_controls["significance"])
+    fraction = _controls_by_name(filter_controls["fraction"])
+
+    assert "holm" in {item["value"] for item in significance["correction"]["options"]}
+    assert "random_seeded" in {
+        item["value"] for item in fraction["tie_policy"]["options"]
+    }
+    assert fraction["random_seed"]["shown_when"] == {"tie_policy": "random_seeded"}
+
+    holm = run_pipeline_from_payload(
+        _guided_payload(
+            method="disparity",
+            filter_name="significance",
+            controls={"alpha": 0.5, "correction": "holm"},
+        )
+    )
+    assert holm["pipeline"]["filter"]["parameters"]["correction"] == "holm"
+
+    def fraction_parameters(controls: Mapping[str, object]) -> dict[str, object]:
+        result = run_pipeline_from_payload(
+            _guided_payload(
+                method="node_degree", filter_name="fraction", controls=controls
+            )
+        )
+        return dict(result["pipeline"]["filter"]["parameters"])
+
+    seeded = fraction_parameters(
+        {"fraction": 0.5, "tie_policy": "random_seeded", "random_seed": 7}
+    )
+    assert seeded["tie_policy"] == "random_seeded"
+    assert seeded["random_seed"] == 7
+    # The seed box is hidden for the other tie rules, so a leftover value is not sent.
+    stable = fraction_parameters(
+        {"fraction": 0.5, "tie_policy": "exact_stable", "random_seed": 7}
+    )
+    assert "random_seed" not in stable
+    with pytest.raises(ValidationError, match="random_seed"):
+        fraction_parameters(
+            {"fraction": 0.5, "tie_policy": "random_seeded", "random_seed": 1.5}
+        )
+
+
 def test_webapp_ui_schema_illustrates_every_method_parameter() -> None:
     method_controls = ui_schema_payload()["controls"]["methods"]
 

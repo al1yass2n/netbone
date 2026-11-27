@@ -66,7 +66,11 @@ saved results show what was used. When auto picks weights for a shortest-path
 method, a warning reminds you that `distance_transform="inverse"` reads larger
 weights as stronger, closer ties. Pass `distance_transform="identity"` if
 larger weights mean longer or costlier links. `nb.describe_method(name)` reports
-`weight_mode` as `"required"`, `"optional"`, or `"ignored"`.
+`weight_mode` as `"required"`, `"optional"`, or `"ignored"`. Methods that
+ignore weights, such as GSPAR and Node Degree, still accept `weight=None` and
+`weight="auto"`, so one loop can pass the same weight to every method. Naming
+an attribute there records a warning in `result.warnings` that it has no
+effect.
 
 The 10% defaults use [fraction filtering](../filters/fraction.md), which
 can retain more when scores tie. Significance defaults use alpha 0.05 with

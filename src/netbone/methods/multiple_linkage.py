@@ -13,7 +13,7 @@ from netbone.results import MethodResult
 
 MULTIPLE_LINKAGE_METADATA: dict[str, object] = {
     "name": "multiple_linkage",
-    "display_name": "Multiple Linkage Analysis",
+    "display_name": "Multiple Linkage",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "multiple_linkage_selected",

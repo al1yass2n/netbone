@@ -5,7 +5,9 @@ Registered name `gspar`
 Ranks links by the Jaccard similarity of their endpoints' open neighborhoods,
 the count of common neighbors divided by the count of distinct neighbors. A
 higher value indicates more shared neighbors. The scorer takes no method
-parameters. Use a fraction filter to control how much the global ranking keeps
+parameters. It accepts `weight=None` or `weight="auto"`, and naming a weight
+attribute records a warning in `result.warnings`, because weights do not change
+the score. Use a fraction filter to control how much the global ranking keeps
 and report the realized fraction when scores tie.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |

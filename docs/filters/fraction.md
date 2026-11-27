@@ -20,6 +20,10 @@ requires an explicit direction.
 | `raise_on_tie` | Raise an error if the cutoff splits a tie. |
 | `random_seeded` | Choose the remaining items from the tied group using the required integer `random_seed`. |
 
+In the web app, these rules are under **Advanced filter options** as **Tie
+policy**. Choosing **random, seeded** shows a **Random seed** box, and the same
+seed always keeps the same tied items.
+
 Inspect the requested and actual counts in `result.selection.parameters`.
 Missing, non-numeric, or non-finite values cause a validation error. Use
 `drop_isolates=True` if you want an edge-target result without isolates.

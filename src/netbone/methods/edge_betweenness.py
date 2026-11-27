@@ -19,7 +19,7 @@ DISTANCE_ATTR = "_netbone_edge_betweenness_distance"
 
 EDGE_BETWEENNESS_METADATA: dict[str, object] = {
     "name": "edge_betweenness",
-    "display_name": "Edge Betweenness Centrality",
+    "display_name": "Edge Betweenness",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "edge_betweenness",

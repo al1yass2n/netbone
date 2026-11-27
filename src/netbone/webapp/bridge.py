@@ -7,7 +7,7 @@ import json
 import math
 import warnings
 from collections import OrderedDict
-from collections.abc import Mapping
+from collections.abc import Hashable, Mapping
 from dataclasses import dataclass, replace
 from heapq import nsmallest
 from io import BytesIO, StringIO
@@ -24,6 +24,7 @@ import networkx as nx
 import netbone as nb
 from netbone._json import JsonValue, json_mapping, json_records, json_value
 from netbone.exceptions import NetboneError, ValidationError
+from netbone.io import duplicate_edge_message
 
 MAX_STATISTICS_ROWS = 250
 MAX_GRAPH_EDGES = 1000
@@ -1995,10 +1996,26 @@ def _filter_controls() -> dict[str, list[dict[str, object]]]:
                 (
                     ("include_all_ties", "include all ties"),
                     ("exact_stable", "exact stable count"),
+                    ("random_seeded", "random, seeded"),
                     ("raise_on_tie", "raise on tie"),
                 ),
                 advanced=True,
             ),
+            {
+                **_number_control(
+                    "random_seed",
+                    "Random seed",
+                    0,
+                    minimum=0,
+                    step=1,
+                    advanced=True,
+                ),
+                "description": (
+                    "Seed for breaking ties at random. The same seed always keeps "
+                    "the same tied edges or nodes."
+                ),
+                "shown_when": {"tie_policy": "random_seeded"},
+            },
             _checkbox_control("drop_isolates", "Drop isolated nodes", False),
         ],
         "significance": [
@@ -2010,6 +2027,7 @@ def _filter_controls() -> dict[str, list[dict[str, object]]]:
                 (
                     ("none", "none"),
                     ("bonferroni", "Bonferroni"),
+                    ("holm", "Holm"),
                     ("fdr_bh", "FDR BH"),
                 ),
                 advanced=True,
@@ -2530,10 +2548,19 @@ def _guided_filter_parameters(
         )
         parameters["tie_policy"] = _option(
             controls.get("tie_policy"),
-            allowed={"include_all_ties", "exact_stable", "raise_on_tie"},
+            allowed={
+                "include_all_ties",
+                "exact_stable",
+                "random_seeded",
+                "raise_on_tie",
+            },
             default="include_all_ties",
             field="tie_policy",
         )
+        if parameters["tie_policy"] == "random_seeded":
+            parameters["random_seed"] = _integer_number(
+                controls.get("random_seed"), default=0, field="random_seed"
+            )
         if method_name == "link_prediction":
             parameters["direction"] = _link_prediction_direction(controls)
         return parameters
@@ -2546,7 +2573,7 @@ def _guided_filter_parameters(
         )
         parameters["correction"] = _option(
             controls.get("correction"),
-            allowed={"none", "bonferroni", "fdr_bh"},
+            allowed={"none", "bonferroni", "holm", "fdr_bh"},
             default="none",
             field="correction",
         )
@@ -2839,7 +2866,7 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     directed = _boolean(payload.get("directed"), default=False, field="directed")
 
     graph = nx.DiGraph() if directed else nx.Graph()
-    seen_edges: set[tuple[str, str]] = set()
+    seen_edges: dict[tuple[str, str], tuple[int, Hashable, Hashable]] = {}
     reader = csv.DictReader(StringIO(csv_text), delimiter=delimiter)
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
@@ -2877,17 +2904,20 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
             )
         )
         if edge_key in seen_edges:
-            edge_label = "arc" if directed else "edge"
             raise ValidationError(
-                f"CSV row {row_number} duplicates simple-graph {edge_label} "
-                f"({source_value!r}, {target_value!r})."
+                duplicate_edge_message(
+                    f"CSV row {row_number}",
+                    (source_value, target_value),
+                    seen_edges[edge_key],
+                    directed=directed,
+                    directed_hint="turn on Directed network",
+                )
             )
-        seen_edges.add(edge_key)
+        seen_edges[edge_key] = (row_number, source_value, target_value)
         if source_value == target_value:
             raise ValidationError(
                 f"CSV row {row_number} is a self-loop on {source_value!r}. "
-                "Self-loops are not supported; remove the row or load the file as "
-                "a temporal event list, which drops them."
+                "Self-loops are not supported; remove the row."
             )
         attributes: dict[str, object] = {}
         if weight is not None:

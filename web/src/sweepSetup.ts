@@ -41,6 +41,12 @@ export function withDirectedOnlyOptions(control: ControlSpec, directed: boolean)
   return { ...control, options: control.options.map((option) => option.directed_only ? { ...option, disabled: true } : option) };
 }
 
+/** Whether a control's `shown_when` conditions hold, reading other controls through `valueOf`. */
+export function isControlShown(control: ControlSpec, valueOf: (name: string) => ControlValue | undefined): boolean {
+  return !control.shown_when
+    || Object.entries(control.shown_when).every(([name, expected]) => String(valueOf(name) ?? "") === String(expected));
+}
+
 export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, weighted }: SweepEnvironment): SweepSetting[] {
   const method = schema.methods.find((item) => item.name === draft.method);
   const methodControls = (schema.controls.methods[draft.method] || []).filter(
@@ -66,7 +72,13 @@ export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, w
       return { ...control, default: "less_equal" };
     }
     return control;
-  });
+  }).filter((control, _index, controls) => isControlShown(control, (name) => {
+    // A varied setting can take the value that needs this control, so keep it.
+    const key = "filter." + name;
+    if (draft.variations.some((variation) => variation.key === key)) return control.shown_when?.[name];
+    const other = controls.find((item) => item.name === name);
+    return draft.fixed[key] ?? (draft.initialFilterParameters?.[name] as ControlValue | undefined) ?? other?.default ?? undefined;
+  }));
   if (draft.method === "link_prediction" && (draft.filter === "default" || draft.filter === "fraction")) {
     filterControls.push({
       name: "direction",

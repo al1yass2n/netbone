@@ -40,6 +40,15 @@ ASSET_TYPES = {
 }
 
 
+def _invalid_json_payload(error: json.JSONDecodeError) -> Mapping[str, object]:
+    return error_payload(
+        ValidationError(
+            f"Request body is not valid JSON ({error.msg} at line {error.lineno}, "
+            f"column {error.colno})."
+        )
+    )
+
+
 class PayloadTooLargeError(ValidationError):
     """Raised when a request body is larger than the server accepts."""
 
@@ -125,9 +134,15 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
         """Run a web pipeline request."""
 
         if not self._host_allowed() or not self._same_origin():
-            self.send_error(
+            self._write_json(
                 HTTPStatus.FORBIDDEN,
-                "Cross-origin requests to the Netbone web app are not allowed.",
+                {
+                    "status": "error",
+                    "error": "Forbidden",
+                    "message": (
+                        "Cross-origin requests to the Netbone web app are not allowed."
+                    ),
+                },
             )
             return
         path = urlparse(self.path).path
@@ -178,7 +193,7 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
             self._write_json(HTTPStatus.BAD_REQUEST, error_payload(exc))
             return
         except json.JSONDecodeError as exc:
-            self._write_json(HTTPStatus.BAD_REQUEST, error_payload(exc))
+            self._write_json(HTTPStatus.BAD_REQUEST, _invalid_json_payload(exc))
             return
         except Exception as exc:  # pragma: no cover - defensive HTTP boundary
             self._write_json(HTTPStatus.INTERNAL_SERVER_ERROR, error_payload(exc))
@@ -198,7 +213,7 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
             self._write_json(HTTPStatus.BAD_REQUEST, error_payload(exc))
             return
         except json.JSONDecodeError as exc:
-            self._write_json(HTTPStatus.BAD_REQUEST, error_payload(exc))
+            self._write_json(HTTPStatus.BAD_REQUEST, _invalid_json_payload(exc))
             return
         except Exception as exc:  # pragma: no cover - defensive HTTP boundary
             self._write_json(HTTPStatus.INTERNAL_SERVER_ERROR, error_payload(exc))

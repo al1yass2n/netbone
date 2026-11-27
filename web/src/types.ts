@@ -37,6 +37,8 @@ export interface ControlSpec {
   ignored_when_directed_reason?: string;
   ignored_when_undirected?: boolean;
   ignored_when_undirected_reason?: string;
+  /** Show the control only while these other controls hold these values. */
+  shown_when?: Record<string, ControlValue>;
   options?: OptionSpec[];
 }
 

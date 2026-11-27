@@ -3,8 +3,11 @@
 Registered name `node_degree`
 
 Ranks nodes by the number of incident links. The scorer takes no method
-parameters. Apply a fraction or threshold to keep nodes with the desired degree
-and use the resulting induced graph to inspect their connections.
+parameters. It accepts `weight=None` or `weight="auto"`, and naming a weight
+attribute records a warning in `result.warnings`. Use
+[Node Strength](node_strength.md) to sum weights instead. Apply a fraction or
+threshold to keep nodes with the desired degree and use the resulting induced
+graph to inspect their connections.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
 | --- | --- | --- | --- | --- |

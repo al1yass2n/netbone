@@ -12,7 +12,7 @@ from netbone.results import MethodResult
 
 PRIMARY_LINKAGE_METADATA: dict[str, object] = {
     "name": "primary_linkage",
-    "display_name": "Primary Linkage Analysis",
+    "display_name": "Primary Linkage",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "primary_linkage_selected",

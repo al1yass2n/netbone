@@ -18,7 +18,7 @@ EPSILON_MODES = frozenset({"absolute", "relative"})
 
 DOUBLY_STOCHASTIC_METADATA: dict[str, object] = {
     "name": "doubly_stochastic",
-    "display_name": "Doubly Stochastic Filter",
+    "display_name": "Doubly Stochastic",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "doubly_stochastic_score",

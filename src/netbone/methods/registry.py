@@ -164,9 +164,21 @@ def _resolve_weight_parameter(
     resolved = dict(parameters)
     mode = definition.metadata.get("weight_mode", "ignored")
     if mode == "ignored":
-        if resolved.get("weight", None) == AUTO_WEIGHT:
-            resolved.pop("weight")
-        return resolved, ()
+        # These methods never read weights, so any weight choice is accepted and
+        # dropped. Naming an attribute gets a warning, since it has no effect.
+        if "weight" not in resolved:
+            return resolved, ()
+        requested = resolved.pop("weight")
+        if requested is None or requested == AUTO_WEIGHT:
+            return resolved, ()
+        if not isinstance(requested, str):
+            raise ConfigurationError(
+                f"{definition.name} parameter 'weight' must be a string or None."
+            )
+        return resolved, (
+            f"{definition.metadata.get('display_name', definition.name)} ignores "
+            f"edge weights, so weight={requested!r} has no effect.",
+        )
     requested = resolved.get("weight", AUTO_WEIGHT)
     if requested != AUTO_WEIGHT:
         return resolved, ()

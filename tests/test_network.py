@@ -241,7 +241,9 @@ def test_from_edgelist_rejects_duplicate_undirected_edges(tmp_path) -> None:
         ]
     ).to_csv(path, index=False)
 
-    with pytest.raises(nb.ValidationError, match="Duplicate simple-graph edge"):
+    with pytest.raises(
+        nb.ValidationError, match="repeats the edge between 'a' and 'b' from row 2"
+    ):
         nb.from_edgelist(path)
 
 

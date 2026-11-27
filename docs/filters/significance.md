@@ -13,7 +13,8 @@ The filter selects rows whose adjusted p-value is strictly less than `alpha`
 | `fdr_bh` | Benjamini–Hochberg false discovery rate adjustment. |
 
 Choose the correction with the method's null model and the set of tests in
-mind. To omit isolated nodes after edge filtering, set `drop_isolates=True`.
+mind. The web app offers all four under **Advanced filter options**
+as **Correction**. To omit isolated nodes after edge filtering, set `drop_isolates=True`.
 
 ```python
 pvalues = nb.score(graph, "disparity", weight="weight")

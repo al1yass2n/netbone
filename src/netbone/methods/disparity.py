@@ -18,7 +18,7 @@ LEAF_POLICIES = frozenset({"ignore", "zero"})
 
 DISPARITY_METADATA: dict[str, object] = {
     "name": "disparity",
-    "display_name": "Disparity Filter",
+    "display_name": "Disparity",
     "target": "edge",
     "output_type": "pvalue",
     "primary_statistic": "disparity_pvalue",

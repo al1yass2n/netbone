@@ -13,7 +13,7 @@ from netbone.results import MethodResult
 
 MARGINAL_LIKELIHOOD_METADATA: dict[str, object] = {
     "name": "marginal_likelihood",
-    "display_name": "Marginal Likelihood Filter",
+    "display_name": "Marginal Likelihood",
     "target": "edge",
     "output_type": "pvalue",
     "primary_statistic": "marginal_likelihood_pvalue",

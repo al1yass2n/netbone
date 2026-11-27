@@ -508,3 +508,128 @@ def test_glanb_large_c_returns_the_exact_limit(c: float) -> None:
     values = statistics["glanb_significance"]
     assert values.notna().all()
     assert values.between(0.0, 1.0).all()
+
+
+def test_edgelist_rejects_a_header_only_file(tmp_path: Path) -> None:
+    path = _write(tmp_path, "empty.csv", "source,target,weight\n")
+
+    with pytest.raises(nb.ValidationError, match="has a header but no edges"):
+        nb.from_edgelist(path)
+
+
+def test_loaders_name_files_that_are_not_utf8(tmp_path: Path) -> None:
+    path = tmp_path / "latin.csv"
+    path.write_bytes("source,target,time\ncafé,b,1\n".encode("latin-1"))
+
+    with pytest.raises(nb.ValidationError, match="latin.csv is not UTF-8 text"):
+        nb.from_edgelist(path, weight=None)
+    with pytest.raises(nb.ValidationError, match="latin.csv is not UTF-8 text"):
+        nb.from_temporal_edgelist(path)
+
+
+def test_loaders_reject_a_folder_path(tmp_path: Path) -> None:
+    with pytest.raises(nb.ValidationError, match="is a folder, not a file"):
+        nb.from_edgelist(tmp_path)
+    with pytest.raises(nb.ValidationError, match="is a folder, not a file"):
+        nb.from_temporal_edgelist(tmp_path)
+
+
+def test_temporal_edgelist_names_mixed_numbers_and_dates(tmp_path: Path) -> None:
+    path = _write(tmp_path, "events.csv", "source,target,time\nA,B,1\nB,C,2024-01-05\n")
+
+    with pytest.raises(
+        nb.ValidationError, match=r"mixes numbers \(row 2\) and dates \(row 3\)"
+    ):
+        nb.from_temporal_edgelist(path)
+
+
+def test_temporal_edgelist_still_names_an_unreadable_time(tmp_path: Path) -> None:
+    path = _write(tmp_path, "events.csv", "source,target,time\nA,B,1\nB,C,banana\n")
+
+    with pytest.raises(nb.ValidationError, match="row 3 has an invalid"):
+        nb.from_temporal_edgelist(path)
+
+
+@pytest.mark.parametrize(
+    ("text", "directed", "message"),
+    [
+        (
+            "source,target\na,b\nb,a\n",
+            False,
+            r"row 3 \('b', 'a'\) repeats the edge between 'a' and 'b' from row 2\. "
+            r"In an undirected file both orders are the same edge; pass directed=True",
+        ),
+        (
+            "source,target\na,b\na,b\n",
+            False,
+            "row 3 repeats the edge between 'a' and 'b' from row 2. Merge repeated",
+        ),
+        (
+            "source,target\na,b\na,b\n",
+            True,
+            "row 3 repeats the arc 'a' -> 'b' from row 2. Merge repeated",
+        ),
+    ],
+)
+def test_edgelist_duplicate_messages_explain_the_fix(
+    tmp_path: Path, text: str, directed: bool, message: str
+) -> None:
+    path = _write(tmp_path, "edges.csv", text)
+
+    with pytest.raises(nb.ValidationError, match=message):
+        nb.from_edgelist(path, weight=None, directed=directed)
+
+
+def test_edgelist_reversed_arcs_are_fine_when_directed(tmp_path: Path) -> None:
+    path = _write(tmp_path, "edges.csv", "source,target\na,b\nb,a\n")
+
+    assert nb.from_edgelist(path, weight=None, directed=True).edge_count == 2
+
+
+def test_web_csv_duplicate_messages_point_at_the_directed_switch() -> None:
+    reversed_preview = preview_payload(
+        _csv_payload("source,target,weight\na,b,1\nb,a,2\n")
+    )
+    directed_payload = _csv_payload("source,target,weight\na,b,1\na,b,2\n")
+    directed_payload["directed"] = True
+    repeated_preview = preview_payload(directed_payload)
+    loop_preview = preview_payload(_csv_payload("source,target,weight\nc,c,2\n"))
+
+    assert "turn on Directed network to keep both directions" in str(
+        reversed_preview["errors"]
+    )
+    assert "repeats the arc 'a' -> 'b' from row 2" in str(repeated_preview["errors"])
+    assert "Self-loops are not supported; remove the row." in str(
+        loop_preview["errors"]
+    )
+
+
+def test_server_answers_cross_origin_posts_with_json(server_url: str) -> None:
+    body = json.dumps(_csv_payload("source,target,weight\na,b,1\n")).encode()
+
+    status, text = _post(f"{server_url}/api/run", body, {"Origin": "https://x.test"})
+
+    assert status == 403
+    assert json.loads(text) == {
+        "status": "error",
+        "error": "Forbidden",
+        "message": "Cross-origin requests to the Netbone web app are not allowed.",
+    }
+
+
+@pytest.mark.parametrize("path", ["/api/preview", "/api/export"])
+def test_server_names_the_place_where_json_breaks(server_url: str, path: str) -> None:
+    status, text = _post(f"{server_url}{path}", b'{"csv_text": "a,b"', {})
+
+    payload = json.loads(text)
+    assert status == 400
+    assert payload["error"] == "ValidationError"
+    assert payload["message"].startswith("Request body is not valid JSON (")
+    assert "line 1, column" in payload["message"]
+
+
+def test_method_display_names_match_the_documentation_titles() -> None:
+    docs = Path(__file__).resolve().parents[1] / "docs" / "methods"
+    for name in nb.list_methods():
+        title = (docs / f"{name}.md").read_text(encoding="utf-8").splitlines()[0]
+        assert nb.describe_method(name)["display_name"] == title.removeprefix("# ")

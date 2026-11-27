@@ -69,4 +69,19 @@ def test_node_degree_rejects_unknown_parameters() -> None:
     graph.add_edge("a", "b")
 
     with pytest.raises(nb.ConfigurationError, match="does not accept"):
-        nb.score(graph, method="node_degree", weight="weight")
+        nb.score(graph, method="node_degree", unknown=1)
+
+
+def test_node_degree_accepts_and_ignores_weight_choices() -> None:
+    graph = nx.Graph()
+    graph.add_edge("a", "b", weight=2.0)
+    graph.add_edge("b", "c", weight=1.0)
+
+    baseline = nb.score(graph, method="node_degree").statistics
+    for weight in (None, "auto"):
+        result = nb.score(graph, method="node_degree", weight=weight)
+        assert result.warnings == ()
+        assert result.statistics.equals(baseline)
+    named = nb.score(graph, method="node_degree", weight="weight")
+    assert named.statistics.equals(baseline)
+    assert any("ignores edge weights" in warning for warning in named.warnings)

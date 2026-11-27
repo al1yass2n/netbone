@@ -53,22 +53,63 @@ def _read_table(
 ) -> pd.DataFrame:
     """Read a delimited table keeping node ids exactly as written."""
 
+    if path.is_dir():
+        raise ValidationError(
+            f"{path} is a folder, not a file. Pass the CSV file path."
+        )
     _check_row_widths(path, delimiter=delimiter)
     with warnings.catch_warnings():
         # Extra trailing empty fields are already known to be empty here.
         warnings.simplefilter("ignore", pd.errors.ParserWarning)
-        return pd.read_csv(
-            path,
-            delimiter=delimiter,
-            dtype={column: str for column in id_columns},
-            keep_default_na=False,
-            na_values={
-                column: list(_MISSING_VALUE_MARKERS) for column in value_columns
-            },
-            skipinitialspace=True,
-            # Never promote the first column to an index when rows run long.
-            index_col=False,
+        try:
+            return pd.read_csv(
+                path,
+                delimiter=delimiter,
+                dtype={column: str for column in id_columns},
+                keep_default_na=False,
+                na_values={
+                    column: list(_MISSING_VALUE_MARKERS) for column in value_columns
+                },
+                skipinitialspace=True,
+                # Never promote the first column to an index when rows run long.
+                index_col=False,
+            )
+        except UnicodeDecodeError as exc:
+            raise ValidationError(
+                f"{path.name} is not UTF-8 text. Save it as UTF-8 (for example "
+                '"CSV UTF-8" in Excel) and load it again.'
+            ) from exc
+
+
+def duplicate_edge_message(
+    where: str,
+    endpoints: tuple[Hashable, Hashable],
+    first: tuple[int, Hashable, Hashable],
+    *,
+    directed: bool,
+    directed_hint: str = "pass directed=True",
+) -> str:
+    """Describe a repeated edge, naming the row that first defined it."""
+
+    source, target = endpoints
+    first_row, first_source, first_target = first
+    if directed:
+        return (
+            f"{where} repeats the arc {source!r} -> {target!r} from row {first_row}. "
+            "Merge repeated rows first, for example by summing their weights."
         )
+    if (source, target) != (first_source, first_target):
+        return (
+            f"{where} ({source!r}, {target!r}) repeats the edge between "
+            f"{first_source!r} and {first_target!r} from row {first_row}. In an "
+            f"undirected file both orders are the same edge; {directed_hint} to "
+            "keep both directions."
+        )
+    return (
+        f"{where} repeats the edge between {source!r} and {target!r} from row "
+        f"{first_row}. Merge repeated rows first, for example by summing their "
+        "weights."
+    )
 
 
 def _check_row_widths(path: Path, *, delimiter: str) -> None:
@@ -156,7 +197,7 @@ def from_edgelist(
 
     Raises:
         ValidationError: If required columns are missing, ids are missing, edge
-            weights are invalid, or duplicate simple-graph edges are present.
+            weights are invalid, an edge is repeated, or the file has no rows.
     """
 
     edge_path = Path(path)
@@ -185,9 +226,13 @@ def from_edgelist(
 
     if not isinstance(directed, bool):
         raise ValidationError("from_edgelist parameter 'directed' must be a boolean.")
+    if table.empty:
+        raise ValidationError(
+            f"Edge-list file {edge_path.name} has a header but no edges."
+        )
 
     graph = nx.DiGraph() if directed else nx.Graph()
-    seen_edges: set[tuple[Hashable, Hashable]] = set()
+    seen_edges: dict[tuple[Hashable, Hashable], tuple[int, Hashable, Hashable]] = {}
     source_ids, target_ids = _node_id_columns(table, source, target)
 
     for position, (_, row) in enumerate(table.iterrows()):
@@ -201,8 +246,7 @@ def from_edgelist(
         if source_value == target_value:
             raise CompatibilityError(
                 f"Edge-list row {row_number} is a self-loop on node "
-                f"{source_value!r}. Self-loops are not supported; remove the row "
-                "or load the data as a temporal event list, which drops them."
+                f"{source_value!r}. Self-loops are not supported; remove the row."
             )
 
         edge_attributes: dict[str, object] = {}
@@ -240,9 +284,14 @@ def from_edgelist(
         edge_key: tuple[Hashable, Hashable] = (first, second)
         if edge_key in seen_edges:
             raise ValidationError(
-                f"Duplicate simple-graph edge found in edge-list row {row_number}."
+                duplicate_edge_message(
+                    f"Edge-list row {row_number}",
+                    (source_value, target_value),
+                    seen_edges[edge_key],
+                    directed=directed,
+                )
             )
-        seen_edges.add(edge_key)
+        seen_edges[edge_key] = (row_number, source_value, target_value)
         graph.add_edge(source_value, target_value, **edge_attributes)
 
     metadata = (
@@ -483,6 +532,23 @@ def _temporal_times(
                 )
             parsed_numeric.append(int(result) if result.is_integer() else result)
         return parsed_numeric, "numeric"
+
+    is_number = numeric.notna().to_numpy()
+    if is_number.any():
+        number_position = int(is_number.nonzero()[0][0])
+        text_position = int((~is_number).nonzero()[0][0])
+        try:
+            pd.to_datetime(values.iloc[text_position], errors="raise", utc=True)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValidationError(
+                f"Temporal event-list row {text_position + 2} has an invalid "
+                f"numeric or datetime value in column {column!r} from {path}."
+            ) from exc
+        raise ValidationError(
+            f"Temporal event-list column {column!r} mixes numbers (row "
+            f"{number_position + 2}) and dates (row {text_position + 2}). Use one "
+            "kind of time value for every row."
+        )
 
     parsed_datetimes: list[TemporalTime] = []
     for position, value in enumerate(values):

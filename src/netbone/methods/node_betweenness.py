@@ -19,7 +19,7 @@ DISTANCE_ATTR = "_netbone_node_betweenness_distance"
 
 NODE_BETWEENNESS_METADATA: dict[str, object] = {
     "name": "node_betweenness",
-    "display_name": "Node Betweenness Centrality",
+    "display_name": "Node Betweenness",
     "target": "node",
     "output_type": "score",
     "primary_statistic": "node_betweenness",
