@@ -52,8 +52,11 @@ ported. It adds:
 - `describe_method()` and `describe_temporal_weighting()` return a `references`
   list, and reports copy the method references.
 - The web app offers the Holm correction, the seeded random tie policy, and a
-  link to the paper behind each method and temporal weighting. `netbone-web --max-upload-mb` sets the largest
-  accepted upload.
+  link to the paper behind each method and temporal weighting.
+  `--max-upload-mb` sets the largest accepted upload.
+- Edge lists and event lists can be separated by spaces. Pass
+  `delimiter=" "` in Python, or pick **Space** in the web app, which also
+  detects such files. Any run of spaces or tabs counts as one separator.
 
 **Stricter input checks**
 

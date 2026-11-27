@@ -521,7 +521,7 @@ export default function App() {
         ref={importInput}
         hidden
         type="file"
-        accept=".csv,.tsv,.txt,.graphml,.xml"
+        accept=".csv,.tsv,.txt,.edges,.graphml,.xml"
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) openNetworkFile(file);
@@ -711,7 +711,7 @@ function NetworkSettings({ data, context, preview, busy, schema, onData, onConte
                   <SelectField label="Event magnitude" value={data.eventWeight} options={headers} optional="Unit magnitude" onChange={(eventWeight) => changeColumns({ eventWeight })} />
                 </>
               ) : <SelectField label="Weight" value={data.weight} options={headers} optional="Unweighted" onChange={(weight) => changeColumns({ weight })} />}
-              <label className="field"><span>Delimiter</span><select value={data.delimiter} onChange={(event) => changeColumns({ delimiter: event.target.value })}><option value=",">Comma</option><option value=";">Semicolon</option><option value={"\t"}>Tab</option></select></label>
+              <label className="field"><span>Delimiter</span><select value={data.delimiter} onChange={(event) => changeColumns({ delimiter: event.target.value })}><option value=",">Comma</option><option value=";">Semicolon</option><option value={"\t"}>Tab</option><option value=" ">Space</option></select></label>
               <label className="toggle-row compact"><span><strong>Directed network</strong><small>Preserve source-to-target arcs.</small></span><input type="checkbox" checked={data.directed} onChange={(event) => changeColumns({ directed: event.target.checked })} /><i /></label>
               </>}
             </div>

@@ -32,7 +32,9 @@ python -c "import netbone; print(netbone.__version__)"
 ```
 
 You should see `0.3.0` when installing this version of the source tree. The
-browser app is included in this install.
+browser app is included in this install. Start it with
+`python -m netbone.webapp`, which works whether or not Python's scripts
+folder is on your `PATH`.
 
 ## Optional tools
 

@@ -381,6 +381,45 @@ def test_temporal_edgelist_accepts_trailing_delimiters(tmp_path: Path) -> None:
     assert temporal.events["time"].tolist() == [1, 2]
 
 
+def test_edgelist_reads_columns_separated_by_spaces_or_tabs(tmp_path: Path) -> None:
+    path = tmp_path / "network.txt"
+    path.write_text(
+        'source  target\tweight\nalice bob 4\n"New York"\tcarol 1\n\n  carol dana 2\n'
+    )
+
+    network = nb.from_edgelist(path, delimiter=" ")
+
+    edges = {
+        (network.node_id_to_original[u], network.node_id_to_original[v]): data["weight"]
+        for u, v, data in network.graph.edges(data=True)
+    }
+    assert edges == {
+        ("alice", "bob"): 4.0,
+        ("New York", "carol"): 1.0,
+        ("carol", "dana"): 2.0,
+    }
+
+
+def test_space_delimited_edgelist_rejects_rows_with_extra_values(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "network.txt"
+    path.write_text("source target weight\na b 1\nb c 2 9\n")
+
+    with pytest.raises(nb.ValidationError, match="Row 3 of network.txt has 4 values"):
+        nb.from_edgelist(path, delimiter=" ")
+
+
+def test_temporal_edgelist_reads_space_separated_columns(tmp_path: Path) -> None:
+    path = tmp_path / "events.txt"
+    path.write_text("source target time magnitude\nA B 0 2\nA  B 2 1\nB\tC 3 2\n")
+
+    temporal = nb.from_temporal_edgelist(path, delimiter=" ", event_weight="magnitude")
+
+    assert temporal.events["time"].tolist() == [0, 2, 3]
+    assert temporal.events["event_weight"].tolist() == [2.0, 1.0, 2.0]
+
+
 def test_temporal_edgelist_rejects_rows_with_extra_values(tmp_path: Path) -> None:
     path = tmp_path / "events.csv"
     path.write_text("source,target,time\na,b,1,x\n")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import math
+import re
 import warnings
 from collections.abc import Hashable
 from pathlib import Path
@@ -18,6 +19,11 @@ from netbone.network import Network, normalize_edgelist_graph, normalize_loaded_
 from netbone.temporal.model import EVENT_COLUMNS, TemporalNetwork
 
 TemporalTime: TypeAlias = int | float | pd.Timestamp
+
+WHITESPACE_DELIMITER = " "
+"""Delimiter value meaning any run of spaces or tabs separates two values."""
+
+_WHITESPACE_FIELD = re.compile(r'"((?:[^"]|"")*)"|(\S+)')
 
 # Markers pandas would read as missing. Node id columns ignore them so labels
 # such as "NA" (Namibia) or "None" stay ordinary node ids.
@@ -44,6 +50,18 @@ _MISSING_VALUE_MARKERS = (
 )
 
 
+def split_whitespace_fields(line: str) -> list[str]:
+    """Split a line on runs of spaces or tabs, keeping quoted values whole."""
+
+    return [
+        quoted.replace('""', '"') if quoted is not None else bare
+        for quoted, bare in (
+            (match.group(1), match.group(2))
+            for match in _WHITESPACE_FIELD.finditer(line)
+        )
+    ]
+
+
 def _read_table(
     path: Path,
     *,
@@ -64,7 +82,7 @@ def _read_table(
         try:
             return pd.read_csv(
                 path,
-                delimiter=delimiter,
+                delimiter=r"\s+" if delimiter == WHITESPACE_DELIMITER else delimiter,
                 dtype={column: str for column in id_columns},
                 keep_default_na=False,
                 na_values={
@@ -122,8 +140,12 @@ def _check_row_widths(path: Path, *, delimiter: str) -> None:
     if len(delimiter) != 1:
         return
     with path.open(newline="", encoding="utf-8-sig", errors="replace") as handle:
-        reader = csv.reader(handle, delimiter=delimiter, skipinitialspace=True)
-        header = next(reader, None)
+        reader = (
+            (split_whitespace_fields(line) for line in handle)
+            if delimiter == WHITESPACE_DELIMITER
+            else csv.reader(handle, delimiter=delimiter, skipinitialspace=True)
+        )
+        header = next((row for row in reader if row), None)
         if header is None:
             return
         width = len(header)
@@ -190,7 +212,9 @@ def from_edgelist(
         target: Column containing target node ids.
         weight: Optional column containing numeric edge weights. When provided,
             values are stored on edges as the canonical `weight` attribute.
-        delimiter: Field delimiter, defaulting to comma.
+        delimiter: Field delimiter, defaulting to comma. Pass `" "` for files
+            whose columns are separated by spaces or tabs; any run of them
+            counts as one separator, and quoted values may contain spaces.
         context: Optional user-supplied context retained in result metadata.
         directed: Whether source-to-target order defines directed arcs. When
             false, reversed rows are duplicate undirected edges.
@@ -371,7 +395,9 @@ def from_temporal_edgelist(
         time: Column containing numeric times or datetime values.
         event_weight: Optional numeric non-negative event magnitude column.
             Omit it to give every event magnitude `1.0`.
-        delimiter: Field delimiter, defaulting to comma.
+        delimiter: Field delimiter, defaulting to comma. Pass `" "` for files
+            whose columns are separated by spaces or tabs; any run of them
+            counts as one separator, and quoted values may contain spaces.
         context: Optional user context retained on aggregated networks.
         directed: Whether source-to-target order defines directed temporal arcs.
 

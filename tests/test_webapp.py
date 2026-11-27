@@ -728,7 +728,7 @@ def test_webapp_source_includes_graphml_import_controls() -> None:
     app = _frontend_text("App.tsx")
     utilities = _frontend_text("utils.ts")
 
-    assert 'accept=".csv,.tsv,.txt,.graphml,.xml"' in app
+    assert 'accept=".csv,.tsv,.txt,.edges,.graphml,.xml"' in app
     assert 'mode === "graphml"' in app
     assert "numeric_edge_attributes" in app
     assert "nextPreview.source_directed === true" in app
@@ -2939,3 +2939,52 @@ def test_webapp_live_graph_is_bounded_without_truncating_retention_counts() -> N
         for edge in sampled_graph["edges"]
     )
     assert filter_preview_payload(payload)["graph"] == sampled_graph
+
+
+def test_webapp_reads_space_separated_edge_and_event_lists() -> None:
+    static = _csv_payload_with_delimiter(
+        'source  target\tweight\nalice bob 4\n"New York" carol 1\n\n  carol dana 2\n'
+    )
+    temporal = _temporal_guided_payload(method="edge_weight")
+    temporal["csv_text"] = str(temporal["csv_text"]).replace(",", "   ")
+    temporal["delimiter"] = " "
+
+    static_preview = preview_payload(static)
+    temporal_preview = preview_payload(temporal)
+    comma_preview = preview_payload(_temporal_guided_payload(method="edge_weight"))
+
+    assert static_preview["valid"] is True
+    assert static_preview["edge_count"] == 3
+    assert static_preview["headers"] == ["source", "target", "weight"]
+    assert temporal_preview["valid"] is True
+    assert temporal_preview["edge_count"] == comma_preview["edge_count"]
+    assert temporal_preview["event_count"] == comma_preview["event_count"]
+    delimiter = next(
+        control
+        for control in ui_schema_payload()["controls"]["data"]
+        if control["name"] == "delimiter"
+    )
+    assert {"value": " ", "label": "Space"} in delimiter["options"]
+
+
+def test_webapp_space_delimiter_rejects_rows_with_extra_values() -> None:
+    preview = preview_payload(
+        _csv_payload_with_delimiter("source target weight\na b 1 9\n")
+    )
+
+    assert preview["valid"] is False
+    assert "row 2 has 4 values" in str(preview["errors"])
+
+
+def _csv_payload_with_delimiter(
+    csv_text: str, delimiter: str = " "
+) -> dict[str, object]:
+    return {
+        "csv_text": csv_text,
+        "source": "source",
+        "target": "target",
+        "weight": "weight",
+        "delimiter": delimiter,
+        "method": {"name": "edge_weight", "parameters": {"weight": "weight"}},
+        "filter": {"name": "fraction", "parameters": {"fraction": 0.5}},
+    }

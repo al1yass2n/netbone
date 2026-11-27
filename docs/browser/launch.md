@@ -1,15 +1,17 @@
 # Run the local web app
 
-Install Netbone in your [Python environment](../start/install.md), then run
-either of these commands.
-
-```bash
-netbone-web
-```
+Install Netbone in your [Python environment](../start/install.md), then start
+the app with the same Python.
 
 ```bash
 python -m netbone.webapp
 ```
+
+This command works on every system, because it runs the app through the
+Python that has Netbone installed. The install also adds a shorter
+`netbone-web` command. It works only when Python's scripts folder is on your
+`PATH`, as it is in an activated virtual environment. If your shell reports
+that `netbone-web` is not found, keep using `python -m netbone.webapp`.
 
 Open [127.0.0.1:8765](http://127.0.0.1:8765/) in a browser on the same machine.
 Keep the terminal open while you work. Press Ctrl+C there to stop the server.
@@ -25,7 +27,7 @@ build is only needed when developing the UI.
 
 ## Startup options
 
-`netbone-web --help` lists the startup settings.
+`python -m netbone.webapp --help` lists the startup settings.
 
 | Option | Default | Purpose |
 | --- | --- | --- |
@@ -36,13 +38,13 @@ build is only needed when developing the UI.
 If the default port is occupied, choose another local port.
 
 ```bash
-netbone-web --port 8766
+python -m netbone.webapp --port 8766
 ```
 
 Then open [127.0.0.1:8766](http://127.0.0.1:8766/).
 
 A larger upload is refused with a message naming the limit. Raise it with, for
-example, `netbone-web --max-upload-mb 500`.
+example, `python -m netbone.webapp --max-upload-mb 500`.
 
 ## Where data is processed
 

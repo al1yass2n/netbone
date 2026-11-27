@@ -85,10 +85,12 @@ def run(
         server.server_close()
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, prog: str | None = None) -> int:
     """Run the local web server from the command line."""
 
-    parser = argparse.ArgumentParser(description="Run the local Netbone web app.")
+    parser = argparse.ArgumentParser(
+        prog=prog, description="Run the local Netbone web app."
+    )
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--port", default=DEFAULT_PORT, type=int)
     parser.add_argument(

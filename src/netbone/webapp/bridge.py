@@ -24,7 +24,11 @@ import networkx as nx
 import netbone as nb
 from netbone._json import JsonValue, json_mapping, json_records, json_value
 from netbone.exceptions import NetboneError, ValidationError
-from netbone.io import duplicate_edge_message
+from netbone.io import (
+    WHITESPACE_DELIMITER,
+    duplicate_edge_message,
+    split_whitespace_fields,
+)
 
 MAX_STATISTICS_ROWS = 250
 MAX_GRAPH_EDGES = 1000
@@ -1853,6 +1857,7 @@ def _data_controls() -> list[dict[str, object]]:
                 {"value": ",", "label": "Comma"},
                 {"value": ";", "label": "Semicolon"},
                 {"value": "\t", "label": "Tab"},
+                {"value": " ", "label": "Space"},
             ],
         },
         {
@@ -2715,9 +2720,7 @@ def _temporal_data_from_payload(payload: Mapping[object, object]) -> dict[str, A
     target = _required_text(payload.get("target"), field="target")
     time = _required_text(payload.get("time"), field="time")
     event_weight = _optional_text(payload.get("event_weight"), field="event_weight")
-    delimiter = _delimiter(
-        _text_or_default(payload.get("delimiter"), default=",", field="delimiter")
-    )
+    delimiter = _delimiter(payload.get("delimiter"))
     context = _text_or_default(
         payload.get("context"), default="webapp temporal upload", field="context"
     )
@@ -2794,13 +2797,27 @@ def _reject_extra_values(
         )
 
 
+def _dict_reader(csv_text: str, delimiter: str) -> csv.DictReader[str]:
+    """Read rows by header name; a space delimiter splits on runs of whitespace."""
+
+    if delimiter != WHITESPACE_DELIMITER:
+        return csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    rows = StringIO()
+    writer = csv.writer(rows, delimiter="\t", lineterminator="\n")
+    for line in csv_text.splitlines():
+        fields = split_whitespace_fields(line)
+        if fields:
+            writer.writerow(fields)
+    return csv.DictReader(StringIO(rows.getvalue()), delimiter="\t")
+
+
 def _csv_records_preview(
     csv_text: str,
     *,
     delimiter: str,
     required_columns: tuple[str | None, ...],
 ) -> dict[str, Any]:
-    reader = csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    reader = _dict_reader(csv_text, delimiter)
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
@@ -2876,9 +2893,7 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     source = _required_text(payload.get("source"), field="source")
     target = _required_text(payload.get("target"), field="target")
     weight = _optional_text(payload.get("weight"), field="weight")
-    delimiter = _delimiter(
-        _text_or_default(payload.get("delimiter"), default=",", field="delimiter")
-    )
+    delimiter = _delimiter(payload.get("delimiter"))
     context = _text_or_default(
         payload.get("context"), default="webapp upload", field="context"
     )
@@ -2886,7 +2901,7 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
 
     graph = nx.DiGraph() if directed else nx.Graph()
     seen_edges: dict[tuple[str, str], tuple[int, Hashable, Hashable]] = {}
-    reader = csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    reader = _dict_reader(csv_text, delimiter)
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
@@ -3336,12 +3351,21 @@ def _optional_text(value: object, *, field: str) -> str | None:
     return text if text else None
 
 
-def _delimiter(value: str) -> str:
-    if value == r"\t":
+def _delimiter(value: object) -> str:
+    if value is None:
+        return ","
+    if not isinstance(value, str):
+        raise ValidationError("delimiter must be a string.")
+    if value == "":
+        return ","
+    if value in {"\t", r"\t"}:
         return "\t"
-    if value not in {",", ";", "\t"}:
-        raise ValidationError("delimiter must be ',', ';', or tab.")
-    return value
+    if value == "space" or value.isspace():
+        return WHITESPACE_DELIMITER
+    text = value.strip()
+    if text not in {",", ";"}:
+        raise ValidationError("delimiter must be ',', ';', tab, or space.")
+    return text
 
 
 def _number(value: object, *, default: float, field: str) -> float:

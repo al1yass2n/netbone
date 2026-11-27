@@ -10,7 +10,7 @@ node labels and input attributes. The input graph stays available as
 
 | Input | Python entry point | How weights and direction are handled |
 | --- | --- | --- |
-| CSV or TSV edge list | `nb.from_edgelist(path)` | Selected weight column becomes `weight`. Set `weight=None` for files without a weight column and `delimiter="\t"` for TSV. |
+| CSV, TSV, or space-separated edge list | `nb.from_edgelist(path)` | Selected weight column becomes `weight`. Set `weight=None` for files without a weight column, `delimiter="\t"` for TSV, and `delimiter=" "` for columns separated by spaces. |
 | GraphML | `nb.from_graphml(path)` | Direction and node and edge attributes come from the file. Pass the chosen numeric attribute to the scoring method. |
 | NetworkX | `nb.from_graph(graph)` | A simple `Graph` or `DiGraph` is normalized. Scoring and pipeline execution also accept NetworkX graphs directly. |
 | Time-stamped rows | `nb.from_temporal_edgelist(path)` | [Aggregate events into a weighted graph](temporal.md) before running a pipeline. |
@@ -26,7 +26,9 @@ repeat an edge before loading, for example by summing their weights.
 Node ids are read as written: a column of plain integers such as `1, 2, 10`
 becomes Python ints, and anything else, including `007`, `NA`, or `None`, stays
 a string label. Spaces after the delimiter are ignored, and so is a trailing
-delimiter at the end of each row. A row with more non-empty values than the
+delimiter at the end of each row. With `delimiter=" "`, any run of spaces or
+tabs separates two values, so aligned columns load as they look. Put a label
+that contains a space in double quotes, as in `"New York"`. A row with more non-empty values than the
 header has columns is rejected with its row number, because its columns would
 not line up. Weights must be finite numbers (`true` and `false` are rejected),
 and a self-loop row is rejected with its row number. GraphML or a NetworkX
