@@ -11,6 +11,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods.link_prediction import (
     DIRECTED_SEMANTICS_WARNING,
     DISTANCE_TRANSFORMS,
@@ -54,12 +55,7 @@ LINK_PREDICTION_IFOREST_METADATA: dict[str, object] = {
     "optional_dependency": "scikit-learn",
     "selection_uses_contamination": False,
     "directed_semantics": LINK_PREDICTION_METADATA["directed_semantics"],
-    "reference": "Integrating Link Prediction and Isolation Forest for Backbone "
-    "Extraction, WAW 2025, LNCS 15699 (2025).",
-    "doi": "10.1007/978-3-031-92898-7_13",
-    "isolation_forest_reference": "Isolation Forest, IEEE International Conference "
-    "on Data Mining (2008).",
-    "isolation_forest_doi": "10.1109/ICDM.2008.17",
+    **reference_metadata("link_prediction_iforest"),
 }
 
 

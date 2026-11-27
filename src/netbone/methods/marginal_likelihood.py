@@ -7,6 +7,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import binomial_upper_tail, integer_edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -28,8 +29,7 @@ MARGINAL_LIKELIHOOD_METADATA: dict[str, object] = {
     "supports_self_loops": False,
     "default_filter": "significance",
     "default_weight": "auto",
-    "reference": "Dianati, Physical Review E 93, 012304 (2016).",
-    "doi": "10.1103/PhysRevE.93.012304",
+    **reference_metadata("marginal_likelihood"),
 }
 
 

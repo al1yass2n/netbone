@@ -166,6 +166,7 @@ def _result_report(result: BackboneResult, *, title: str | None) -> Report:
         "parameters": dict(method_result.parameters),
         "reference": method_result.metadata.get("reference"),
         "doi": method_result.metadata.get("doi"),
+        "references": _method_references(method_result.metadata),
     }
     filter_section = {
         "name": filter_name,
@@ -287,6 +288,13 @@ def _sweep_report(sweep_result: SweepResult, *, title: str | None) -> Report:
             },
         },
     )
+
+
+def _method_references(metadata: Mapping[str, object]) -> list[dict[str, object]]:
+    references = metadata.get("references", ())
+    if not isinstance(references, list | tuple):
+        return []
+    return [dict(item) for item in references if isinstance(item, Mapping)]
 
 
 def _comparison_result_row(name: str, result: BackboneResult) -> dict[str, object]:
@@ -431,7 +439,9 @@ def _markdown_value(value: JsonValue) -> str:
         return "true" if value else "false"
     if isinstance(value, int | float | str):
         return str(value)
-    return json.dumps(json_value(value), sort_keys=True, separators=(",", ":"))
+    return json.dumps(
+        json_value(value), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
 
 
 def _escape_table(value: str) -> str:

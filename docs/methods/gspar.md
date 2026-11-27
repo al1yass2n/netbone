@@ -27,4 +27,6 @@ result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").r
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1145/1989323.1989399)
+## References
+
+- Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of Data, 721–732. ACM. [doi:10.1145/1989323.1989399](https://doi.org/10.1145/1989323.1989399)

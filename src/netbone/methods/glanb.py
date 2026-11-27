@@ -9,6 +9,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -32,8 +33,7 @@ GLANB_METADATA: dict[str, object] = {
     "default_filter": "significance",
     "default_weight": "auto",
     "requires_parameter": ("c",),
-    "reference": "Zhang et al., PLoS ONE 9(6): e100428 (2014).",
-    "doi": "10.1371/journal.pone.0100428",
+    **reference_metadata("glanb"),
 }
 
 

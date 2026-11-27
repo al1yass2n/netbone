@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -37,8 +38,7 @@ DISPARITY_METADATA: dict[str, object] = {
     "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
     "default_leaf_policy": "zero",
     "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
-    "reference": "Serrano, Boguna, and Vespignani, PNAS 106(16) (2009).",
-    "doi": "10.1073/pnas.0808904106",
+    **reference_metadata("disparity"),
 }
 
 

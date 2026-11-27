@@ -11,6 +11,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -39,8 +40,7 @@ EDGE_BETWEENNESS_METADATA: dict[str, object] = {
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
     "default_normalized": True,
-    "reference": "Girvan and Newman, PNAS 99(12): 7821-7826 (2002).",
-    "doi": "10.1073/pnas.122653799",
+    **reference_metadata("edge_betweenness"),
 }
 
 

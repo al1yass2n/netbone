@@ -26,4 +26,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1073/pnas.122653799)
+## References
+
+- Girvan, M., & Newman, M. E. J. (2002). Community structure in social and biological networks. Proceedings of the National Academy of Sciences, 99(12), 7821–7826. [doi:10.1073/pnas.122653799](https://doi.org/10.1073/pnas.122653799)

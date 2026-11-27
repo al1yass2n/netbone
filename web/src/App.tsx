@@ -1052,7 +1052,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           </div>
           {!method && <p className="analysis-step-intro">Choose how Netbone scores the nodes or edges in this network.</p>}
           {method && <div className="analysis-selection-row">
-            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint></div>
+            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint>{method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}</div>
             {!demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
           </div>}
           {!score && (selectedBlocked || basicMethodSpecs.length > 0 || advancedMethodSpecs.length > 0) && <div className="scoring-settings">{scoringSettings}</div>}

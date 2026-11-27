@@ -11,6 +11,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -40,8 +41,7 @@ NODE_BETWEENNESS_METADATA: dict[str, object] = {
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
     "default_normalized": True,
     "default_endpoints": False,
-    "reference": "Brandes, Journal of Mathematical Sociology 25(2): 163-177 (2001).",
-    "doi": "10.1080/0022250X.2001.9990249",
+    **reference_metadata("node_betweenness"),
 }
 
 

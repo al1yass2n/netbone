@@ -48,4 +48,6 @@ result = candidate.filter("significance", alpha=0.05, correction="holm").run(gra
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1073/pnas.0808904106)
+## References
+
+- Serrano, M. Á., Boguñá, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Sciences, 106(16), 6483–6488. [doi:10.1073/pnas.0808904106](https://doi.org/10.1073/pnas.0808904106)

@@ -25,4 +25,6 @@ result = candidate.filter("significance", alpha=0.05, correction="holm").run(gra
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1103/PhysRevE.93.012304)
+## References
+
+- Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93(1), 012304. [doi:10.1103/PhysRevE.93.012304](https://doi.org/10.1103/PhysRevE.93.012304)

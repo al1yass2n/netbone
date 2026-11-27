@@ -27,3 +27,10 @@ candidate = nb.pipeline().score("maximum_spanning_forest", weight="weight")
 result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
+
+## References
+
+Kruskal's algorithm builds the forest. Mantegna used the spanning tree to filter correlation networks.
+
+- Kruskal, J. B. (1956). On the shortest spanning subtree of a graph and the traveling salesman problem. Proceedings of the American Mathematical Society, 7(1), 48–50. [doi:10.1090/S0002-9939-1956-0078686-7](https://doi.org/10.1090/S0002-9939-1956-0078686-7)
+- Mantegna, R. N. (1999). Hierarchical structure in financial markets. The European Physical Journal B, 11(1), 193–197. [doi:10.1007/s100510050929](https://doi.org/10.1007/s100510050929)

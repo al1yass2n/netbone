@@ -29,4 +29,9 @@ result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").r
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1080/0022250X.2001.9990249)
+## References
+
+Freeman defined the measure. Netbone computes it with Brandes's algorithm through NetworkX.
+
+- Freeman, L. C. (1977). A set of measures of centrality based on betweenness. Sociometry, 40(1), 35–41. [doi:10.2307/3033543](https://doi.org/10.2307/3033543)
+- Brandes, U. (2001). A faster algorithm for betweenness centrality. Journal of Mathematical Sociology, 25(2), 163–177. [doi:10.1080/0022250X.2001.9990249](https://doi.org/10.1080/0022250X.2001.9990249)

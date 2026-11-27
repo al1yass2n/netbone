@@ -27,4 +27,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1038/s41598-018-32430-1)
+## References
+
+- Zhang, R. J., Stanley, H. E., & Ye, F. Y. (2018). Extracting h-backbone as a core structure in weighted networks. Scientific Reports, 8, 14356. [doi:10.1038/s41598-018-32430-1](https://doi.org/10.1038/s41598-018-32430-1)

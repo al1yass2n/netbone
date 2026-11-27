@@ -29,4 +29,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1109/ICDE.2017.100)
+## References
+
+- Coscia, M., & Neffke, F. M. H. (2017). Network backboning with noisy data. In 2017 IEEE 33rd International Conference on Data Engineering (ICDE), 425–436. IEEE. [doi:10.1109/ICDE.2017.100](https://doi.org/10.1109/ICDE.2017.100)

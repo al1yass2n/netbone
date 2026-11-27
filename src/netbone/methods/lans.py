@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -37,8 +38,7 @@ LANS_METADATA: dict[str, object] = {
     "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
     "default_leaf_policy": "zero",
     "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
-    "reference": "Foti, Hughes, and Rockmore, PLoS ONE 6(2): e16431 (2011).",
-    "doi": "10.1371/journal.pone.0016431",
+    **reference_metadata("lans"),
 }
 
 

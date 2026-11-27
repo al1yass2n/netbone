@@ -33,4 +33,6 @@ result = candidate.filter("fraction", fraction=0.5, direction="lower").run(graph
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1007/s41109-025-00705-y)
+## References
+
+- Yassin, A., Cherifi, H., Seba, H., & Togni, O. (2025). High and low similarity backbone extraction using similarity-based link prediction. Applied Network Science, 10(1). [doi:10.1007/s41109-025-00705-y](https://doi.org/10.1007/s41109-025-00705-y)

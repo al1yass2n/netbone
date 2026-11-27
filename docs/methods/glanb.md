@@ -26,4 +26,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1371/journal.pone.0100428)
+## References
+
+- Zhang, X., Zhang, Z., Zhao, H., Wang, Q., & Zhu, J. (2014). Extracting the globally and locally adaptive backbone of complex networks. PLoS ONE, 9(6), e100428. [doi:10.1371/journal.pone.0100428](https://doi.org/10.1371/journal.pone.0100428)

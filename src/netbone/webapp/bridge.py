@@ -1777,7 +1777,20 @@ def _method_card(name: str, metadata: Mapping[str, object]) -> dict[str, object]
         "recommended_filter": default_filter,
         "default_filter_parameters": dict(default_filter_parameters),
         "filter_reason": _filter_reason(default_filter, output_type, name),
+        "references": _method_references(metadata),
+        "reference_note": metadata.get("reference_note"),
     }
+
+
+def _method_references(metadata: Mapping[str, object]) -> list[dict[str, str]]:
+    references = metadata.get("references", ())
+    if not isinstance(references, list | tuple):
+        return []
+    return [
+        {key: str(item[key]) for key in ("citation", "doi", "url") if key in item}
+        for item in references
+        if isinstance(item, Mapping)
+    ]
 
 
 def _filter_cards() -> list[dict[str, object]]:

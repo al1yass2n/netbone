@@ -30,4 +30,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1073/pnas.0904725106)
+## References
+
+- Slater, P. B. (2009). A two-stage algorithm for extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Sciences, 106(26), E66. [doi:10.1073/pnas.0904725106](https://doi.org/10.1073/pnas.0904725106)

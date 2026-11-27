@@ -9,6 +9,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import integer_edge_weights
 from netbone.network import Network
 from netbone.results import MethodResult
@@ -32,8 +33,7 @@ NOISE_CORRECTED_METADATA: dict[str, object] = {
     "default_filter": "threshold",
     "default_filter_parameters": {"value": 1.64, "operator": "greater"},
     "default_weight": "auto",
-    "reference": "Coscia and Neffke, IEEE ICDE, pp. 425–436 (2017).",
-    "doi": "10.1109/ICDE.2017.100",
+    **reference_metadata("noise_corrected"),
 }
 
 

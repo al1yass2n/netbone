@@ -10,6 +10,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -58,9 +59,7 @@ LINK_PREDICTION_METADATA: dict[str, object] = {
         "local_path": "forward directed paths of length two and three from source "
         "to target",
     },
-    "reference": "Link prediction perspective on network backbone extraction, "
-    "Applied Network Science (2025).",
-    "doi": "10.1007/s41109-025-00705-y",
+    **reference_metadata("link_prediction"),
 }
 
 

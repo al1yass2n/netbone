@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import (
     DISTANCE_TRANSFORMS,
     edge_betweenness_by_edge_id,
@@ -39,8 +40,7 @@ H_BACKBONE_METADATA: dict[str, object] = {
     "default_weight": "auto",
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
-    "reference": "Zhang, Stanley, and Ye, Scientific Reports 8, 14356 (2018).",
-    "doi": "10.1038/s41598-018-32430-1",
+    **reference_metadata("h_backbone"),
 }
 
 

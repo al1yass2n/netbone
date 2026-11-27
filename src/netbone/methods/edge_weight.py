@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -25,6 +26,7 @@ EDGE_WEIGHT_METADATA: dict[str, object] = {
     "weight_mode": "optional",
     "default_weight": "auto",
     "supports_multigraph": False,
+    **reference_metadata("edge_weight"),
 }
 
 

@@ -22,3 +22,7 @@ candidate = nb.pipeline().score("edge_weight", weight="weight")
 result = candidate.filter("threshold", value=5, operator="greater_equal").run(graph)
 print(result.summary())
 ```
+
+## References
+
+Edge Weight is a baseline that ranks edges by their own weight, so it has no single source paper.

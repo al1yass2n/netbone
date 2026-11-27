@@ -62,6 +62,14 @@ export interface MethodSpec {
   meaning_template?: string;
   score_meaning_template?: string;
   filter_reason?: string;
+  references?: MethodReference[];
+  reference_note?: string | null;
+}
+
+export interface MethodReference {
+  citation: string;
+  doi: string;
+  url: string;
 }
 
 export type FilterName = "default" | "fraction" | "significance" | "threshold";

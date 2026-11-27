@@ -48,4 +48,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1371/journal.pone.0016431)
+## References
+
+- Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. PLoS ONE, 6(2), e16431. [doi:10.1371/journal.pone.0016431](https://doi.org/10.1371/journal.pone.0016431)

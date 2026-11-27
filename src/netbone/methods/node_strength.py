@@ -10,6 +10,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import Network
 from netbone.results import MethodResult
 
@@ -37,6 +38,7 @@ NODE_STRENGTH_METADATA: dict[str, object] = {
     "default_weight": "auto",
     "default_direction": "total",
     "direction_options": ("in", "out", "total"),
+    **reference_metadata("node_strength"),
 }
 
 

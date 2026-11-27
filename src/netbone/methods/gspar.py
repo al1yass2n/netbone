@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -27,8 +28,7 @@ GSPAR_METADATA: dict[str, object] = {
         "fraction": 0.1,
     },
     "neighborhood": "open",
-    "reference": "Satuluri, Parthasarathy, and Ruan, SIGMOD 2011.",
-    "doi": "10.1145/1989323.1989399",
+    **reference_metadata("gspar"),
 }
 
 

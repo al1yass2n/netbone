@@ -30,3 +30,7 @@ result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").r
 )
 print(result.summary())
 ```
+
+## References
+
+- Barrat, A., Barthélemy, M., Pastor-Satorras, R., & Vespignani, A. (2004). The architecture of complex weighted networks. Proceedings of the National Academy of Sciences, 101(11), 3747–3752. [doi:10.1073/pnas.0400087101](https://doi.org/10.1073/pnas.0400087101)

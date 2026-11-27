@@ -10,6 +10,7 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -34,6 +35,7 @@ MAXIMUM_SPANNING_FOREST_METADATA: dict[str, object] = {
     },
     "default_weight": "auto",
     "tie_policy": "stable_edge_id",
+    **reference_metadata("maximum_spanning_forest"),
 }
 
 

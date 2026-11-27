@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.network import Network
 from netbone.results import MethodResult
 
@@ -26,6 +27,7 @@ NODE_DEGREE_METADATA: dict[str, object] = {
     "default_filter_parameters": {
         "fraction": 0.1,
     },
+    **reference_metadata("node_degree"),
 }
 
 

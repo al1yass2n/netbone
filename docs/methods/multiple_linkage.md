@@ -26,4 +26,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1111/j.1467-9663.2009.00547.x)
+## References
+
+- Van Nuffel, N. (2007). Determination of the number of significant flows in origin–destination specific analysis: The case of commuting in Flanders. Regional Studies, 41(4), 509–524. [doi:10.1080/00343400701281808](https://doi.org/10.1080/00343400701281808)

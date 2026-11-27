@@ -23,4 +23,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1111/j.1467-9663.2009.00547.x)
+## References
+
+- Nystuen, J. D., & Dacey, M. F. (1961). A graph theory interpretation of nodal regions. Papers of the Regional Science Association, 7(1), 29–42. [doi:10.1111/j.1435-5597.1961.tb01769.x](https://doi.org/10.1111/j.1435-5597.1961.tb01769.x)

@@ -7,6 +7,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -33,8 +34,7 @@ MULTIPLE_LINKAGE_METADATA: dict[str, object] = {
     },
     "default_weight": "auto",
     "tie_policy": "stable_edge_id",
-    "reference": "Nocaj, Ortmann, and Brandes, Computer Graphics Forum 28(3), 2009.",
-    "doi": "10.1111/j.1467-9663.2009.00547.x",
+    **reference_metadata("multiple_linkage"),
 }
 
 

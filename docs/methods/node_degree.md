@@ -25,3 +25,7 @@ result = candidate.filter("fraction", fraction=0.5, tie_policy="exact_stable").r
 )
 print(result.summary())
 ```
+
+## References
+
+- Freeman, L. C. (1978). Centrality in social networks: Conceptual clarification. Social Networks, 1(3), 215–239. [doi:10.1016/0378-8733(78)90021-7](https://doi.org/10.1016/0378-8733(78)90021-7)

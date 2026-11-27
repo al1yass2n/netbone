@@ -33,4 +33,9 @@ result = candidate.filter("fraction", fraction=0.5).run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1007/978-3-031-92898-7_13)
+## References
+
+The first paper defines the method. The second defines the Isolation Forest model it applies.
+
+- Yassin, A., Cherifi, H., Seba, H., & Togni, O. (2025). Integrating link prediction and isolation forest for backbone extraction. In Modelling and Mining Networks (WAW 2025), Lecture Notes in Computer Science 15699, 189–204. Springer. [doi:10.1007/978-3-031-92898-7_13](https://doi.org/10.1007/978-3-031-92898-7_13)
+- Liu, F. T., Ting, K. M., & Zhou, Z.-H. (2008). Isolation forest. In 2008 Eighth IEEE International Conference on Data Mining, 413–422. IEEE. [doi:10.1109/ICDM.2008.17](https://doi.org/10.1109/ICDM.2008.17)

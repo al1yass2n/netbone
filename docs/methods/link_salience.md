@@ -27,4 +27,6 @@ result = candidate.filter("default").run(graph)
 print(result.summary())
 ```
 
-[Algorithm reference](https://doi.org/10.1038/ncomms1847)
+## References
+
+- Grady, D., Thiemann, C., & Brockmann, D. (2012). Robust classification of salient links in complex networks. Nature Communications, 3, 864. [doi:10.1038/ncomms1847](https://doi.org/10.1038/ncomms1847)
