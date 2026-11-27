@@ -8,6 +8,7 @@ import math
 import re
 import shutil
 import sys
+import warnings
 from collections.abc import Mapping
 from pathlib import Path
 from typing import TypeAlias, TypeVar
@@ -59,6 +60,8 @@ def save_experiment(
         subject: `BackboneResult`, `Comparison`, or `SweepResult` to export.
         path: Destination directory for the bundle.
         overwrite: Whether an existing destination directory may be replaced.
+            Only empty directories and earlier Netbone bundles are replaced;
+            any other existing directory is left untouched.
 
     Raises:
         ConfigurationError: If the subject type is unsupported.
@@ -111,6 +114,12 @@ def _prepare_directory(path: str | Path, *, overwrite: bool) -> Path:
             raise ValidationError(
                 f"Experiment bundle directory already exists: {destination}."
             )
+        if not _is_replaceable_bundle(destination):
+            raise ValidationError(
+                f"Refusing to overwrite {destination}: it is not empty and is not "
+                "a Netbone experiment bundle (no manifest.json with "
+                "bundle_schema_version). Choose a new or empty directory."
+            )
         try:
             shutil.rmtree(destination)
         except OSError as exc:
@@ -124,6 +133,18 @@ def _prepare_directory(path: str | Path, *, overwrite: bool) -> Path:
             f"Experiment bundle directory could not be created: {destination}."
         ) from exc
     return destination
+
+
+def _is_replaceable_bundle(directory: Path) -> bool:
+    """Return whether overwrite may delete this existing directory."""
+
+    try:
+        if not any(directory.iterdir()):
+            return True
+        manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(manifest, Mapping) and "bundle_schema_version" in manifest
 
 
 def _write_report_files(destination: Path, experiment_report: Report) -> dict[str, str]:
@@ -593,6 +614,7 @@ def _graph_copy_for_export(graph: nx.Graph) -> nx.Graph:
 
 
 def _write_graphml(path: Path, graph: nx.Graph) -> None:
+    _warn_on_text_label_collisions(path, graph)
     graphml_graph = _strip_viz_attributes(graph)
     _restore_graph_defaults(graphml_graph)
     try:
@@ -601,6 +623,25 @@ def _write_graphml(path: Path, graph: nx.Graph) -> None:
         raise ValidationError(
             f"Experiment GraphML file could not be written: {path}."
         ) from exc
+
+
+def _warn_on_text_label_collisions(path: Path, graph: nx.Graph) -> None:
+    """Warn when distinct node ids share one text label in GraphML or GEXF."""
+
+    seen: dict[str, object] = {}
+    for node in graph.nodes:
+        text = str(node)
+        if text in seen and seen[text] != node:
+            warnings.warn(
+                f"Nodes {seen[text]!r} and {node!r} are both written as {text!r} "
+                f"in {path.name}; the exported graph merges them and cannot be "
+                "reloaded faithfully. Relabel the nodes to distinct strings, or "
+                "use the CSV tables in the bundle.",
+                UserWarning,
+                stacklevel=3,
+            )
+            return
+        seen[text] = node
 
 
 def _restore_graph_defaults(graph: nx.Graph) -> None:

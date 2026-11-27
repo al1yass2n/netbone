@@ -28,6 +28,7 @@ import { api, downloadExperiment, downloadGraph, downloadJson } from "./api";
 import { CitationFooter } from "./components/CitationFooter";
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
 import { ControlField } from "./components/ControlField";
+import { isControlShown, withDirectedOnlyOptions } from "./sweepSetup";
 import { Hint } from "./components/Hint";
 import LauncherBackdrop from "./components/LauncherBackdrop";
 import { NetworkPreview } from "./components/NetworkPreview";
@@ -67,6 +68,8 @@ import {
 } from "./utils";
 
 import { demoMode, loadDemo } from "./demo-api";
+
+const BACKBONE_READY_MESSAGE = "Backbone ready to inspect and export.";
 
 export default function App() {
   const [schema, setSchema] = useState<UiSchema | null>(null);
@@ -144,9 +147,21 @@ export default function App() {
   const effectiveDirected = Boolean(preview?.directed);
   const weighted = data.mode === "temporal" || Boolean(data.weight);
   const positiveIntegerWeights = preview?.positive_integer_weights;
+  const weightSign = preview?.weight_sign;
   const methodCompatibility = useCallback((candidate: MethodSpec) => methodCompatibilityReason(
-    candidate, { directed: effectiveDirected, weighted, positiveIntegerWeights },
-  ), [effectiveDirected, weighted, positiveIntegerWeights]);
+    candidate, { directed: effectiveDirected, weighted, positiveIntegerWeights, weightSign },
+  ), [effectiveDirected, weighted, positiveIntegerWeights, weightSign]);
+
+  useEffect(() => {
+    // Outgoing- or incoming-only choices have no meaning once the network is undirected.
+    if (effectiveDirected || !schema || !methodName) return;
+    const reset: Record<string, ControlValue> = {};
+    for (const control of schema.controls.methods[methodName] || []) {
+      const chosen = control.options?.find((option) => option.value === String(methodControls[control.name]));
+      if (chosen?.directed_only && control.default != null) reset[control.name] = control.default;
+    }
+    if (Object.keys(reset).length) setMethodControls((current) => ({ ...current, ...reset }));
+  }, [effectiveDirected, schema, methodName, methodControls]);
 
   const combinedControls = useMemo(
     () => ({ ...methodControls, ...filterControls }),
@@ -220,6 +235,15 @@ export default function App() {
       window.clearTimeout(timer);
     };
   }, [score, method, filterChosen, filterName, filterControls, currentPayload]);
+
+  // The screen-reader status describes the current scores and backbone, so it
+  // must not keep announcing them after a change clears them.
+  useEffect(() => {
+    if (!score && busy !== "score") setMessage("");
+  }, [score, busy]);
+  useEffect(() => {
+    if (!result && busy !== "filter") setMessage((current) => current === BACKBONE_READY_MESSAGE ? "" : current);
+  }, [result, busy]);
 
   function selectMethod(selected: MethodSpec) {
     if (!schema || !preview?.can_run || previewBusy || busy || methodCompatibility(selected) || (weighted && !context.weightSemantics)) return;
@@ -360,7 +384,7 @@ export default function App() {
       const extraction = await api.filter({ score_id: score.score_id, guided: currentPayload().guided! });
       setResult(extraction);
       if (save) saveBackbone(extraction);
-      else setMessage("Backbone ready to inspect and export.");
+      else setMessage(BACKBONE_READY_MESSAGE);
     } catch (reason) {
       setError(errorMessage(reason));
       setMessage("");
@@ -487,6 +511,7 @@ export default function App() {
           directed={Boolean(preview.directed)}
           weighted={weighted}
           positiveIntegerWeights={positiveIntegerWeights}
+          weightSign={weightSign}
           basePayload={currentPayload()}
           initialConfiguration={result?.resolved_config ?? filterPreview?.resolved_config}
         />
@@ -496,7 +521,7 @@ export default function App() {
         ref={importInput}
         hidden
         type="file"
-        accept=".csv,.tsv,.txt,.graphml,.xml"
+        accept=".csv,.tsv,.txt,.edges,.graphml,.xml"
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) openNetworkFile(file);
@@ -686,7 +711,7 @@ function NetworkSettings({ data, context, preview, busy, schema, onData, onConte
                   <SelectField label="Event magnitude" value={data.eventWeight} options={headers} optional="Unit magnitude" onChange={(eventWeight) => changeColumns({ eventWeight })} />
                 </>
               ) : <SelectField label="Weight" value={data.weight} options={headers} optional="Unweighted" onChange={(weight) => changeColumns({ weight })} />}
-              <label className="field"><span>Delimiter</span><select value={data.delimiter} onChange={(event) => changeColumns({ delimiter: event.target.value })}><option value=",">Comma</option><option value=";">Semicolon</option><option value={"\t"}>Tab</option></select></label>
+              <label className="field"><span>Delimiter</span><select value={data.delimiter} onChange={(event) => changeColumns({ delimiter: event.target.value })}><option value=",">Comma</option><option value=";">Semicolon</option><option value={"\t"}>Tab</option><option value=" ">Space</option></select></label>
               <label className="toggle-row compact"><span><strong>Directed network</strong><small>Preserve source-to-target arcs.</small></span><input type="checkbox" checked={data.directed} onChange={(event) => changeColumns({ directed: event.target.checked })} /><i /></label>
               </>}
             </div>
@@ -704,6 +729,7 @@ function NetworkSettings({ data, context, preview, busy, schema, onData, onConte
                 const weighting = schema.temporal.weightings.find((item) => item.name === event.target.value);
                 onData({ temporalWeighting: event.target.value, temporalParameters: { ...(weighting?.default_parameters || {}) } });
               }}>{schema.temporal.weightings.map((item) => <option key={item.name} value={item.name}>{item.label}</option>)}</select><small>{temporalSpec?.description}</small></label>
+              {temporalSpec?.references?.[0] && <p className="temporal-paper">Source <a className="method-paper-link" href={temporalSpec.references[0].url} target="_blank" rel="noreferrer" title={temporalSpec.references[0].citation}>Paper<span className="visually-hidden"> for {temporalSpec.label} (opens in a new tab)</span></a></p>}
               <div className="field-grid">{temporalControls.map((control) => <ControlField key={control.name} control={control} value={data.temporalParameters[control.name]} onChange={(name, value) => onData({ temporalParameters: { ...data.temporalParameters, [name]: value } })} />)}</div>
             </div>
           )}
@@ -816,7 +842,9 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
   const methodSpecs = method ? resolvedControls(schema.controls.methods[method.name] || [], data, Boolean(preview?.directed), context) : [];
   const basicMethodSpecs = methodSpecs.filter((control) => !control.advanced);
   const advancedMethodSpecs = methodSpecs.filter((control) => control.advanced);
-  const filterSpecs = method && filterChosen ? adjustedFilterControls(schema.controls.filters[filterName] || [], score, method) : [];
+  const filterSpecs = method && filterChosen
+    ? adjustedFilterControls(schema.controls.filters[filterName] || [], score, method).filter((control) => isControlShown(control, (name) => filterControls[name]))
+    : [];
   const basicFilterSpecs = filterSpecs.filter((control) => !control.advanced && control.name !== "drop_isolates");
   const advancedFilterSpecs = filterSpecs.filter((control) => control.advanced || control.name === "drop_isolates");
   const searchTerms = methodSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
@@ -1025,7 +1053,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           </div>
           {!method && <p className="analysis-step-intro">Choose how Netbone scores the nodes or edges in this network.</p>}
           {method && <div className="analysis-selection-row">
-            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint></div>
+            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint>{method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}</div>
             {!demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
           </div>}
           {!score && (selectedBlocked || basicMethodSpecs.length > 0 || advancedMethodSpecs.length > 0) && <div className="scoring-settings">{scoringSettings}</div>}
@@ -1327,6 +1355,8 @@ function resolvedControls(controls: ControlSpec[], data: DataDraft, directed: bo
       next = { ...next, default: semantics === "distance" ? "identity" : semantics === "strength" ? "inverse" : null };
     }
     if (directed && control.ignored_when_directed) next = { ...next, disabled: true, disabled_reason: control.ignored_when_directed_reason };
+    next = withDirectedOnlyOptions(next, directed);
+    if (!directed && control.ignored_when_undirected) next = { ...next, disabled: true, disabled_reason: control.ignored_when_undirected_reason };
     return next;
   });
 }

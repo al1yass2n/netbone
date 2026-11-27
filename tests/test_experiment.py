@@ -230,15 +230,36 @@ def test_save_experiment_rejects_existing_directory_without_overwrite(
     assert (destination / "keep.txt").exists()
 
 
-def test_save_experiment_overwrites_directory_when_requested(tmp_path: Path) -> None:
+def test_save_experiment_overwrites_previous_bundle_when_requested(
+    tmp_path: Path,
+) -> None:
     destination = tmp_path / "bundle"
-    destination.mkdir()
+    nb.save_experiment(_result(2.0), destination)
     (destination / "remove.txt").write_text("remove\n", encoding="utf-8")
 
     nb.save_experiment(_result(2.0), destination, overwrite=True)
 
     assert not (destination / "remove.txt").exists()
     assert (destination / "manifest.json").exists()
+
+
+def test_save_experiment_overwrite_refuses_unrelated_directory(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "project"
+    destination.mkdir()
+    keep = destination / "keep.txt"
+    keep.write_text("keep\n", encoding="utf-8")
+
+    with pytest.raises(nb.ValidationError, match="not a Netbone experiment bundle"):
+        nb.save_experiment(_result(2.0), destination, overwrite=True)
+
+    assert keep.read_text(encoding="utf-8") == "keep\n"
+
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    nb.save_experiment(_result(2.0), empty, overwrite=True)
+    assert (empty / "manifest.json").exists()
 
 
 def test_save_experiment_rejects_file_path_and_unsupported_subject(

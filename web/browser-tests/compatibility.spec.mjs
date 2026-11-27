@@ -118,3 +118,150 @@ test("Noise Corrected applies the published cutoff and allows it to be changed",
   const configuration = JSON.parse(await inspect.locator("pre").textContent());
   expect(configuration.filter.parameters).toMatchObject({ value: 2.32, operator: "greater" });
 });
+
+test("a CSV header with spaces after commas maps cleanly", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "spaced.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("source, target, weight\na, b, 4\nb, c, 2\n"),
+  });
+  const mapping = page.getByRole("dialog", { name: "Review network settings" });
+  await mapping.getByRole("radio", { name: /^Strength/ }).check();
+  await expect(mapping.getByRole("button", { name: "Use this mapping" })).toBeEnabled();
+});
+
+test("negative weights disable methods that need positive weights", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "signed.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("source,target,weight\na,b,-4\nb,c,2\nc,a,3\n"),
+  });
+  const mapping = page.getByRole("dialog", { name: "Review network settings" });
+  await mapping.getByRole("radio", { name: /^Strength/ }).check();
+  await mapping.getByRole("button", { name: "Use this mapping" }).click();
+  const picker = page.getByRole("dialog", { name: "Choose a scoring method" });
+  const card = (label) => picker.getByRole("button").filter({ has: page.getByText(label, { exact: true }) });
+  await expect(card("Disparity")).toBeDisabled();
+  await expect(card("Disparity")).toContainText("Requires positive weights");
+  await expect(card("Primary Linkage")).toBeEnabled();
+});
+
+test("Node Strength offers in, out and total strength on directed networks", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Try an example", { exact: true }).click();
+  await page.getByRole("button", { name: /^Weighted relationships / }).click();
+  const methods = await openMethods(page);
+  await methods.getByRole("button", { name: /^Node Strength / }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  const status = page.locator("span.visually-hidden[role=status][aria-atomic=true]");
+  const openScoringSettings = async () => {
+    const details = page.locator("details.analysis-score-settings");
+    if (await details.count() && !(await details.evaluate((element) => element.open))) await details.locator("summary").click();
+  };
+  await expect(status).toHaveText(/node scores are ready/);
+  await openScoringSettings();
+  await expect(page.getByRole("radio", { name: /^in-strength/ })).toBeDisabled();
+  await expect(page.getByText("Undirected graphs have a single strength per node.")).toBeVisible();
+
+  await page.getByRole("button", { name: "Network settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Network settings" });
+  await settings.getByRole("button", { name: "Change mapping" }).click();
+  await settings.getByRole("checkbox", { name: /^Directed network/ }).check();
+  await settings.getByRole("button", { name: "Done" }).click();
+  await expect(page.getByLabel("Network summary")).toContainText("Directed");
+  // Changing direction clears the scores, so the status must stop announcing them.
+  await expect(page.getByRole("button", { name: "Compute scores" })).toBeVisible();
+  await expect(status).toHaveText("");
+  await openScoringSettings();
+  const inStrength = page.getByRole("radio", { name: /^in-strength/ });
+  await expect(inStrength).toBeEnabled();
+  await inStrength.check();
+  await page.getByRole("button", { name: "Compute scores" }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Inspect & export" }).click();
+  const inspect = page.getByRole("dialog", { name: "Inspect & export" });
+  await inspect.getByText("View run settings", { exact: true }).click();
+  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  expect(configuration.method.parameters).toMatchObject({ direction: "in" });
+});
+
+test("outgoing-only and incoming-only aggregation unlock on directed networks", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Try an example", { exact: true }).click();
+  await page.getByRole("button", { name: /^Weighted relationships / }).click();
+  const methods = await openMethods(page);
+  await methods.getByRole("button", { name: /^Disparity / }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  const status = page.locator("span.visually-hidden[role=status][aria-atomic=true]");
+  const openScoringSettings = async () => {
+    const details = page.locator("details.analysis-score-settings");
+    if (await details.count() && !(await details.evaluate((element) => element.open))) await details.locator("summary").click();
+    const advanced = page.locator("details.advanced-method-settings");
+    if (await advanced.count() && !(await advanced.evaluate((element) => element.open))) await advanced.locator("summary").click();
+  };
+  await expect(status).toHaveText(/edge scores are ready/);
+  await openScoringSettings();
+  await expect(page.getByRole("radio", { name: /^outgoing only/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /^incoming only/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /^minimum/ })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Network settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Network settings" });
+  await settings.getByRole("button", { name: "Change mapping" }).click();
+  await settings.getByRole("checkbox", { name: /^Directed network/ }).check();
+  await settings.getByRole("button", { name: "Done" }).click();
+  await expect(page.getByLabel("Network summary")).toContainText("Directed");
+  await expect(page.getByRole("button", { name: "Compute scores" })).toBeVisible();
+  await expect(status).toHaveText("");
+  await openScoringSettings();
+  const incoming = page.getByRole("radio", { name: /^incoming only/ });
+  await expect(incoming).toBeEnabled();
+  await incoming.check();
+  await page.getByRole("button", { name: "Compute scores" }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Inspect & export" }).click();
+  const inspect = page.getByRole("dialog", { name: "Inspect & export" });
+  await inspect.getByText("View run settings", { exact: true }).click();
+  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  expect(configuration.method.parameters).toMatchObject({ pvalue_aggregation: "in" });
+});
+
+test("seeded random ties show a seed box and Holm correction is offered", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Try an example", { exact: true }).click();
+  await page.getByRole("button", { name: /^Weighted relationships / }).click();
+  const methods = await openMethods(page);
+  await methods.getByRole("button", { name: /^Edge Weight / }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  const openAdvancedFilters = async () => {
+    const advanced = page.locator("details.advanced-options").filter({ hasText: "Advanced filter options" });
+    if (!(await advanced.evaluate((element) => element.open))) await advanced.locator("summary").click();
+  };
+  await openAdvancedFilters();
+  const seed = page.getByRole("spinbutton", { name: /^Random seed/ });
+  await expect(seed).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Tie policy" }).selectOption("random_seeded");
+  await expect(seed).toBeVisible();
+  await seed.fill("7");
+  await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Inspect & export" }).click();
+  const inspect = page.getByRole("dialog", { name: "Inspect & export" });
+  await inspect.getByText("View run settings", { exact: true }).click();
+  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  expect(configuration.filter.parameters).toMatchObject({ tie_policy: "random_seeded", random_seed: 7 });
+  await inspect.getByRole("button", { name: "Close" }).click();
+
+  await page.getByRole("combobox", { name: "Tie policy" }).selectOption("exact_stable");
+  await expect(seed).toHaveCount(0);
+  await page.getByRole("button", { name: "Change method" }).click();
+  await page.getByRole("dialog", { name: "Choose a scoring method" }).getByRole("button", { name: /^Disparity / }).click();
+  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await openAdvancedFilters();
+  const correction = page.getByRole("combobox", { name: "Correction" });
+  await correction.selectOption("holm");
+  await expect(correction).toHaveValue("holm");
+});

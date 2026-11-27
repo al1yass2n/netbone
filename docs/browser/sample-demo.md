@@ -5,6 +5,13 @@ Edge weights count the contexts in which two members interacted.
 
 <a href="../../demo/" class="docs-button">Open the web demo</a>
 
+<figure class="docs-screenshot" markdown>
+
+[![The web demo showing the Karate Club network with an Edge Weight backbone at 25% retention](../assets/screens/demo-workbench.png){ loading=lazy }](../assets/screens/demo-workbench.png){ .docs-shot-link title="Open the full-size screenshot" }
+
+<figcaption markdown="span">The demo runs the same workbench as the local app, with precomputed results.</figcaption>
+</figure>
+
 ## Compare two 20-edge backbones
 
 The demo opens with Edge Weight at 25% retention. **Compare** already

@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.network import Network
 from netbone.results import MethodResult
 
@@ -19,12 +20,14 @@ NODE_DEGREE_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "ignored",
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "fraction",
     "default_filter_parameters": {
         "fraction": 0.1,
     },
+    **reference_metadata("node_degree"),
 }
 
 

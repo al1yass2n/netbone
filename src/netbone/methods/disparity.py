@@ -9,15 +9,17 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
-P_VALUE_AGGREGATIONS = frozenset({"average", "max", "min"})
+P_VALUE_AGGREGATIONS = frozenset({"average", "in", "max", "min", "out"})
+DIRECTED_ONLY_AGGREGATIONS = frozenset({"in", "out"})
 LEAF_POLICIES = frozenset({"ignore", "zero"})
 
 DISPARITY_METADATA: dict[str, object] = {
     "name": "disparity",
-    "display_name": "Disparity Filter",
+    "display_name": "Disparity",
     "target": "edge",
     "output_type": "pvalue",
     "primary_statistic": "disparity_pvalue",
@@ -26,16 +28,17 @@ DISPARITY_METADATA: dict[str, object] = {
     "directed_semantics": "source_outgoing_and_target_incoming_distributions",
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
+    "default_weight": "auto",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "significance",
     "default_pvalue_aggregation": "min",
     "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
-    "default_leaf_policy": "ignore",
+    "default_leaf_policy": "zero",
     "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
-    "reference": "Serrano, Boguna, and Vespignani, PNAS 106(16) (2009).",
-    "doi": "10.1073/pnas.0808904106",
+    **reference_metadata("disparity"),
 }
 
 
@@ -44,7 +47,7 @@ def compute_disparity(
     *,
     weight: str = "weight",
     pvalue_aggregation: str = "min",
-    leaf_policy: str = "ignore",
+    leaf_policy: str = "zero",
 ) -> MethodResult:
     """Compute edge p-values from the disparity filter.
 
@@ -58,12 +61,14 @@ def compute_disparity(
     Args:
         network: Normalized simple directed or undirected network to score.
         weight: Edge attribute containing finite positive weights.
-        pvalue_aggregation: How to combine endpoint p-values: `min`, `max`, or
-            `average`.
-        leaf_policy: How degree-one endpoints contribute: `ignore` ignores
-            them during aggregation when another endpoint is available, while
-            `zero` uses the previous behavior where leaf endpoint p-values are
-            `0.0`.
+        pvalue_aggregation: How to combine endpoint p-values. `min` keeps an
+            edge that is significant for at least one endpoint, `max` requires
+            both, and `average` takes their mean. On directed graphs, `out`
+            uses only the source's outgoing test (important for the sender) and
+            `in` only the target's incoming test (important for the receiver).
+        leaf_policy: How degree-one endpoints contribute. `zero` (default)
+            gives a leaf endpoint p-value `0.0`, while `ignore` leaves it out
+            of the aggregation when the other endpoint is available.
 
     Raises:
         ConfigurationError: If a method parameter value is invalid.
@@ -75,6 +80,12 @@ def compute_disparity(
         allowed = ", ".join(sorted(P_VALUE_AGGREGATIONS))
         raise ConfigurationError(
             f"disparity parameter 'pvalue_aggregation' must be one of: {allowed}."
+        )
+    if pvalue_aggregation in DIRECTED_ONLY_AGGREGATIONS and not network.directed:
+        raise ConfigurationError(
+            f"disparity pvalue_aggregation={pvalue_aggregation!r} needs a directed "
+            "graph; an undirected edge has no source or target end. Use 'min', "
+            "'max', or 'average'."
         )
     if leaf_policy not in LEAF_POLICIES:
         allowed = ", ".join(sorted(LEAF_POLICIES))
@@ -221,6 +232,10 @@ def _aggregate_pvalues(
     *,
     pvalue_aggregation: str,
 ) -> float:
+    if pvalue_aggregation == "out":
+        pvalues = (pvalues[0], None)
+    elif pvalue_aggregation == "in":
+        pvalues = (None, pvalues[1])
     available = [pvalue for pvalue in pvalues if pvalue is not None]
     if not available:
         return 1.0

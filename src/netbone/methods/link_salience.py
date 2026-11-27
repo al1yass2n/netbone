@@ -11,6 +11,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -27,6 +28,7 @@ LINK_SALIENCE_METADATA: dict[str, object] = {
     "directed_semantics": "outgoing_shortest_paths",
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "optional",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -35,11 +37,10 @@ LINK_SALIENCE_METADATA: dict[str, object] = {
         "value": 0.5,
         "operator": "greater_equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
-    "reference": "Grady, Thiemann, and Brockmann, Nature Communications 3, 864 (2012).",
-    "doi": "10.1038/ncomms1847",
+    **reference_metadata("link_salience"),
 }
 
 

@@ -13,6 +13,13 @@
 5. Download an individual table or chart, or use **Export full experiment**
    to save the comparison bundle.
 
+<figure class="docs-screenshot" markdown>
+
+[![The Compare backbones view showing a shared edges matrix for two saved backbones](../assets/screens/app-compare.png){ loading=lazy }](../assets/screens/app-compare.png){ .docs-shot-link title="Open the full-size screenshot" }
+
+<figcaption markdown="span">Edge Weight and Edge Betweenness backbones of Zachary’s Karate Club, both at a retained fraction of 25%, share 6 links.</figcaption>
+</figure>
+
 Overlap and ranking answer different questions. Two runs with identical
 scores and different cutoffs can agree on the ranks and still choose
 different edges. See [reading comparison tables](../python/compare.md).
@@ -31,6 +38,13 @@ settings. The browser allows at most 100 runs in a sweep. In **Sweep results**,
 choose a measurement, review the chart or table, and read the explanations
 for failed or unavailable values. Download run and metric CSV files,
 settings JSON, or the full experiment ZIP.
+
+<figure class="docs-screenshot" markdown>
+
+[![A sweep chart of connected component count against retained fraction from 0.1 to 0.9](../assets/screens/app-sweep.png){ loading=lazy }](../assets/screens/app-sweep.png){ .docs-shot-link title="Open the full-size screenshot" }
+
+<figcaption markdown="span">A sweep of the retained fraction for Edge Betweenness. The number of connected components rises quickly below 30%.</figcaption>
+</figure>
 
 ## Choose what to download
 

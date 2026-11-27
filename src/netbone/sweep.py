@@ -220,6 +220,11 @@ class Sweep:
         computation and cache entry.
         """
 
+        if method is not None and not isinstance(method, str):
+            raise ConfigurationError(
+                "vary_method() takes one method name. To compare several methods, "
+                "use grid(methods={...}) or call vary_method() once per method."
+            )
         method_name = method or self.base_pipeline.method_name
         if method_name is None:
             raise ConfigurationError(
@@ -721,8 +726,10 @@ def _score_cache_key_text(
 ) -> str:
     if pipeline_config.method_name is None:
         return ""
-    cache_key = _method_cache_key(network, pipeline_config)
-    return repr(cache_key)
+    # The in-memory cache key includes the graph's object id; the reported text
+    # leaves it out so saved sweep tables and bundles are reproducible.
+    _, method_name, parameters = _method_cache_key(network, pipeline_config)
+    return repr((method_name, parameters))
 
 
 def _freeze_mapping(parameters: Mapping[str, object]) -> tuple[tuple[str, object], ...]:

@@ -3,9 +3,11 @@
 Use Python 3.11 or later. The distribution and import are both named
 `netbone`. The core dependencies are NetworkX and pandas.
 
-These instructions target the 0.3.0 source tree. Install from a checkout to get
-the pipeline API and local web app described here. The [0.2.3 PyPI release](https://pypi.org/project/netbone/0.2.3/)
-belongs to the earlier GitLab codebase.
+!!! note "Install from source"
+    These instructions target the 0.3.0 source tree. Install from a checkout
+    to get the pipeline API and local web app described here. The
+    [0.2.3 PyPI release](https://pypi.org/project/netbone/0.2.3/) belongs to
+    the earlier GitLab codebase.
 
 ## Install from source
 
@@ -30,7 +32,9 @@ python -c "import netbone; print(netbone.__version__)"
 ```
 
 You should see `0.3.0` when installing this version of the source tree. The
-browser app is included in this install.
+browser app is included in this install. Start it with
+`python -m netbone.webapp`, which works whether or not Python's scripts
+folder is on your `PATH`.
 
 ## Optional tools
 

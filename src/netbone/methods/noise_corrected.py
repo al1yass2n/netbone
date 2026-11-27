@@ -9,6 +9,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import integer_edge_weights
 from netbone.network import Network
 from netbone.results import MethodResult
@@ -24,15 +25,15 @@ NOISE_CORRECTED_METADATA: dict[str, object] = {
     "directed_semantics": "source_outgoing_and_target_incoming_margins",
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": True,
     "requires_integer_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "threshold",
     "default_filter_parameters": {"value": 1.64, "operator": "greater"},
-    "default_weight": "weight",
-    "reference": "Coscia and Neffke, IEEE ICDE, pp. 425–436 (2017).",
-    "doi": "10.1109/ICDE.2017.100",
+    "default_weight": "auto",
+    **reference_metadata("noise_corrected"),
 }
 
 

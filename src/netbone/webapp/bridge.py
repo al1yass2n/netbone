@@ -7,7 +7,7 @@ import json
 import math
 import warnings
 from collections import OrderedDict
-from collections.abc import Mapping
+from collections.abc import Hashable, Mapping
 from dataclasses import dataclass, replace
 from heapq import nsmallest
 from io import BytesIO, StringIO
@@ -24,6 +24,11 @@ import networkx as nx
 import netbone as nb
 from netbone._json import JsonValue, json_mapping, json_records, json_value
 from netbone.exceptions import NetboneError, ValidationError
+from netbone.io import (
+    WHITESPACE_DELIMITER,
+    duplicate_edge_message,
+    split_whitespace_fields,
+)
 
 MAX_STATISTICS_ROWS = 250
 MAX_GRAPH_EDGES = 1000
@@ -319,6 +324,38 @@ METHOD_CONTROL_GUIDANCE: dict[str, dict[str, object]] = {
                     "result": "edge p = 0.21",
                 },
             },
+            "out": {
+                "description": (
+                    "Directed graphs only. Use the source's outgoing test, so the "
+                    "arc is kept when it matters to the sender."
+                ),
+                "directed_only": True,
+                "illustration": {
+                    "kind": "endpoint",
+                    "left": "i",
+                    "left_value": "p out = 0.02",
+                    "rule": "OUT",
+                    "right": "j",
+                    "right_value": "p in = 0.40",
+                    "result": "arc p = 0.02",
+                },
+            },
+            "in": {
+                "description": (
+                    "Directed graphs only. Use the target's incoming test, so the "
+                    "arc is kept when it matters to the receiver."
+                ),
+                "directed_only": True,
+                "illustration": {
+                    "kind": "endpoint",
+                    "left": "i",
+                    "left_value": "p out = 0.02",
+                    "rule": "IN",
+                    "right": "j",
+                    "right_value": "p in = 0.40",
+                    "result": "arc p = 0.40",
+                },
+            },
         },
     },
     "leaf_policy": {
@@ -488,6 +525,57 @@ METHOD_PARAMETER_GUIDANCE: dict[tuple[str, str], dict[str, object]] = {
             "on directed graphs, or ordinary degree-one endpoints on undirected "
             "graphs."
         ),
+    },
+    ("lans", "pvalue_aggregation"): {
+        "description": (
+            "Combine the two endpoint tests. On directed graphs these are the "
+            "source-outgoing and target-incoming p-values."
+        ),
+    },
+    ("lans", "leaf_policy"): {
+        "description": (
+            "Control source out-degree-one and target in-degree-one endpoint tests "
+            "on directed graphs, or ordinary degree-one endpoints on undirected "
+            "graphs."
+        ),
+    },
+    ("node_strength", "direction"): {
+        "description": (
+            "On directed graphs, choose which arcs count toward a node's "
+            "strength: incoming, outgoing, or both."
+        ),
+        "options": {
+            "total": {
+                "description": "Add incoming and outgoing arc weights.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "in 3",
+                    "center": "+ out 1",
+                    "right": "node b",
+                    "result": "strength = 4",
+                },
+            },
+            "in": {
+                "description": "Add only the weights of arcs that point to the node.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "in 3",
+                    "center": "ignore out 1",
+                    "right": "node b",
+                    "result": "strength = 3",
+                },
+            },
+            "out": {
+                "description": "Add only the weights of arcs that leave the node.",
+                "illustration": {
+                    "kind": "equation",
+                    "left": "out 1",
+                    "center": "ignore in 3",
+                    "right": "node b",
+                    "result": "strength = 1",
+                },
+            },
+        },
     },
     ("glanb", "c"): {
         "description": (
@@ -1509,6 +1597,25 @@ def _cached_result(result_id: str) -> nb.BackboneResult:
         return result
 
 
+def _weight_sign(graph: nx.Graph, weight: str | None) -> str | None:
+    """Summarize selected weights as positive, nonnegative, or mixed."""
+
+    if weight is None or graph.number_of_edges() == 0:
+        return None
+    values = [
+        float(attributes[weight])
+        for _, _, attributes in graph.edges(data=True)
+        if _is_finite_number(attributes.get(weight))
+    ]
+    if len(values) != graph.number_of_edges():
+        return "mixed"
+    if all(value > 0 for value in values):
+        return "positive"
+    if all(value >= 0 for value in values):
+        return "nonnegative"
+    return "mixed"
+
+
 def preview_payload(payload: object) -> dict[str, JsonValue]:
     """Return parsed CSV readiness metadata for the guided web UI."""
 
@@ -1584,6 +1691,7 @@ def preview_payload(payload: object) -> dict[str, JsonValue]:
             for _, _, attributes in graph.edges(data=True)
             for value in (attributes.get(selected_weight),)
         ),
+        "weight_sign": _weight_sign(graph, selected_weight),
         "likely_weight_columns": json_value(parsed["likely_weight_columns"]),
         "records": json_value(parsed["records"]),
     }
@@ -1661,13 +1769,36 @@ def _method_card(name: str, metadata: Mapping[str, object]) -> dict[str, object]
         "requires_integer_weights": bool(
             metadata.get("requires_integer_weights", False)
         ),
+        "requires_positive_weights": bool(
+            metadata.get("requires_positive_weights", False)
+        ),
+        "requires_nonnegative_weights": bool(
+            metadata.get("requires_nonnegative_weights", False)
+        ),
         "supports_weighted": bool(metadata.get("supports_weighted", False)),
         "supports_directed": bool(metadata.get("supports_directed", False)),
         "directed_semantics": metadata.get("directed_semantics"),
         "recommended_filter": default_filter,
         "default_filter_parameters": dict(default_filter_parameters),
         "filter_reason": _filter_reason(default_filter, output_type, name),
+        "references": _method_references(metadata),
+        "reference_note": metadata.get("reference_note"),
     }
+
+
+def _method_references(metadata: Mapping[str, object]) -> list[dict[str, str]]:
+    references = metadata.get("references", ())
+    if not isinstance(references, list | tuple):
+        return []
+    return [
+        {
+            key: str(item[key])
+            for key in ("citation", "doi", "url", "bibtex")
+            if key in item
+        }
+        for item in references
+        if isinstance(item, Mapping)
+    ]
 
 
 def _filter_cards() -> list[dict[str, object]]:
@@ -1726,6 +1857,7 @@ def _data_controls() -> list[dict[str, object]]:
                 {"value": ",", "label": "Comma"},
                 {"value": ";", "label": "Semicolon"},
                 {"value": "\t", "label": "Tab"},
+                {"value": " ", "label": "Space"},
             ],
         },
         {
@@ -1778,6 +1910,8 @@ def _temporal_schema() -> dict[str, object]:
                     if isinstance(required_parameters, list | tuple)
                     else []
                 ),
+                "references": _method_references(metadata),
+                "reference_note": metadata.get("reference_note"),
             }
         )
         controls[name] = _temporal_weighting_controls(name)
@@ -1886,10 +2020,26 @@ def _filter_controls() -> dict[str, list[dict[str, object]]]:
                 (
                     ("include_all_ties", "include all ties"),
                     ("exact_stable", "exact stable count"),
+                    ("random_seeded", "random, seeded"),
                     ("raise_on_tie", "raise on tie"),
                 ),
                 advanced=True,
             ),
+            {
+                **_number_control(
+                    "random_seed",
+                    "Random seed",
+                    0,
+                    minimum=0,
+                    step=1,
+                    advanced=True,
+                ),
+                "description": (
+                    "Seed for breaking ties at random. The same seed always keeps "
+                    "the same tied edges or nodes."
+                ),
+                "shown_when": {"tie_policy": "random_seeded"},
+            },
             _checkbox_control("drop_isolates", "Drop isolated nodes", False),
         ],
         "significance": [
@@ -1901,6 +2051,7 @@ def _filter_controls() -> dict[str, list[dict[str, object]]]:
                 (
                     ("none", "none"),
                     ("bonferroni", "Bonferroni"),
+                    ("holm", "Holm"),
                     ("fdr_bh", "FDR BH"),
                 ),
                 advanced=True,
@@ -1923,29 +2074,21 @@ def _method_controls(
                 ("min", "minimum"),
                 ("max", "maximum"),
                 ("average", "average"),
+                ("out", "outgoing only"),
+                ("in", "incoming only"),
             ),
             advanced=True,
         )
         leaf_policy = _select_control(
             "leaf_policy",
             "Leaf policy",
-            "zero" if name == "lans" else "ignore",
+            "zero",
             (
                 ("zero", "zero"),
                 ("ignore", "ignore leaf endpoint"),
             ),
             advanced=True,
         )
-        if name == "lans":
-            pvalue_aggregation.update(
-                {
-                    "ignored_when_directed": True,
-                    "ignored_when_directed_reason": (
-                        "Directed LANS evaluates each arc at its source only, so "
-                        "there are no endpoint p-values to combine."
-                    ),
-                }
-            )
         controls.extend([pvalue_aggregation, leaf_policy])
     if name == "glanb":
         controls.append(
@@ -2050,6 +2193,26 @@ def _method_controls(
         controls.append(
             _checkbox_control("endpoints", "Count endpoints", False, advanced=True)
         )
+    if name == "node_strength":
+        direction = _select_control(
+            "direction",
+            "Strength direction",
+            "total",
+            (
+                ("total", "total (in + out)"),
+                ("in", "in-strength"),
+                ("out", "out-strength"),
+            ),
+        )
+        direction.update(
+            {
+                "ignored_when_undirected": True,
+                "ignored_when_undirected_reason": (
+                    "Undirected graphs have a single strength per node."
+                ),
+            }
+        )
+        controls.append(direction)
     if name in {"link_prediction", "link_prediction_iforest"}:
         controls.append(
             _number_control(
@@ -2239,14 +2402,14 @@ def _guided_method_parameters(
     if method_name in P_VALUE_AGGREGATION_METHODS:
         parameters["pvalue_aggregation"] = _option(
             controls.get("pvalue_aggregation"),
-            allowed={"min", "max", "average"},
+            allowed={"min", "max", "average", "out", "in"},
             default="min",
             field="pvalue_aggregation",
         )
         parameters["leaf_policy"] = _option(
             controls.get("leaf_policy"),
             allowed={"zero", "ignore"},
-            default="zero" if method_name == "lans" else "ignore",
+            default="zero",
             field="leaf_policy",
         )
     if method_name == "glanb":
@@ -2323,6 +2486,13 @@ def _guided_method_parameters(
             controls.get("normalized"),
             default=True,
             field="normalized",
+        )
+    if method_name == "node_strength":
+        parameters["direction"] = _option(
+            controls.get("direction"),
+            allowed={"total", "in", "out"},
+            default="total",
+            field="direction",
         )
     if method_name == "node_betweenness":
         parameters["endpoints"] = _boolean(
@@ -2402,10 +2572,19 @@ def _guided_filter_parameters(
         )
         parameters["tie_policy"] = _option(
             controls.get("tie_policy"),
-            allowed={"include_all_ties", "exact_stable", "raise_on_tie"},
+            allowed={
+                "include_all_ties",
+                "exact_stable",
+                "random_seeded",
+                "raise_on_tie",
+            },
             default="include_all_ties",
             field="tie_policy",
         )
+        if parameters["tie_policy"] == "random_seeded":
+            parameters["random_seed"] = _integer_number(
+                controls.get("random_seed"), default=0, field="random_seed"
+            )
         if method_name == "link_prediction":
             parameters["direction"] = _link_prediction_direction(controls)
         return parameters
@@ -2418,7 +2597,7 @@ def _guided_filter_parameters(
         )
         parameters["correction"] = _option(
             controls.get("correction"),
-            allowed={"none", "bonferroni", "fdr_bh"},
+            allowed={"none", "bonferroni", "holm", "fdr_bh"},
             default="none",
             field="correction",
         )
@@ -2541,9 +2720,7 @@ def _temporal_data_from_payload(payload: Mapping[object, object]) -> dict[str, A
     target = _required_text(payload.get("target"), field="target")
     time = _required_text(payload.get("time"), field="time")
     event_weight = _optional_text(payload.get("event_weight"), field="event_weight")
-    delimiter = _delimiter(
-        _text_or_default(payload.get("delimiter"), default=",", field="delimiter")
-    )
+    delimiter = _delimiter(payload.get("delimiter"))
     context = _text_or_default(
         payload.get("context"), default="webapp temporal upload", field="context"
     )
@@ -2606,16 +2783,46 @@ def _temporal_data_from_payload(payload: Mapping[object, object]) -> dict[str, A
     }
 
 
+def _reject_extra_values(
+    row: Mapping[str | None, object], *, row_number: int, width: int
+) -> None:
+    """Reject non-empty values past the header; trailing empty fields are fine."""
+
+    extra = row.get(None)
+    if isinstance(extra, list) and any(str(value).strip() for value in extra):
+        raise ValidationError(
+            f"CSV row {row_number} has {width + len(extra)} values but the header "
+            f"has {width} columns. Check the delimiter, or add a header for the "
+            "extra column."
+        )
+
+
+def _dict_reader(csv_text: str, delimiter: str) -> csv.DictReader[str]:
+    """Read rows by header name; a space delimiter splits on runs of whitespace."""
+
+    if delimiter != WHITESPACE_DELIMITER:
+        return csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    rows = StringIO()
+    writer = csv.writer(rows, delimiter="\t", lineterminator="\n")
+    for line in csv_text.splitlines():
+        fields = split_whitespace_fields(line)
+        if fields:
+            writer.writerow(fields)
+    return csv.DictReader(StringIO(rows.getvalue()), delimiter="\t")
+
+
 def _csv_records_preview(
     csv_text: str,
     *,
     delimiter: str,
     required_columns: tuple[str | None, ...],
 ) -> dict[str, Any]:
-    reader = csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    reader = _dict_reader(csv_text, delimiter)
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
+    # Look rows up by the stripped names so "source, target, weight" works.
+    reader.fieldnames = headers
     missing_columns = [
         column
         for column in required_columns
@@ -2627,8 +2834,9 @@ def _csv_records_preview(
         )
     records: list[dict[str, JsonValue]] = []
     row_count = 0
-    for row in reader:
+    for row_number, row in enumerate(reader, start=2):
         row_count += 1
+        _reject_extra_values(row, row_number=row_number, width=len(headers))
         if len(records) < MAX_PREVIEW_ROWS:
             records.append(
                 {header: json_value(row.get(header, "")) for header in headers}
@@ -2685,20 +2893,20 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     source = _required_text(payload.get("source"), field="source")
     target = _required_text(payload.get("target"), field="target")
     weight = _optional_text(payload.get("weight"), field="weight")
-    delimiter = _delimiter(
-        _text_or_default(payload.get("delimiter"), default=",", field="delimiter")
-    )
+    delimiter = _delimiter(payload.get("delimiter"))
     context = _text_or_default(
         payload.get("context"), default="webapp upload", field="context"
     )
     directed = _boolean(payload.get("directed"), default=False, field="directed")
 
     graph = nx.DiGraph() if directed else nx.Graph()
-    seen_edges: set[tuple[str, str]] = set()
-    reader = csv.DictReader(StringIO(csv_text), delimiter=delimiter)
+    seen_edges: dict[tuple[str, str], tuple[int, Hashable, Hashable]] = {}
+    reader = _dict_reader(csv_text, delimiter)
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
+    # Look rows up by the stripped names so "source, target, weight" works.
+    reader.fieldnames = headers
     missing_columns = [
         column
         for column in (source, target, weight)
@@ -2713,6 +2921,7 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     row_count = 0
     for row_number, row in enumerate(reader, start=2):
         row_count += 1
+        _reject_extra_values(row, row_number=row_number, width=len(headers))
         source_value = (row.get(source) or "").strip()
         target_value = (row.get(target) or "").strip()
         if not source_value or not target_value:
@@ -2729,12 +2938,21 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
             )
         )
         if edge_key in seen_edges:
-            edge_label = "arc" if directed else "edge"
             raise ValidationError(
-                f"CSV row {row_number} duplicates simple-graph {edge_label} "
-                f"({source_value!r}, {target_value!r})."
+                duplicate_edge_message(
+                    f"CSV row {row_number}",
+                    (source_value, target_value),
+                    seen_edges[edge_key],
+                    directed=directed,
+                    directed_hint="turn on Directed network",
+                )
             )
-        seen_edges.add(edge_key)
+        seen_edges[edge_key] = (row_number, source_value, target_value)
+        if source_value == target_value:
+            raise ValidationError(
+                f"CSV row {row_number} is a self-loop on {source_value!r}. "
+                "Self-loops are not supported; remove the row."
+            )
         attributes: dict[str, object] = {}
         if weight is not None:
             raw_weight = (row.get(weight) or "").strip()
@@ -2743,11 +2961,17 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
                     f"CSV row {row_number} has an empty weight value."
                 )
             try:
-                attributes[weight] = float(raw_weight)
+                numeric_weight = float(raw_weight)
             except ValueError as exc:
                 raise ValidationError(
                     f"CSV row {row_number} weight {raw_weight!r} is not numeric."
                 ) from exc
+            if not math.isfinite(numeric_weight):
+                raise ValidationError(
+                    f"CSV row {row_number} weight {raw_weight!r} must be a finite "
+                    "number."
+                )
+            attributes[weight] = numeric_weight
         graph.add_edge(source_value, target_value, **attributes)
         if len(records) < MAX_PREVIEW_ROWS:
             records.append(
@@ -3127,12 +3351,21 @@ def _optional_text(value: object, *, field: str) -> str | None:
     return text if text else None
 
 
-def _delimiter(value: str) -> str:
-    if value == r"\t":
+def _delimiter(value: object) -> str:
+    if value is None:
+        return ","
+    if not isinstance(value, str):
+        raise ValidationError("delimiter must be a string.")
+    if value == "":
+        return ","
+    if value in {"\t", r"\t"}:
         return "\t"
-    if value not in {",", ";", "\t"}:
-        raise ValidationError("delimiter must be ',', ';', or tab.")
-    return value
+    if value == "space" or value.isspace():
+        return WHITESPACE_DELIMITER
+    text = value.strip()
+    if text not in {",", ";"}:
+        raise ValidationError("delimiter must be ',', ';', tab, or space.")
+    return text
 
 
 def _number(value: object, *, default: float, field: str) -> float:

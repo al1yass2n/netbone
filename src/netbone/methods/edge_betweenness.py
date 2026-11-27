@@ -11,6 +11,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
@@ -19,7 +20,7 @@ DISTANCE_ATTR = "_netbone_edge_betweenness_distance"
 
 EDGE_BETWEENNESS_METADATA: dict[str, object] = {
     "name": "edge_betweenness",
-    "display_name": "Edge Betweenness Centrality",
+    "display_name": "Edge Betweenness",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "edge_betweenness",
@@ -27,19 +28,19 @@ EDGE_BETWEENNESS_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": False,
-    "requires_positive_weights": False,
+    "weight_mode": "optional",
+    "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "fraction",
     "default_filter_parameters": {
         "fraction": 0.1,
     },
-    "default_weight": None,
+    "default_weight": "auto",
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
     "default_normalized": True,
-    "reference": "Girvan and Newman, PNAS 99(12): 7821-7826 (2002).",
-    "doi": "10.1073/pnas.122653799",
+    **reference_metadata("edge_betweenness"),
 }
 
 

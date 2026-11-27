@@ -10,6 +10,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -27,7 +28,7 @@ DIRECTED_SEMANTICS_WARNING = (
 
 LINK_PREDICTION_METADATA: dict[str, object] = {
     "name": "link_prediction",
-    "display_name": "Link Prediction Backbone Framework",
+    "display_name": "Link Prediction",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "link_prediction_similarity",
@@ -35,6 +36,7 @@ LINK_PREDICTION_METADATA: dict[str, object] = {
     "supports_directed": True,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "optional",
     "requires_positive_weights": True,
     "uses_weights": True,
     "supports_multigraph": False,
@@ -45,7 +47,7 @@ LINK_PREDICTION_METADATA: dict[str, object] = {
     },
     "requires_fraction_direction": True,
     "similarity_options": tuple(sorted(SIMILARITIES)),
-    "default_weight": None,
+    "default_weight": "auto",
     "default_weight_alpha": 1.0,
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
@@ -57,9 +59,7 @@ LINK_PREDICTION_METADATA: dict[str, object] = {
         "local_path": "forward directed paths of length two and three from source "
         "to target",
     },
-    "reference": "Link prediction perspective on network backbone extraction, "
-    "Applied Network Science (2025).",
-    "doi": "10.1007/s41109-025-00705-y",
+    **reference_metadata("link_prediction"),
 }
 
 

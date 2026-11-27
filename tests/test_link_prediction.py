@@ -220,7 +220,7 @@ def test_link_prediction_default_filter_requires_direction() -> None:
     assert sorted(result.graph.edges()) == [("a", "b")]
 
 
-def test_link_prediction_default_ignores_weights_and_preserves_input() -> None:
+def test_link_prediction_weight_none_ignores_weights_and_preserves_input() -> None:
     graph = nx.Graph()
     graph.add_edge("a", "b", weight="heavy")
     graph.add_edge("a", "c", weight="light")
@@ -231,11 +231,33 @@ def test_link_prediction_default_ignores_weights_and_preserves_input() -> None:
         graph,
         method="link_prediction",
         similarity="preferential_attachment",
+        weight=None,
     )
 
     assert sorted(graph.edges(data=True)) == original_edges
-    assert result.metadata["default_weight"] is None
+    assert result.metadata["default_weight"] == "auto"
+    assert result.parameters.get("weight") is None
     assert result.statistics["link_prediction_similarity"].tolist() == [1.0, 1.0, 1.0]
+
+
+def test_link_prediction_default_uses_weights_when_every_edge_has_them() -> None:
+    graph = nx.Graph()
+    graph.add_edge("a", "b", weight=10.0)
+    graph.add_edge("a", "c", weight=2.0)
+    graph.add_edge("b", "c", weight=3.0)
+
+    automatic = nb.score(
+        graph, method="link_prediction", similarity="preferential_attachment"
+    )
+    explicit = nb.score(
+        graph,
+        method="link_prediction",
+        similarity="preferential_attachment",
+        weight="weight",
+    )
+
+    assert automatic.parameters["weight"] == "weight"
+    assert automatic.statistics.equals(explicit.statistics)
 
 
 def test_link_prediction_weighted_preferential_attachment_uses_strengths() -> None:

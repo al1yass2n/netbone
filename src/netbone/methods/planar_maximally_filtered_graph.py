@@ -8,6 +8,7 @@ from typing import Any
 import networkx as nx
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -22,6 +23,7 @@ PLANAR_MAXIMALLY_FILTERED_GRAPH_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "optional",
     "requires_positive_weights": False,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -30,10 +32,9 @@ PLANAR_MAXIMALLY_FILTERED_GRAPH_METADATA: dict[str, object] = {
         "value": 1.0,
         "operator": "equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "tie_policy": "stable_edge_id",
-    "reference": "Tumminello et al., PNAS 102(30): 10421-10426 (2005).",
-    "doi": "10.1073/pnas.0500298102",
+    **reference_metadata("planar_maximally_filtered_graph"),
 }
 
 

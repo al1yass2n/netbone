@@ -6,6 +6,7 @@ import type {
   JsonRecord,
   MethodSpec,
   NetworkContext,
+  WeightSign,
 } from "./types";
 
 export function parseHeaders(text: string, delimiter: string): string[] {
@@ -22,7 +23,7 @@ export function parseHeaders(text: string, delimiter: string): string[] {
       index += 1;
     } else if (character === '"') {
       quoted = !quoted;
-    } else if (character === delimiter && !quoted) {
+    } else if (!quoted && (delimiter === " " ? /\s/.test(character ?? "") : character === delimiter)) {
       values.push(value.trim());
       value = "";
     } else {
@@ -37,11 +38,14 @@ export function detectDelimiter(filename: string, text: string): string {
   if (/\.tsv$/i.test(filename)) return "\t";
   const firstLine = text.split(/\r?\n/).find((line) => line.trim().length > 0) || "";
   const candidates = [",", "\t", ";"];
-  return candidates.reduce((best, candidate) => {
+  const best = candidates.reduce((best, candidate) => {
     const count = firstLine.split(candidate).length;
     const bestCount = firstLine.split(best).length;
     return count > bestCount ? candidate : best;
   }, ",");
+  // A header such as "source target weight" has no comma, tab or semicolon.
+  if (firstLine.split(best).length === 1 && firstLine.trim().split(/\s+/).length > 1) return " ";
+  return best;
 }
 
 export function guessColumn(
@@ -101,16 +105,23 @@ export function initialControlValues(controls: ControlSpec[]): Record<string, Co
 
 export function methodCompatibilityReason(
   method: MethodSpec,
-  { directed, weighted, positiveIntegerWeights }: {
+  { directed, weighted, positiveIntegerWeights, weightSign }: {
     directed: boolean;
     weighted: boolean;
     positiveIntegerWeights?: boolean;
+    weightSign?: WeightSign | null;
   },
 ): string {
   if (directed && !method.supports_directed) return "Not available for directed networks";
   if (!weighted && method.requires_weights) return "Requires a weight column";
   if (method.requires_integer_weights && positiveIntegerWeights === false) {
     return "Requires positive whole-number weights";
+  }
+  if (weighted && method.requires_positive_weights && weightSign && weightSign !== "positive") {
+    return "Requires positive weights";
+  }
+  if (weighted && method.requires_nonnegative_weights && weightSign === "mixed") {
+    return "Requires non-negative weights";
   }
   return "";
 }

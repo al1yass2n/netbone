@@ -3131,3 +3131,18 @@ html:has(.analysis-dock) { scroll-padding-block-end: 128px; }
 .graph-preview-locked svg { color: var(--muted); }
 .graph-preview-locked p { margin: 0; font-size: var(--text-small); }
 .method-list > button, .filter-choice-list > button, .example-list > button { border-radius: var(--button-radius); }
+
+.method-paper-link {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: var(--text-small);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.method-paper-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+.method-paper-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.temporal-paper { margin: -4px 0 0; color: var(--muted); font-size: var(--text-small); }

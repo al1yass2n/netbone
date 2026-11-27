@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import (
     DISTANCE_TRANSFORMS,
     edge_betweenness_by_edge_id,
@@ -27,6 +28,7 @@ H_BACKBONE_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -35,11 +37,10 @@ H_BACKBONE_METADATA: dict[str, object] = {
         "value": 1.0,
         "operator": "equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
-    "reference": "Zhang, Stanley, and Ye, Scientific Reports 8, 14356 (2018).",
-    "doi": "10.1038/s41598-018-32430-1",
+    **reference_metadata("h_backbone"),
 }
 
 

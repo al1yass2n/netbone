@@ -322,6 +322,50 @@ def test_webapp_ui_schema_keeps_filter_details_advanced() -> None:
     assert fraction_controls["tie_policy"]["advanced"] is True
 
 
+def test_webapp_offers_holm_and_seeded_random_ties() -> None:
+    filter_controls = ui_schema_payload()["controls"]["filters"]
+    significance = _controls_by_name(filter_controls["significance"])
+    fraction = _controls_by_name(filter_controls["fraction"])
+
+    assert "holm" in {item["value"] for item in significance["correction"]["options"]}
+    assert "random_seeded" in {
+        item["value"] for item in fraction["tie_policy"]["options"]
+    }
+    assert fraction["random_seed"]["shown_when"] == {"tie_policy": "random_seeded"}
+
+    holm = run_pipeline_from_payload(
+        _guided_payload(
+            method="disparity",
+            filter_name="significance",
+            controls={"alpha": 0.5, "correction": "holm"},
+        )
+    )
+    assert holm["pipeline"]["filter"]["parameters"]["correction"] == "holm"
+
+    def fraction_parameters(controls: Mapping[str, object]) -> dict[str, object]:
+        result = run_pipeline_from_payload(
+            _guided_payload(
+                method="node_degree", filter_name="fraction", controls=controls
+            )
+        )
+        return dict(result["pipeline"]["filter"]["parameters"])
+
+    seeded = fraction_parameters(
+        {"fraction": 0.5, "tie_policy": "random_seeded", "random_seed": 7}
+    )
+    assert seeded["tie_policy"] == "random_seeded"
+    assert seeded["random_seed"] == 7
+    # The seed box is hidden for the other tie rules, so a leftover value is not sent.
+    stable = fraction_parameters(
+        {"fraction": 0.5, "tie_policy": "exact_stable", "random_seed": 7}
+    )
+    assert "random_seed" not in stable
+    with pytest.raises(ValidationError, match="random_seed"):
+        fraction_parameters(
+            {"fraction": 0.5, "tie_policy": "random_seeded", "random_seed": 1.5}
+        )
+
+
 def test_webapp_ui_schema_illustrates_every_method_parameter() -> None:
     method_controls = ui_schema_payload()["controls"]["methods"]
 
@@ -348,9 +392,19 @@ def test_webapp_ui_schema_method_choices_match_registered_implementations() -> N
 
     assert _option_values(disparity["pvalue_aggregation"]) == {
         "average",
+        "in",
         "max",
         "min",
+        "out",
     }
+    assert _option_values(lans["pvalue_aggregation"]) == _option_values(
+        disparity["pvalue_aggregation"]
+    )
+    assert {
+        option["value"]
+        for option in disparity["pvalue_aggregation"]["options"]
+        if option.get("directed_only")
+    } == {"in", "out"}
     aggregation_options = {
         option["value"]: option for option in disparity["pvalue_aggregation"]["options"]
     }
@@ -369,10 +423,9 @@ def test_webapp_ui_schema_method_choices_match_registered_implementations() -> N
         disparity["pvalue_aggregation"]["description"]
     )
     assert "source out-degree-one" in str(disparity["leaf_policy"]["description"])
-    assert lans["pvalue_aggregation"]["ignored_when_directed"] is True
-    assert "source only" in str(
-        lans["pvalue_aggregation"]["ignored_when_directed_reason"]
-    )
+    assert "ignored_when_directed" not in lans["pvalue_aggregation"]
+    assert disparity["leaf_policy"]["default"] == "zero"
+    assert lans["leaf_policy"]["default"] == "zero"
     assert aggregation_options["average"]["illustration"]["result"] == ("edge p = 0.21")
     assert _option_values(disparity["leaf_policy"]) == {"ignore", "zero"}
     leaf_options = {
@@ -675,7 +728,7 @@ def test_webapp_source_includes_graphml_import_controls() -> None:
     app = _frontend_text("App.tsx")
     utilities = _frontend_text("utils.ts")
 
-    assert 'accept=".csv,.tsv,.txt,.graphml,.xml"' in app
+    assert 'accept=".csv,.tsv,.txt,.edges,.graphml,.xml"' in app
     assert 'mode === "graphml"' in app
     assert "numeric_edge_attributes" in app
     assert "nextPreview.source_directed === true" in app
@@ -2886,3 +2939,52 @@ def test_webapp_live_graph_is_bounded_without_truncating_retention_counts() -> N
         for edge in sampled_graph["edges"]
     )
     assert filter_preview_payload(payload)["graph"] == sampled_graph
+
+
+def test_webapp_reads_space_separated_edge_and_event_lists() -> None:
+    static = _csv_payload_with_delimiter(
+        'source  target\tweight\nalice bob 4\n"New York" carol 1\n\n  carol dana 2\n'
+    )
+    temporal = _temporal_guided_payload(method="edge_weight")
+    temporal["csv_text"] = str(temporal["csv_text"]).replace(",", "   ")
+    temporal["delimiter"] = " "
+
+    static_preview = preview_payload(static)
+    temporal_preview = preview_payload(temporal)
+    comma_preview = preview_payload(_temporal_guided_payload(method="edge_weight"))
+
+    assert static_preview["valid"] is True
+    assert static_preview["edge_count"] == 3
+    assert static_preview["headers"] == ["source", "target", "weight"]
+    assert temporal_preview["valid"] is True
+    assert temporal_preview["edge_count"] == comma_preview["edge_count"]
+    assert temporal_preview["event_count"] == comma_preview["event_count"]
+    delimiter = next(
+        control
+        for control in ui_schema_payload()["controls"]["data"]
+        if control["name"] == "delimiter"
+    )
+    assert {"value": " ", "label": "Space"} in delimiter["options"]
+
+
+def test_webapp_space_delimiter_rejects_rows_with_extra_values() -> None:
+    preview = preview_payload(
+        _csv_payload_with_delimiter("source target weight\na b 1 9\n")
+    )
+
+    assert preview["valid"] is False
+    assert "row 2 has 4 values" in str(preview["errors"])
+
+
+def _csv_payload_with_delimiter(
+    csv_text: str, delimiter: str = " "
+) -> dict[str, object]:
+    return {
+        "csv_text": csv_text,
+        "source": "source",
+        "target": "target",
+        "weight": "weight",
+        "delimiter": delimiter,
+        "method": {"name": "edge_weight", "parameters": {"weight": "weight"}},
+        "filter": {"name": "fraction", "parameters": {"fraction": 0.5}},
+    }

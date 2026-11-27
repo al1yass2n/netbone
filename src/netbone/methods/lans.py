@@ -9,10 +9,12 @@ from typing import Any
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
-P_VALUE_AGGREGATIONS = frozenset({"average", "max", "min"})
+P_VALUE_AGGREGATIONS = frozenset({"average", "in", "max", "min", "out"})
+DIRECTED_ONLY_AGGREGATIONS = frozenset({"in", "out"})
 LEAF_POLICIES = frozenset({"ignore", "zero"})
 
 LANS_METADATA: dict[str, object] = {
@@ -23,9 +25,11 @@ LANS_METADATA: dict[str, object] = {
     "primary_statistic": "lans_pvalue",
     "preferred_direction": "lower",
     "supports_directed": True,
-    "directed_semantics": "source_outgoing_distribution",
+    "directed_semantics": "source_outgoing_and_target_incoming_distributions",
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
+    "default_weight": "auto",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -34,8 +38,7 @@ LANS_METADATA: dict[str, object] = {
     "pvalue_aggregation_options": tuple(sorted(P_VALUE_AGGREGATIONS)),
     "default_leaf_policy": "zero",
     "leaf_policy_options": tuple(sorted(LEAF_POLICIES)),
-    "reference": "Foti, Hughes, and Rockmore, PLoS ONE 6(2): e16431 (2011).",
-    "doi": "10.1371/journal.pone.0016431",
+    **reference_metadata("lans"),
 }
 
 
@@ -48,16 +51,19 @@ def compute_lans(
 ) -> MethodResult:
     """Compute LANS empirical upper-tail p-values for each edge.
 
-    For undirected graphs, LANS compares an edge's fractional incident weight
-    at both endpoints and combines the endpoint p-values. For directed graphs,
-    each arc is evaluated only against its source node's outgoing fractional
-    weight distribution; its source p-value is the primary `lans_pvalue`.
+    LANS compares an edge's fractional weight with the empirical distribution
+    of fractional weights at both endpoints and combines the two endpoint
+    p-values. For directed graphs, an arc is compared with its source node's
+    outgoing distribution and its target node's incoming distribution.
 
     Args:
         network: Normalized simple graph to score.
         weight: Edge attribute containing finite positive weights.
-        pvalue_aggregation: How to combine endpoint p-values: `min`, `max`, or
-            `average`.
+        pvalue_aggregation: How to combine endpoint p-values. `min` keeps an
+            edge that is significant for at least one endpoint, `max` requires
+            both, and `average` takes their mean. On directed graphs, `out`
+            uses only the source's outgoing test (important for the sender) and
+            `in` only the target's incoming test (important for the receiver).
         leaf_policy: How degree-one endpoints contribute: `zero` treats the
             leaf endpoint as locally significant, while `ignore` ignores them
             during aggregation when another endpoint is available.
@@ -73,6 +79,12 @@ def compute_lans(
         raise ConfigurationError(
             f"lans parameter 'pvalue_aggregation' must be one of: {allowed}."
         )
+    if pvalue_aggregation in DIRECTED_ONLY_AGGREGATIONS and not network.directed:
+        raise ConfigurationError(
+            f"lans pvalue_aggregation={pvalue_aggregation!r} needs a directed "
+            "graph; an undirected edge has no source or target end. Use 'min', "
+            "'max', or 'average'."
+        )
     if leaf_policy not in LEAF_POLICIES:
         allowed = ", ".join(sorted(LEAF_POLICIES))
         raise ConfigurationError(
@@ -80,12 +92,9 @@ def compute_lans(
         )
 
     weights = _edge_weights(network, weight=weight)
-    fractions = _endpoint_fractions(network, weights)
-    endpoint_pvalues = _endpoint_pvalues(
-        network,
-        fractions,
-        leaf_policy=leaf_policy,
-    )
+    source_fractions, target_fractions = _endpoint_fractions(network, weights)
+    source_pvalues = _endpoint_pvalues(source_fractions, leaf_policy=leaf_policy)
+    target_pvalues = _endpoint_pvalues(target_fractions, leaf_policy=leaf_policy)
 
     rows: list[dict[str, Any]] = []
     for source_id, target_id, attributes in sorted(
@@ -93,19 +102,14 @@ def compute_lans(
         key=lambda edge: edge[2][EDGE_ID_ATTR],
     ):
         edge_id = int(attributes[EDGE_ID_ATTR])
-        source_fraction = fractions[source_id][edge_id]
-        source_pvalue = endpoint_pvalues[source_id][edge_id]
-        if network.directed:
-            target_fraction = None
-            target_pvalue = None
-            lans_pvalue = source_pvalue if source_pvalue is not None else 1.0
-        else:
-            target_fraction = fractions[target_id][edge_id]
-            target_pvalue = endpoint_pvalues[target_id][edge_id]
-            lans_pvalue = _aggregate_pvalues(
-                (source_pvalue, target_pvalue),
-                pvalue_aggregation=pvalue_aggregation,
-            )
+        source_fraction = source_fractions[source_id][edge_id]
+        source_pvalue = source_pvalues[source_id][edge_id]
+        target_fraction = target_fractions[target_id][edge_id]
+        target_pvalue = target_pvalues[target_id][edge_id]
+        lans_pvalue = _aggregate_pvalues(
+            (source_pvalue, target_pvalue),
+            pvalue_aggregation=pvalue_aggregation,
+        )
         rows.append(
             {
                 "edge_id": edge_id,
@@ -151,14 +155,7 @@ def compute_lans(
             "leaf_policy": leaf_policy,
         },
         metadata=LANS_METADATA,
-        warnings=(
-            (
-                "LANS parameter 'pvalue_aggregation' is ignored for directed "
-                "graphs because each arc is evaluated at its source only."
-            ),
-        )
-        if network.directed and pvalue_aggregation != "min"
-        else (),
+        warnings=(),
     )
 
 
@@ -195,38 +192,52 @@ def _edge_weights(network: Network, *, weight: str) -> dict[int, float]:
 def _endpoint_fractions(
     network: Network,
     weights: dict[int, float],
-) -> dict[int, dict[int, float]]:
-    strengths: dict[int, float] = {node_id: 0.0 for node_id in network.graph.nodes}
+) -> tuple[dict[int, dict[int, float]], dict[int, dict[int, float]]]:
+    """Return each edge's weight share at its source and at its target.
+
+    Undirected graphs use one incident distribution per node, so both maps
+    share it. Directed graphs use outgoing shares at the source and incoming
+    shares at the target.
+    """
+
+    outgoing: dict[int, float] = {node_id: 0.0 for node_id in network.graph.nodes}
+    incoming: dict[int, float] = {node_id: 0.0 for node_id in network.graph.nodes}
     for edge_id, edge_weight in weights.items():
         source_id, target_id = network.edge_id_to_endpoints[edge_id]
-        strengths[source_id] += edge_weight
-        if not network.directed:
-            strengths[target_id] += edge_weight
+        outgoing[source_id] += edge_weight
+        incoming[target_id] += edge_weight
+    if not network.directed:
+        strengths = {
+            node_id: outgoing[node_id] + incoming[node_id] for node_id in outgoing
+        }
+        outgoing = incoming = strengths
 
-    fractions: dict[int, dict[int, float]] = {
+    source_fractions: dict[int, dict[int, float]] = {
+        node_id: {} for node_id in network.graph.nodes
+    }
+    target_fractions: dict[int, dict[int, float]] = {
         node_id: {} for node_id in network.graph.nodes
     }
     for edge_id, edge_weight in weights.items():
         source_id, target_id = network.edge_id_to_endpoints[edge_id]
-        fractions[source_id][edge_id] = edge_weight / strengths[source_id]
-        if not network.directed:
-            fractions[target_id][edge_id] = edge_weight / strengths[target_id]
-    return fractions
+        source_fractions[source_id][edge_id] = edge_weight / outgoing[source_id]
+        target_fractions[target_id][edge_id] = edge_weight / incoming[target_id]
+    if not network.directed:
+        for node_id in network.graph.nodes:
+            merged = {**source_fractions[node_id], **target_fractions[node_id]}
+            source_fractions[node_id] = merged
+            target_fractions[node_id] = merged
+    return source_fractions, target_fractions
 
 
 def _endpoint_pvalues(
-    network: Network,
     fractions: dict[int, dict[int, float]],
     *,
     leaf_policy: str,
 ) -> dict[int, dict[int, float | None]]:
     pvalues: dict[int, dict[int, float | None]] = {}
     for node_id, edge_fractions in fractions.items():
-        degree = (
-            network.graph.out_degree[node_id]
-            if network.directed
-            else network.graph.degree[node_id]
-        )
+        degree = len(edge_fractions)
         if degree <= 1 and leaf_policy == "ignore":
             pvalues[node_id] = {edge_id: None for edge_id in sorted(edge_fractions)}
             continue
@@ -252,6 +263,10 @@ def _aggregate_pvalues(
     *,
     pvalue_aggregation: str,
 ) -> float:
+    if pvalue_aggregation == "out":
+        pvalues = (pvalues[0], None)
+    elif pvalue_aggregation == "in":
+        pvalues = (None, pvalues[1])
     available = [pvalue for pvalue in pvalues if pvalue is not None]
     if not available:
         return 1.0

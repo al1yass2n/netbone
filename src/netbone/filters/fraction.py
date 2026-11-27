@@ -65,7 +65,8 @@ def apply_fraction(
 
     resolved_statistic, series = numeric_statistic(method_result, statistic)
     count = len(method_result.statistics)
-    requested_count = math.ceil(requested_fraction * count)
+    # Round away binary floating-point noise first, so 0.07 * 100 keeps 7 items.
+    requested_count = math.ceil(round(requested_fraction * count, 9))
     sorted_rows = _sorted_rows(method_result, series, direction=resolved_direction)
     affected_tied_ids: list[int] = []
 

@@ -1,4 +1,4 @@
-import type { ControlSpec, ControlValue, FilterName, JsonRecord, JsonValue, UiSchema } from "./types";
+import type { ControlSpec, ControlValue, FilterName, JsonRecord, JsonValue, UiSchema, WeightSign } from "./types";
 
 export type SettingKind = "method" | "filter";
 
@@ -28,10 +28,23 @@ export interface SweepEnvironment {
   directed: boolean;
   weighted: boolean;
   positiveIntegerWeights?: boolean;
+  weightSign?: WeightSign | null;
 }
 
 export function record(value: JsonValue | undefined): JsonRecord | undefined {
   return value && typeof value === "object" && !Array.isArray(value) ? value : undefined;
+}
+
+/** Disable options that only make sense on directed graphs, such as outgoing-only aggregation. */
+export function withDirectedOnlyOptions(control: ControlSpec, directed: boolean): ControlSpec {
+  if (directed || !control.options?.some((option) => option.directed_only)) return control;
+  return { ...control, options: control.options.map((option) => option.directed_only ? { ...option, disabled: true } : option) };
+}
+
+/** Whether a control's `shown_when` conditions hold, reading other controls through `valueOf`. */
+export function isControlShown(control: ControlSpec, valueOf: (name: string) => ControlValue | undefined): boolean {
+  return !control.shown_when
+    || Object.entries(control.shown_when).every(([name, expected]) => String(valueOf(name) ?? "") === String(expected));
 }
 
 export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, weighted }: SweepEnvironment): SweepSetting[] {
@@ -39,9 +52,10 @@ export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, w
   const methodControls = (schema.controls.methods[draft.method] || []).filter(
     (control) => !control.disabled && control.control !== "notice"
       && !(directed && control.ignored_when_directed)
+      && !(!directed && control.ignored_when_undirected)
       && !(control.name === "distance_transform" && !weighted)
       && control.name !== "link_prediction_mode" && !control.name.startsWith("iforest_similarity_"),
-  );
+  ).map((control) => withDirectedOnlyOptions(control, directed));
   const filterControls = (schema.controls.filters[draft.filter] || []).filter(
     (control) => !control.disabled && control.control !== "notice"
       && control.name !== "statistic" && !(control.name === "drop_isolates" && method?.target === "node"),
@@ -58,7 +72,13 @@ export function sweepSettings(draft: SweepDraft, schema: UiSchema, { directed, w
       return { ...control, default: "less_equal" };
     }
     return control;
-  });
+  }).filter((control, _index, controls) => isControlShown(control, (name) => {
+    // A varied setting can take the value that needs this control, so keep it.
+    const key = "filter." + name;
+    if (draft.variations.some((variation) => variation.key === key)) return control.shown_when?.[name];
+    const other = controls.find((item) => item.name === name);
+    return draft.fixed[key] ?? (draft.initialFilterParameters?.[name] as ControlValue | undefined) ?? other?.default ?? undefined;
+  }));
   if (draft.method === "link_prediction" && (draft.filter === "default" || draft.filter === "fraction")) {
     filterControls.push({
       name: "direction",

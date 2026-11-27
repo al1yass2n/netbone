@@ -10,6 +10,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -18,7 +19,7 @@ EPSILON_MODES = frozenset({"absolute", "relative"})
 
 DOUBLY_STOCHASTIC_METADATA: dict[str, object] = {
     "name": "doubly_stochastic",
-    "display_name": "Doubly Stochastic Filter",
+    "display_name": "Doubly Stochastic",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "doubly_stochastic_score",
@@ -26,6 +27,7 @@ DOUBLY_STOCHASTIC_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -35,14 +37,13 @@ DOUBLY_STOCHASTIC_METADATA: dict[str, object] = {
         "value": 1.0,
         "operator": "equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "default_epsilon": 1e-4,
     "default_epsilon_mode": "relative",
     "epsilon_mode_options": tuple(sorted(EPSILON_MODES)),
     "component_policy": "connected_components",
     "connected_tie_policy": "stable_edge_id",
-    "reference": "Slater, Physica A / PNAS doubly stochastic transformation.",
-    "doi": "10.1073/pnas.0904725106",
+    **reference_metadata("doubly_stochastic"),
 }
 
 

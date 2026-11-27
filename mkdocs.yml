@@ -26,14 +26,14 @@ nav:
       - Try the web demo: browser/sample-demo.md
       - Run the local web app: browser/launch.md
       - Extract a backbone in the browser: browser/first-session.md
-      - Import a network: browser/import.md
-      - Compare and sweep: browser/evaluate.md
+      - Import a network in the browser: browser/import.md
+      - Compare, sweep, and export in the browser: browser/evaluate.md
   - Methods:
       - Method catalog: reference/methods.md
       - Edge Weight: methods/edge_weight.md
       - Edge Betweenness: methods/edge_betweenness.md
       - Disparity: methods/disparity.md
-      - Locally Adaptive Network Sparsification: methods/lans.md
+      - LANS: methods/lans.md
       - Link Salience: methods/link_salience.md
       - Link Prediction: methods/link_prediction.md
       - Link Prediction Isolation Forest: methods/link_prediction_iforest.md
@@ -41,26 +41,28 @@ nav:
       - Maximum Spanning Forest: methods/maximum_spanning_forest.md
       - Primary Linkage: methods/primary_linkage.md
       - Multiple Linkage: methods/multiple_linkage.md
-      - Planar Maximally Filtered Graph: methods/planar_maximally_filtered_graph.md
+      - PMFG: methods/planar_maximally_filtered_graph.md
       - H-Backbone: methods/h_backbone.md
       - Doubly Stochastic: methods/doubly_stochastic.md
       - Marginal Likelihood: methods/marginal_likelihood.md
       - Noise Corrected: methods/noise_corrected.md
-      - Globally and Locally Adaptive Network Backbone: methods/glanb.md
+      - GLANB: methods/glanb.md
       - Node Degree: methods/node_degree.md
       - Node Strength: methods/node_strength.md
       - Node Betweenness: methods/node_betweenness.md
+  - Filters:
+      - Threshold: filters/threshold.md
+      - Fraction: filters/fraction.md
+      - Significance: filters/significance.md
+      - Method default: filters/default.md
   - API reference:
       - Pipelines and results: reference/pipelines.md
       - Networks and loaders: reference/networks.md
       - Comparison, sweeps, and exports: reference/measurement.md
       - Temporal input and aggregation: reference/temporal.md
-      - Registry discovery: reference/registry.md
-      - Threshold: filters/threshold.md
-      - Fraction: filters/fraction.md
-      - Significance: filters/significance.md
-      - Method default: filters/default.md
+      - Registry and helpers: reference/registry.md
   - Project:
+      - Release notes: changelog.md
       - Troubleshooting: help.md
       - Develop and publish the documentation: develop.md
 
@@ -78,15 +80,23 @@ plugins:
             show_source: false
             filters: ["!^_"]
 
+hooks:
+  - docs_hooks/mathml.py
+  - docs_hooks/site.py
+
 markdown_extensions:
+  - admonition
   - attr_list
-  - fenced_code
   - md_in_html
   - toc:
       permalink: true
-  - codehilite:
+  - pymdownx.highlight:
+      css_class: codehilite
       guess_lang: false
-      noclasses: false
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
 
 extra_css:
   - assets/docs-syntax.css

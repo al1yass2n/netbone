@@ -4,7 +4,9 @@ include mkdocs.yml
 include README.md
 recursive-include docs *.md *.css *.js
 recursive-include docs_theme *.html
+recursive-include docs_hooks *.py
 recursive-include docs/assets/fonts *.woff2 *.txt
+recursive-include docs/assets/screens *.png
 prune docs/demo
 recursive-include examples *.csv *.py
 recursive-include src/netbone/webapp/static *.css *.html *.js
@@ -13,5 +15,6 @@ include web/playwright.config.mjs
 include web/playwright.demo.config.mjs
 recursive-include web/browser-tests *.mjs
 recursive-include web/demo-tests *.mjs
+recursive-include web/scripts *.mjs
 recursive-include web/src *.css *.ts *.tsx
 recursive-include tests *.py

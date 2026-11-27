@@ -10,17 +10,29 @@ node labels and input attributes. The input graph stays available as
 
 | Input | Python entry point | How weights and direction are handled |
 | --- | --- | --- |
-| CSV or TSV edge list | `nb.from_edgelist(path)` | Selected weight column becomes `weight`. Set `weight=None` for files without a weight column and `delimiter="\t"` for TSV. |
+| CSV, TSV, or space-separated edge list | `nb.from_edgelist(path)` | Selected weight column becomes `weight`. Set `weight=None` for files without a weight column, `delimiter="\t"` for TSV, and `delimiter=" "` for columns separated by spaces. |
 | GraphML | `nb.from_graphml(path)` | Direction and node and edge attributes come from the file. Pass the chosen numeric attribute to the scoring method. |
 | NetworkX | `nb.from_graph(graph)` | A simple `Graph` or `DiGraph` is normalized. Scoring and pipeline execution also accept NetworkX graphs directly. |
 | Time-stamped rows | `nb.from_temporal_edgelist(path)` | [Aggregate events into a weighted graph](temporal.md) before running a pipeline. |
 
 By default, static edge lists expect `source`, `target`, and `weight` columns.
-Pass their actual names as keyword arguments. A static file needs one row per
-edge. With `directed=False`, reverse rows belong to the same undirected edge and
-are rejected as duplicates. CSV input infers column types through pandas, so use
-string labels with a prefix if leading zeros are meaningful. GraphML or a
-NetworkX graph can represent isolated nodes explicitly.
+Pass their actual names as keyword arguments. Files must be UTF-8 text; in
+Excel, save as **CSV UTF-8**. A static file needs one row per edge, and a file
+with a header but no rows is rejected. With `directed=False`, reverse rows
+belong to the same undirected edge, so a `b,a` row after `a,b` is rejected with
+both row numbers and a hint to pass `directed=True`. Merge rows that really
+repeat an edge before loading, for example by summing their weights.
+
+Node ids are read as written: a column of plain integers such as `1, 2, 10`
+becomes Python ints, and anything else, including `007`, `NA`, or `None`, stays
+a string label. Spaces after the delimiter are ignored, and so is a trailing
+delimiter at the end of each row. With `delimiter=" "`, any run of spaces or
+tabs separates two values, so aligned columns load as they look. Put a label
+that contains a space in double quotes, as in `"New York"`. A row with more non-empty values than the
+header has columns is rejected with its row number, because its columns would
+not line up. Weights must be finite numbers (`true` and `false` are rejected),
+and a self-loop row is rejected with its row number. GraphML or a NetworkX
+graph can represent isolated nodes explicitly.
 
 ## Preserve or project directed links
 
@@ -36,13 +48,17 @@ import netbone as nb
 
 flows = nx.DiGraph()
 flows.add_weighted_edges_from([("north", "south", 4), ("south", "north", 3)])
-projected = nb.to_undirected(flows, weight="weight", reciprocal_merge="sum")
+projected = nb.to_undirected(flows)
 assert projected.to_original_graph()["north"]["south"]["weight"] == 7
 ```
 
-The merge choices are `sum`, `mean`, `max`, and `min`. Use
-`weight=None, reciprocal_merge=None` for unweighted projection. Reciprocal
-attribute conflicts are recorded as directional provenance.
+The default `weight="auto"` follows the same rule as scoring: weights are
+merged when every arc has a `weight`, the projection is unweighted when none
+do, and an error names the count when only some do. Choose the merge with
+`reciprocal_merge`: `sum` (default), `mean`, `max`, or `min`. Pass
+`weight=None` for an unweighted projection; it removes `weight` from every
+edge, so the result is never partially weighted. Other reciprocal attribute
+conflicts are recorded as directional provenance.
 
 Parallel edges are unsupported. Most methods reject self-loops, so check
 compatibility before scoring data with loops. The

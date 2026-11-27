@@ -16,7 +16,7 @@ Install from the current repository and launch the app.
 git clone https://github.com/al1yass2n/netbone.git
 cd netbone
 python -m pip install .
-netbone-web
+python -m netbone.webapp
 ```
 
 Open [127.0.0.1:8765](http://127.0.0.1:8765/). Pick a built-in example or

@@ -9,6 +9,7 @@ import networkx as nx
 import pandas as pd
 
 from netbone.exceptions import ConfigurationError, ValidationError
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -25,14 +26,14 @@ GLANB_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "optional",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "significance",
-    "default_weight": None,
+    "default_weight": "auto",
     "requires_parameter": ("c",),
-    "reference": "Zhang et al., PLoS ONE 9(6): e100428 (2014).",
-    "doi": "10.1371/journal.pone.0100428",
+    **reference_metadata("glanb"),
 }
 
 
@@ -226,8 +227,22 @@ def _endpoint_significance(
             if degree <= 1:
                 significance[edge_id][node_id] = None
                 continue
-            significance[edge_id][node_id] = (1.0 - value) ** ((degree - 1) ** c)
+            significance[edge_id][node_id] = _endpoint_statistic(value, degree, c=c)
     return significance
+
+
+def _endpoint_statistic(value: float, degree: int, *, c: float) -> float:
+    """Return ``(1 - value) ** ((degree - 1) ** c)`` without overflowing.
+
+    A large ``c`` can make the exponent exceed the float range. The limit is
+    then exact: 0 when the involvement is positive and 1 when it is zero.
+    """
+
+    try:
+        exponent = float(degree - 1) ** c
+    except OverflowError:
+        exponent = math.inf
+    return (1.0 - value) ** exponent
 
 
 def _aggregate_significance(

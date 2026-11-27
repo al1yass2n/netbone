@@ -6,13 +6,14 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.methods._references import reference_metadata
 from netbone.methods._utils import edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
 
 PRIMARY_LINKAGE_METADATA: dict[str, object] = {
     "name": "primary_linkage",
-    "display_name": "Primary Linkage Analysis",
+    "display_name": "Primary Linkage",
     "target": "edge",
     "output_type": "score",
     "primary_statistic": "primary_linkage_selected",
@@ -20,6 +21,7 @@ PRIMARY_LINKAGE_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": False,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -28,10 +30,9 @@ PRIMARY_LINKAGE_METADATA: dict[str, object] = {
         "value": 1.0,
         "operator": "equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "tie_policy": "stable_edge_id",
-    "reference": "Nocaj, Ortmann, and Brandes, Computer Graphics Forum 28(3), 2009.",
-    "doi": "10.1111/j.1467-9663.2009.00547.x",
+    **reference_metadata("primary_linkage"),
 }
 
 

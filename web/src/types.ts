@@ -16,6 +16,7 @@ export interface OptionSpec {
   label: string;
   description?: string;
   disabled?: boolean;
+  directed_only?: boolean;
   illustration?: Record<string, JsonValue>;
 }
 
@@ -34,6 +35,10 @@ export interface ControlSpec {
   disabled_reason?: string;
   ignored_when_directed?: boolean;
   ignored_when_directed_reason?: string;
+  ignored_when_undirected?: boolean;
+  ignored_when_undirected_reason?: string;
+  /** Show the control only while these other controls hold these values. */
+  shown_when?: Record<string, ControlValue>;
   options?: OptionSpec[];
 }
 
@@ -49,12 +54,23 @@ export interface MethodSpec {
   default_filter_parameters: Record<string, ControlValue>;
   requires_weights: boolean;
   requires_integer_weights?: boolean;
+  requires_positive_weights?: boolean;
+  requires_nonnegative_weights?: boolean;
   supports_directed: boolean;
   supports_weighted: boolean;
   approaches: string[];
   meaning_template?: string;
   score_meaning_template?: string;
   filter_reason?: string;
+  references?: MethodReference[];
+  reference_note?: string | null;
+}
+
+export interface MethodReference {
+  citation: string;
+  doi: string;
+  url: string;
+  bibtex: string;
 }
 
 export type FilterName = "default" | "fraction" | "significance" | "threshold";
@@ -74,6 +90,8 @@ export interface TemporalWeightingSpec {
   uses_age: boolean;
   default_parameters: Record<string, number>;
   required_parameters: string[];
+  references?: MethodReference[];
+  reference_note?: string | null;
 }
 
 export interface UiSchema {
@@ -130,8 +148,11 @@ export interface NetworkContext {
   time: string;
 }
 
+export type WeightSign = "positive" | "nonnegative" | "mixed";
+
 export interface PreviewResponse {
   positive_integer_weights?: boolean;
+  weight_sign?: WeightSign | null;
   status?: string;
   valid?: boolean;
   can_run?: boolean;

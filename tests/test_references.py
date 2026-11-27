@@ -1,0 +1,148 @@
+"""Method references stay complete and consistent across code, docs, and app."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import networkx as nx
+import pytest
+
+import netbone as nb
+from netbone.webapp.bridge import ui_schema_payload
+
+DOCS = Path(__file__).resolve().parents[1] / "docs" / "methods"
+TEMPORAL_DOCS = Path(__file__).resolve().parents[1] / "docs" / "python" / "temporal.md"
+BASELINES = {"edge_weight"}
+TEMPORAL_FRAMEWORK_DOI = "10.1109/COMPENG69955.2026.11766128"
+
+
+@pytest.mark.parametrize("name", nb.list_methods())
+def test_every_method_cites_its_source(name: str) -> None:
+    metadata = nb.describe_method(name)
+    references = metadata["references"]
+
+    if name in BASELINES:
+        assert references == ()
+        assert metadata["reference"] is None
+        assert metadata["doi"] is None
+        assert metadata["reference_note"]
+        return
+
+    assert references
+    assert metadata["reference"] == references[0]["citation"]
+    assert metadata["doi"] == references[0]["doi"]
+    for reference in references:
+        assert reference["citation"].strip()
+        assert reference["doi"].startswith("10.")
+        assert reference["url"] == f"https://doi.org/{reference['doi']}"
+    json.dumps(metadata)
+
+
+@pytest.mark.parametrize("name", nb.list_methods())
+def test_every_method_page_lists_the_metadata_references(name: str) -> None:
+    page = (DOCS / f"{name}.md").read_text(encoding="utf-8")
+    metadata = nb.describe_method(name)
+
+    assert "\n## References\n" in page
+    for reference in metadata["references"]:
+        assert reference["citation"] in page
+        assert f"({reference['url']})" in page
+        assert reference["bibtex"] in page
+    if metadata.get("reference_note"):
+        assert str(metadata["reference_note"]) in " ".join(page.split())
+
+
+@pytest.mark.parametrize("name", nb.list_methods())
+def test_every_method_page_facts_match_the_metadata(name: str) -> None:
+    page = (DOCS / f"{name}.md").read_text(encoding="utf-8")
+    facts = page.split('<dl class="method-facts">', 1)[1].split("</dl>", 1)[0]
+    metadata = nb.describe_method(name)
+    direction = (
+        "lower is stronger"
+        if metadata["preferred_direction"] == "lower"
+        else "higher is stronger"
+    )
+
+    assert f"<dd><code>{name}</code></dd>" in facts
+    assert f"<dd>{'Edges' if metadata['target'] == 'edge' else 'Nodes'}</dd>" in facts
+    assert f"<code>{metadata['primary_statistic']}</code>, {direction}" in facts
+    directed = "Supported" if metadata["supports_directed"] else "Not supported"
+    assert f"<dt>Directed graphs</dt><dd>{directed}</dd>" in facts
+    weights = facts.split("<dt>Weights</dt><dd>", 1)[1].split("</dd>", 1)[0]
+    expected = {"required": "Required", "optional": "Optional", "ignored": "Ignored"}
+    assert weights.startswith(expected[str(metadata["weight_mode"])])
+
+
+def test_web_method_cards_carry_the_references() -> None:
+    cards = {card["name"]: card for card in ui_schema_payload()["methods"]}
+
+    for name in nb.list_methods():
+        metadata = nb.describe_method(name)
+        assert cards[name]["references"] == [
+            dict(reference) for reference in metadata["references"]
+        ]
+        assert cards[name]["reference_note"] == metadata.get("reference_note")
+
+
+def test_report_lists_every_method_reference() -> None:
+    graph = nx.Graph()
+    graph.add_weighted_edges_from([("a", "b", 3.0), ("b", "c", 2.0), ("c", "a", 1.0)])
+    result = (
+        nb.pipeline().score("node_betweenness").filter("fraction", fraction=0.5)
+    ).run(graph)
+    method = nb.report(result).to_dict()["sections"]["method"]
+
+    assert [reference["doi"] for reference in method["references"]] == [
+        "10.2307/3033543",
+        "10.1080/0022250X.2001.9990249",
+    ]
+    assert "Brandes, U. (2001)" in nb.report(result).to_markdown()
+
+
+def test_docs_and_app_share_one_bibtex_entry() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "docs" / "index.md").read_text(encoding="utf-8")
+    docs_entry = page.split("```bibtex\n", 1)[1].split("```", 1)[0]
+    footer = (root / "web" / "src" / "components" / "CitationFooter.tsx").read_text(
+        encoding="utf-8"
+    )
+    doi = footer.split('const doi = "', 1)[1].split('"', 1)[0]
+    app_entry = footer.split("const bibtex = `", 1)[1].split("`;", 1)[0]
+
+    assert docs_entry == app_entry.replace("${doi}", doi)
+
+
+@pytest.mark.parametrize("name", nb.list_temporal_weightings())
+def test_every_temporal_weighting_cites_its_source(name: str) -> None:
+    metadata = nb.describe_temporal_weighting(name)
+    page = TEMPORAL_DOCS.read_text(encoding="utf-8")
+
+    if name == "baseline":
+        assert metadata["references"] == ()
+        assert metadata["reference"] is None
+        assert metadata["reference_note"]
+        return
+
+    assert [reference["doi"] for reference in metadata["references"]] == [
+        TEMPORAL_FRAMEWORK_DOI
+    ]
+    assert metadata["reference"] == metadata["references"][0]["citation"]
+    for reference in metadata["references"]:
+        assert reference["citation"] in page
+        assert f"({reference['url']})" in page
+        assert reference["bibtex"] in page
+    json.dumps(metadata)
+
+
+def test_web_temporal_weightings_carry_the_references() -> None:
+    weightings = {
+        item["name"]: item for item in ui_schema_payload()["temporal"]["weightings"]
+    }
+
+    for name in nb.list_temporal_weightings():
+        metadata = nb.describe_temporal_weighting(name)
+        assert weightings[name]["references"] == [
+            dict(reference) for reference in metadata["references"]
+        ]
+        assert weightings[name]["reference_note"] == metadata.get("reference_note")

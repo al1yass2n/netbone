@@ -40,6 +40,21 @@ new examples from an installed environment.
 Open the demo from the homepage. Regenerate its files after changing the
 dataset, supported settings, web interface, or Python result format.
 
+## Refresh the web app screenshots
+
+The browser guides show screenshots of the web app. A script regenerates
+them from the local app and the built demo, so they match the current
+interface. Run it after a visible UI change, once the demo is built.
+
+```bash
+npm run screenshots --prefix web
+```
+
+It writes PNG files to `docs/assets/screens`. Set `NETBONE_PYTHON` to choose
+the Python interpreter, and `NETBONE_BROWSER_EXECUTABLE` or
+`NETBONE_BROWSER_CHANNEL` to choose the browser Playwright starts. Review the
+images before committing them.
+
 ## Run project checks
 
 ```bash
@@ -57,9 +72,10 @@ run individual examples with Python, for instance
 `python examples/parameter_sweep.py`.
 
 If working on the frontend, CI uses Node.js 24. Use `npm ci --prefix web` to
-install frontend dependencies and `npm run build --prefix web` to build the
-packaged assets. Build assets only if working on the UI or preparing a
-package release.
+install frontend dependencies, `npm test --prefix web` to run the frontend unit
+tests, and `npm run build --prefix web` to build the packaged assets. Commit the
+rebuilt `src/netbone/webapp/static` files with any UI change; CI fails when they
+differ from a fresh build.
 
 ## Publish the static site
 

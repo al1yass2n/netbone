@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import math
+import re
 import warnings
 from collections.abc import Hashable
 from pathlib import Path
@@ -12,11 +14,184 @@ from xml.etree.ElementTree import ParseError
 import networkx as nx
 import pandas as pd
 
-from netbone.exceptions import ValidationError
+from netbone.exceptions import CompatibilityError, ValidationError
 from netbone.network import Network, normalize_edgelist_graph, normalize_loaded_graph
 from netbone.temporal.model import EVENT_COLUMNS, TemporalNetwork
 
 TemporalTime: TypeAlias = int | float | pd.Timestamp
+
+WHITESPACE_DELIMITER = " "
+"""Delimiter value meaning any run of spaces or tabs separates two values."""
+
+_WHITESPACE_FIELD = re.compile(r'"((?:[^"]|"")*)"|(\S+)')
+
+# Markers pandas would read as missing. Node id columns ignore them so labels
+# such as "NA" (Namibia) or "None" stay ordinary node ids.
+_MISSING_VALUE_MARKERS = (
+    "",
+    "#N/A",
+    "#N/A N/A",
+    "#NA",
+    "-1.#IND",
+    "-1.#QNAN",
+    "-NaN",
+    "-nan",
+    "1.#IND",
+    "1.#QNAN",
+    "<NA>",
+    "N/A",
+    "NA",
+    "NULL",
+    "NaN",
+    "None",
+    "n/a",
+    "nan",
+    "null",
+)
+
+
+def split_whitespace_fields(line: str) -> list[str]:
+    """Split a line on runs of spaces or tabs, keeping quoted values whole."""
+
+    return [
+        quoted.replace('""', '"') if quoted is not None else bare
+        for quoted, bare in (
+            (match.group(1), match.group(2))
+            for match in _WHITESPACE_FIELD.finditer(line)
+        )
+    ]
+
+
+def _read_table(
+    path: Path,
+    *,
+    delimiter: str,
+    id_columns: tuple[str, ...],
+    value_columns: tuple[str, ...],
+) -> pd.DataFrame:
+    """Read a delimited table keeping node ids exactly as written."""
+
+    if path.is_dir():
+        raise ValidationError(
+            f"{path} is a folder, not a file. Pass the CSV file path."
+        )
+    _check_row_widths(path, delimiter=delimiter)
+    with warnings.catch_warnings():
+        # Extra trailing empty fields are already known to be empty here.
+        warnings.simplefilter("ignore", pd.errors.ParserWarning)
+        try:
+            return pd.read_csv(
+                path,
+                delimiter=r"\s+" if delimiter == WHITESPACE_DELIMITER else delimiter,
+                dtype={column: str for column in id_columns},
+                keep_default_na=False,
+                na_values={
+                    column: list(_MISSING_VALUE_MARKERS) for column in value_columns
+                },
+                skipinitialspace=True,
+                # Never promote the first column to an index when rows run long.
+                index_col=False,
+            )
+        except UnicodeDecodeError as exc:
+            raise ValidationError(
+                f"{path.name} is not UTF-8 text. Save it as UTF-8 (for example "
+                '"CSV UTF-8" in Excel) and load it again.'
+            ) from exc
+
+
+def duplicate_edge_message(
+    where: str,
+    endpoints: tuple[Hashable, Hashable],
+    first: tuple[int, Hashable, Hashable],
+    *,
+    directed: bool,
+    directed_hint: str = "pass directed=True",
+) -> str:
+    """Describe a repeated edge, naming the row that first defined it."""
+
+    source, target = endpoints
+    first_row, first_source, first_target = first
+    if directed:
+        return (
+            f"{where} repeats the arc {source!r} -> {target!r} from row {first_row}. "
+            "Merge repeated rows first, for example by summing their weights."
+        )
+    if (source, target) != (first_source, first_target):
+        return (
+            f"{where} ({source!r}, {target!r}) repeats the edge between "
+            f"{first_source!r} and {first_target!r} from row {first_row}. In an "
+            f"undirected file both orders are the same edge; {directed_hint} to "
+            "keep both directions."
+        )
+    return (
+        f"{where} repeats the edge between {source!r} and {target!r} from row "
+        f"{first_row}. Merge repeated rows first, for example by summing their "
+        "weights."
+    )
+
+
+def _check_row_widths(path: Path, *, delimiter: str) -> None:
+    """Reject rows with more values than the header, allowing trailing empties.
+
+    Spreadsheet exports often end every row with a delimiter, which is harmless.
+    A non-empty extra value means the columns do not line up with the header.
+    """
+
+    if len(delimiter) != 1:
+        return
+    with path.open(newline="", encoding="utf-8-sig", errors="replace") as handle:
+        reader = (
+            (split_whitespace_fields(line) for line in handle)
+            if delimiter == WHITESPACE_DELIMITER
+            else csv.reader(handle, delimiter=delimiter, skipinitialspace=True)
+        )
+        header = next((row for row in reader if row), None)
+        if header is None:
+            return
+        width = len(header)
+        row_number = 1
+        for row in reader:
+            if not row:
+                continue
+            row_number += 1
+            extra = [value for value in row[width:] if value.strip()]
+            if extra:
+                raise ValidationError(
+                    f"Row {row_number} of {path.name} has {len(row)} values but the "
+                    f"header has {width} columns. Check the delimiter, or add a "
+                    "header for the extra column."
+                )
+
+
+def _node_id_columns(
+    table: pd.DataFrame, source: str, target: str
+) -> tuple[list[Hashable], list[Hashable]]:
+    """Convert source and target ids together so both use the same id type."""
+
+    combined = _node_id_values(pd.concat([table[source], table[target]]))
+    return combined[: len(table)], combined[len(table) :]
+
+
+def _node_id_values(values: pd.Series) -> list[Hashable]:
+    """Return node ids, converting to numbers only when no label would change.
+
+    A column of plain integers such as ``1, 2, 10`` becomes Python ints. Labels
+    with leading zeros, signs, decimals or text stay strings, so ``007`` and
+    ``7`` remain different nodes.
+    """
+
+    texts = ["" if pd.isna(value) else str(value).strip() for value in values]
+    present = [text for text in texts if text]
+    if present and all(_is_canonical_integer(text) for text in present):
+        return [int(text) if text else "" for text in texts]
+    return list(texts)
+
+
+def _is_canonical_integer(text: str) -> bool:
+    try:
+        return str(int(text)) == text
+    except ValueError:
+        return False
 
 
 def from_edgelist(
@@ -37,19 +212,26 @@ def from_edgelist(
         target: Column containing target node ids.
         weight: Optional column containing numeric edge weights. When provided,
             values are stored on edges as the canonical `weight` attribute.
-        delimiter: Field delimiter, defaulting to comma.
+        delimiter: Field delimiter, defaulting to comma. Pass `" "` for files
+            whose columns are separated by spaces or tabs; any run of them
+            counts as one separator, and quoted values may contain spaces.
         context: Optional user-supplied context retained in result metadata.
         directed: Whether source-to-target order defines directed arcs. When
             false, reversed rows are duplicate undirected edges.
 
     Raises:
         ValidationError: If required columns are missing, ids are missing, edge
-            weights are invalid, or duplicate simple-graph edges are present.
+            weights are invalid, an edge is repeated, or the file has no rows.
     """
 
     edge_path = Path(path)
     try:
-        table = pd.read_csv(edge_path, delimiter=delimiter)
+        table = _read_table(
+            edge_path,
+            delimiter=delimiter,
+            id_columns=(source, target),
+            value_columns=() if weight is None else (weight,),
+        )
     except FileNotFoundError as exc:
         raise ValidationError(f"Edge-list file does not exist: {edge_path}.") from exc
     except pd.errors.EmptyDataError as exc:
@@ -68,16 +250,27 @@ def from_edgelist(
 
     if not isinstance(directed, bool):
         raise ValidationError("from_edgelist parameter 'directed' must be a boolean.")
+    if table.empty:
+        raise ValidationError(
+            f"Edge-list file {edge_path.name} has a header but no edges."
+        )
 
     graph = nx.DiGraph() if directed else nx.Graph()
-    seen_edges: set[tuple[Hashable, Hashable]] = set()
+    seen_edges: dict[tuple[Hashable, Hashable], tuple[int, Hashable, Hashable]] = {}
+    source_ids, target_ids = _node_id_columns(table, source, target)
 
-    for row_number, row in table.iterrows():
-        source_value = row[source]
-        target_value = row[target]
-        if pd.isna(source_value) or pd.isna(target_value):
+    for position, (_, row) in enumerate(table.iterrows()):
+        row_number = position + 2
+        source_value = source_ids[position]
+        target_value = target_ids[position]
+        if source_value == "" or target_value == "":
             raise ValidationError(
-                f"Edge-list row {row_number + 2} has a missing source or target id."
+                f"Edge-list row {row_number} has a missing source or target id."
+            )
+        if source_value == target_value:
+            raise CompatibilityError(
+                f"Edge-list row {row_number} is a self-loop on node "
+                f"{source_value!r}. Self-loops are not supported; remove the row."
             )
 
         edge_attributes: dict[str, object] = {}
@@ -85,26 +278,44 @@ def from_edgelist(
             weight_value = row[weight]
             if pd.isna(weight_value):
                 raise ValidationError(
-                    f"Edge-list row {row_number + 2} has a missing weight value."
+                    f"Edge-list row {row_number} has a missing weight value."
+                )
+            if isinstance(weight_value, bool) or pd.api.types.is_bool(weight_value):
+                raise ValidationError(
+                    f"Edge-list row {row_number} has a boolean weight "
+                    f"{str(weight_value).lower()!r} in column {weight!r}. Use "
+                    "numbers, or pass weight=None for an unweighted network."
                 )
             try:
-                edge_attributes["weight"] = float(weight_value)
+                numeric_weight = float(weight_value)
             except (TypeError, ValueError) as exc:
                 raise ValidationError(
-                    f"Edge-list row {row_number + 2} has a non-numeric weight "
+                    f"Edge-list row {row_number} has a non-numeric weight "
                     f"value in column {weight!r}."
                 ) from exc
+            if not math.isfinite(numeric_weight):
+                raise ValidationError(
+                    f"Edge-list row {row_number} has a non-finite weight value "
+                    f"in column {weight!r}."
+                )
+            edge_attributes["weight"] = numeric_weight
 
-        edge_key = (
+        first, second = (
             (source_value, target_value)
             if directed
-            else tuple(sorted((source_value, target_value), key=repr))
+            else sorted((source_value, target_value), key=repr)
         )
+        edge_key: tuple[Hashable, Hashable] = (first, second)
         if edge_key in seen_edges:
             raise ValidationError(
-                f"Duplicate simple-graph edge found in edge-list row {row_number + 2}."
+                duplicate_edge_message(
+                    f"Edge-list row {row_number}",
+                    (source_value, target_value),
+                    seen_edges[edge_key],
+                    directed=directed,
+                )
             )
-        seen_edges.add(edge_key)
+        seen_edges[edge_key] = (row_number, source_value, target_value)
         graph.add_edge(source_value, target_value, **edge_attributes)
 
     metadata = (
@@ -184,7 +395,9 @@ def from_temporal_edgelist(
         time: Column containing numeric times or datetime values.
         event_weight: Optional numeric non-negative event magnitude column.
             Omit it to give every event magnitude `1.0`.
-        delimiter: Field delimiter, defaulting to comma.
+        delimiter: Field delimiter, defaulting to comma. Pass `" "` for files
+            whose columns are separated by spaces or tabs; any run of them
+            counts as one separator, and quoted values may contain spaces.
         context: Optional user context retained on aggregated networks.
         directed: Whether source-to-target order defines directed temporal arcs.
 
@@ -194,7 +407,12 @@ def from_temporal_edgelist(
 
     event_path = Path(path)
     try:
-        table = pd.read_csv(event_path, delimiter=delimiter)
+        table = _read_table(
+            event_path,
+            delimiter=delimiter,
+            id_columns=(source, target),
+            value_columns=(time,) if event_weight is None else (time, event_weight),
+        )
     except FileNotFoundError as exc:
         raise ValidationError(
             f"Temporal event-list file does not exist: {event_path}."
@@ -234,11 +452,12 @@ def from_temporal_edgelist(
     seen_nodes: set[Hashable] = set()
     records: list[dict[str, object]] = []
     self_interaction_count = 0
-    for position, (_, row) in enumerate(table.iterrows()):
+    source_ids, target_ids = _node_id_columns(table, source, target)
+    for position in range(len(table)):
         row_number = position + 2
-        source_value = row[source]
-        target_value = row[target]
-        if pd.isna(source_value) or pd.isna(target_value):
+        source_value = source_ids[position]
+        target_value = target_ids[position]
+        if source_value == "" or target_value == "":
             raise ValidationError(
                 f"Temporal event-list row {row_number} has a missing source or "
                 "target id."
@@ -339,6 +558,23 @@ def _temporal_times(
                 )
             parsed_numeric.append(int(result) if result.is_integer() else result)
         return parsed_numeric, "numeric"
+
+    is_number = numeric.notna().to_numpy()
+    if is_number.any():
+        number_position = int(is_number.nonzero()[0][0])
+        text_position = int((~is_number).nonzero()[0][0])
+        try:
+            pd.to_datetime(values.iloc[text_position], errors="raise", utc=True)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValidationError(
+                f"Temporal event-list row {text_position + 2} has an invalid "
+                f"numeric or datetime value in column {column!r} from {path}."
+            ) from exc
+        raise ValidationError(
+            f"Temporal event-list column {column!r} mixes numbers (row "
+            f"{number_position + 2}) and dates (row {text_position + 2}). Use one "
+            "kind of time value for every row."
+        )
 
     parsed_datetimes: list[TemporalTime] = []
     for position, value in enumerate(values):

@@ -13,7 +13,7 @@ import networkx as nx
 from netbone._version import __version__
 from netbone.exceptions import CompatibilityError, ConfigurationError, ValidationError
 from netbone.filters.registry import get_filter
-from netbone.methods.registry import get_method
+from netbone.methods.registry import get_method, run_method
 from netbone.network import Network, ensure_network
 from netbone.results import BackboneResult, MethodResult, Selection
 
@@ -354,7 +354,7 @@ def _compute_method(
             "the graph to undirected with an explicit aggregation rule before "
             "scoring."
         )
-    return method.compute(network, parameters)
+    return run_method(method, network, parameters)
 
 
 def _apply_filter(

@@ -218,7 +218,7 @@ def test_link_prediction_iforest_reports_missing_optional_dependency(
 
     monkeypatch.setattr(iforest_method, "import_module", missing_dependency)
 
-    with pytest.raises(nb.ConfigurationError, match=r"netbone\[ml\]"):
+    with pytest.raises(nb.ConfigurationError, match=r"pip install \"\.\[ml\]\""):
         nb.score(
             _feature_graph(),
             method="link_prediction_iforest",
