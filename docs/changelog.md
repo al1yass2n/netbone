@@ -57,6 +57,12 @@ ported. It adds:
 - Edge lists and event lists can be separated by spaces. Pass
   `delimiter=" "` in Python, or pick **Space** in the web app, which also
   detects such files. Any run of spaces or tabs counts as one separator.
+- The web app has a new look. Analysis, Compare and Sweep are tabs in one
+  header. The method picker groups methods by family and shows each one's
+  goal, tags and source. The network preview uses a force layout. Tables hide
+  id columns, page through long results and mark rows as Kept or Dropped.
+  Charts use round axis ticks, and each table or chart has one **Download**
+  menu.
 
 **Stricter input checks**
 

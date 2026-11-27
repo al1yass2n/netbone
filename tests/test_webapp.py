@@ -678,19 +678,19 @@ def test_webapp_source_filters_methods_by_discovery_facets() -> None:
 def test_webapp_source_keeps_method_details_in_selected_pane() -> None:
     app = _frontend_text("App.tsx")
 
-    assert '<span aria-hidden="true">1</span> Scoring method</h2>' in app
+    assert '<span aria-hidden="true">1</span> Method</h2>' in app
     assert '<span aria-hidden="true">2</span> Filter</h2>' in app
     assert "<strong>{method.label}</strong>" in app
     assert "<strong>{filterLabel(filterName)}</strong>" in app
     assert "Start with a goal" not in app
     assert "Clear search and filters" in app
-    assert '"Change method" : "Choose method"' in app
+    assert 'aria-label="Change method"' in app
     assert "methodDialog.current?.showModal()" in app
     assert "Advanced method settings" in app
     assert "compactChoices" in app
     assert "Browse methods to choose one for this network." in app
     assert "Recommended selection" in app
-    assert '"Change filter" : "Choose filter"' in app
+    assert 'aria-label="Change filter"' in app
     assert "</button> : methodChoiceButton}" in app
     assert '{score && method && <section className="analysis-step">' in app
     assert "Advanced filter options" in app

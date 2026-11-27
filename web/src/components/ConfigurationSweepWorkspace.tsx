@@ -128,7 +128,6 @@ export function SweepWorkspace({ schema, method, filterName, directed, weighted,
     <main className="workspace sweep-workspace sweep-setup-workspace" aria-labelledby="sweep-title">
       <header className="workspace-header">
         <div>
-          <span className="eyebrow">{preview ? "SWEEP / REVIEW" : "SWEEP / CONFIGURE"}</span>
           <h1 id="sweep-title" ref={heading} tabIndex={-1}>{preview ? "Review sweep runs" : "Test a range of settings"}</h1>
           <p>{preview ? "Check the values Netbone will use before running the sweep."
             : "Choose a setting and enter the values you want to compare."}</p>
@@ -447,7 +446,7 @@ function SweepResultsView({ result, drawerOpen, onDrawer, onEdit, heading }: { r
   const runLabels = sweepRunLabels(result);
   return <main className="workspace sweep-workspace sweep-results-workspace" aria-labelledby="sweep-results-title">
     <header className="workspace-header">
-      <div><span className="eyebrow">SWEEP / RESULTS</span><h1 id="sweep-results-title" ref={heading} tabIndex={-1}>Sweep results</h1><p>See how your settings affected retention and other backbone properties.</p></div>
+      <div><h1 id="sweep-results-title" ref={heading} tabIndex={-1}>Sweep results</h1><p>See how your settings affected retention and other backbone properties.</p></div>
       <div className="figure-actions">
         <button className="button button--quiet" onClick={() => onDrawer(true)}><Settings2 size={16} /> Run settings</button>
         <button className="button button--primary" onClick={onEdit}><Pencil size={16} /> Edit sweep</button>

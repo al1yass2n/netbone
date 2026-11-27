@@ -9,6 +9,7 @@ import type { ComparisonResponse, ExtractionResponse, JsonValue, MetricRecord, S
 import { formatPercent, formatValue, labelize } from "../utils";
 import { ComparisonFigure } from "./ComparisonFigure";
 import { ExperimentExport } from "./ExperimentExport";
+import { DownloadMenu } from "./DownloadMenu";
 import { Hint } from "./Hint";
 import { ScoreAlignmentFigure } from "./ScoreAlignmentFigure";
 import { StatisticsTable } from "./StatisticsTable";
@@ -229,7 +230,6 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
     <main className="workspace compare-workspace" aria-labelledby="compare-title">
       <header className="workspace-header">
         <div>
-          <span className="eyebrow">ANALYSIS / COMPARE</span>
           <h1 id="compare-title">Compare backbones</h1>
           <p>See what each backbone keeps, where they overlap, and how their scores agree.</p>
         </div>
@@ -376,9 +376,13 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
                         <Hint label={`What ${metricTitle} means`}>{metricDescription}</Hint>
                       </div>
                       <div className="figure-actions">
-                        <button className="button button--export" disabled={scope === "alignment" && (!activeAlignment || activeAlignment.status !== "ok")} onClick={() => downloadCsv(scope === "alignment" ? (activeAlignment?.points.map((point) => ({ ...point })) || []) : activeRecords, scope === "alignment" ? "netbone-score-alignment.csv" : `netbone-comparison-${activeMetric}.csv`)}><Download size={15} /> CSV</button>
-                        {view === "chart" && <button className="button button--export" disabled={scope === "alignment" && activeAlignment?.status !== "ok"} onClick={() => { if (figureRef.current) downloadSvgFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`); }}><Download size={15} /> SVG</button>}
-                        {view === "chart" && <button className="button button--export" disabled={scope === "alignment" && activeAlignment?.status !== "ok"} onClick={() => { if (figureRef.current) void downloadPngFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`).catch((error: unknown) => setFigureError(error instanceof Error ? error.message : "PNG export failed.")); }}><Download size={15} /> PNG</button>}
+                        <DownloadMenu items={[
+                          { label: "Data (CSV)", disabled: scope === "alignment" && (!activeAlignment || activeAlignment.status !== "ok"), onSelect: () => downloadCsv(scope === "alignment" ? (activeAlignment?.points.map((point) => ({ ...point })) || []) : activeRecords, scope === "alignment" ? "netbone-score-alignment.csv" : `netbone-comparison-${activeMetric}.csv`) },
+                          ...(view === "chart" ? [
+                            { label: "Figure (SVG)", disabled: scope === "alignment" && activeAlignment?.status !== "ok", onSelect: () => { if (figureRef.current) downloadSvgFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`); } },
+                            { label: "Figure (PNG)", disabled: scope === "alignment" && activeAlignment?.status !== "ok", onSelect: () => { if (figureRef.current) void downloadPngFigure(figureRef.current, scope === "alignment" ? "netbone-score-alignment" : `netbone-comparison-${activeMetric}`).catch((error: unknown) => setFigureError(error instanceof Error ? error.message : "PNG export failed.")); } },
+                          ] : []),
+                        ]} />
                       </div>
                     </header>
                     {scope === "alignment" ? (
@@ -403,7 +407,7 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
           <section className="inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="inspection-title" onMouseDown={(event) => event.stopPropagation()}>
             <header>
               <h2 id="inspection-title">{inspected.label}</h2>
-              <button className="icon-button" title="Close inspection" onClick={() => setInspectId(null)}><X size={18} /></button>
+              <button className="icon-button dialog-close" title="Close inspection" aria-label="Close inspection" onClick={() => setInspectId(null)}><X size={18} /></button>
             </header>
             <div className="inspection-content">
               <div className="inspection-toolbar">
@@ -424,7 +428,7 @@ export function ComparisonWorkspace({ saved, onChange, onExtract }: ComparisonWo
       {renameId && (
         <div className="dialog-backdrop" onMouseDown={() => setRenameId(null)}>
           <section className="rename-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-title" onMouseDown={(event) => event.stopPropagation()}>
-            <header><div><span className="eyebrow">COMPARISON LABEL</span><h2 id="rename-title">Rename saved backbone</h2></div><button className="icon-button" title="Close rename dialog" onClick={() => setRenameId(null)}><X size={18} /></button></header>
+            <header><div><span className="eyebrow">COMPARISON LABEL</span><h2 id="rename-title">Rename saved backbone</h2></div><button className="icon-button dialog-close" title="Close rename dialog" aria-label="Close rename dialog" onClick={() => setRenameId(null)}><X size={18} /></button></header>
             <label className="field"><span>Label</span><input autoFocus maxLength={120} value={renameLabel} onChange={(event) => setRenameLabel(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") applyRename(); }} /></label>
             {suggestedLabel && <button className="button button--quiet" onClick={() => setRenameLabel(suggestedLabel)}>Use suggested label · {suggestedLabel}</button>}
             <button className="button button--save" disabled={!renameLabel.trim()} onClick={applyRename}>Save label</button>

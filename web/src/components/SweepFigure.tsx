@@ -1,5 +1,6 @@
-import { BarChart3, Download, Table2 } from "lucide-react";
+import { BarChart3, Table2 } from "lucide-react";
 import { forwardRef, useRef, useState } from "react";
+import { DownloadMenu } from "./DownloadMenu";
 import { downloadCsv } from "../api";
 import { downloadPngFigure, downloadSvgFigure } from "../figureExport";
 import { numericSweepParameters, tradeoffRows, trajectoryRows } from "../sweepFigureData";
@@ -7,7 +8,8 @@ import type { SweepPlotRow } from "../sweepFigureData";
 import type { SweepResponse } from "../types";
 import { formatValue, labelize } from "../utils";
 
-const colors = ["#0072b2", "#e69f00", "#009e73", "#cc79a7", "#56b4e9", "#d55e00"];
+export const FIGURE_COLORS = ["#136b56", "#c2410c", "#6d4fc2", "#a16207", "#1d6fa5", "#be185d"];
+const colors = FIGURE_COLORS;
 
 export function SweepVisualizations({ result }: { result: SweepResponse }) {
   const parameters = numericSweepParameters(result.runs);
@@ -47,7 +49,7 @@ export function SweepVisualizations({ result }: { result: SweepResponse }) {
 
   return <section className="panel sweep-figure-panel" aria-labelledby="sweep-figure-title">
     <header className="sweep-figure-header">
-      <div><span className="eyebrow">VISUALIZE</span><h2 id="sweep-figure-title">Sweep figures</h2><p>Compare measured outcomes across the generated runs.</p></div>
+      <div><h2 id="sweep-figure-title">Sweep figures</h2><p>Compare measured outcomes across the generated runs.</p></div>
       <div className="segmented" role="tablist" aria-label="Sweep figure">
         <button role="tab" aria-selected={mode === "trajectory"} onClick={() => { setMode("trajectory"); setFigureError(""); }}>Trajectory</button>
         <button role="tab" aria-selected={mode === "tradeoff"} onClick={() => { setMode("tradeoff"); setFigureError(""); }}>Trade-off</button>
@@ -69,16 +71,19 @@ export function SweepVisualizations({ result }: { result: SweepResponse }) {
         <button aria-pressed={view === "table"} title="Table view" onClick={() => setView("table")}><Table2 size={17} /></button>
       </div>
       <div className="figure-actions">
-        <button className="button button--export" disabled={!rows.length} onClick={() => downloadCsv(rows.map((row) => ({ ...row })), `${filename}.csv`)}><Download size={15} /> CSV</button>
-        {view === "chart" && <>
-          <button className="button button--export" disabled={!validCount} onClick={() => { if (figureRef.current) downloadSvgFigure(figureRef.current, filename); }}><Download size={15} /> SVG</button>
-          <button className="button button--export" disabled={!validCount} onClick={() => { if (figureRef.current) void downloadPngFigure(figureRef.current, filename).catch((error: unknown) => setFigureError(error instanceof Error ? error.message : "PNG export failed.")); }}><Download size={15} /> PNG</button>
-        </>}
+        <DownloadMenu items={[
+          { label: "Data (CSV)", disabled: !rows.length, onSelect: () => downloadCsv(rows.map((row) => ({ ...row })), `${filename}.csv`) },
+          ...(view === "chart" ? [
+            { label: "Figure (SVG)", disabled: !validCount, onSelect: () => { if (figureRef.current) downloadSvgFigure(figureRef.current, filename); } },
+            { label: "Figure (PNG)", disabled: !validCount, onSelect: () => { if (figureRef.current) void downloadPngFigure(figureRef.current, filename).catch((error: unknown) => setFigureError(error instanceof Error ? error.message : "PNG export failed.")); } },
+          ] : []),
+        ]} />
       </div>
     </div>
     {!ready ? <div className="empty-state empty-state--quiet"><h3>{mode === "trajectory" ? "No numeric parameter sweep" : "Metrics needed for this figure"}</h3><p>{mode === "trajectory" ? "Vary a numeric method or filter parameter in at least two runs." : "Measure a retention metric and a component-count metric, then run the sweep again."}</p></div>
       : view === "table" ? <SweepFigureTable rows={rows} xLabel={xLabel} yLabel={yLabel} />
         : validCount ? <>
+          <div className="sweep-chart-scroll"><SweepFigure ref={figureRef} rows={rows} mode={mode} title={title} description={description} xLabel={xLabel} yLabel={yLabel} xIsRatio={mode === "tradeoff"} yIsRatio={(mode === "trajectory" ? metric : component).endsWith("_retention")} onPoint={(matches) => setPoint({ key: chartKey, rows: matches })} /></div>
           <div className="sweep-point-details">
             <p className="sweep-figure-note">Hover over, focus, or tap a point to see which run it represents.</p>
             <div aria-live="polite">
@@ -87,7 +92,6 @@ export function SweepVisualizations({ result }: { result: SweepResponse }) {
               </li>)}</ul>}
             </div>
           </div>
-          <div className="sweep-chart-scroll"><SweepFigure ref={figureRef} rows={rows} mode={mode} title={title} description={description} xLabel={xLabel} yLabel={yLabel} xIsRatio={mode === "tradeoff"} yIsRatio={(mode === "trajectory" ? metric : component).endsWith("_retention")} onPoint={(matches) => setPoint({ key: chartKey, rows: matches })} /></div>
         </>
           : <div className="empty-state empty-state--quiet"><h3>No plottable values</h3><p>The selected records are unavailable. Open the table to inspect their explanations.</p></div>}
     {ready && <p className="sweep-figure-note">{validCount} of {rows.length} runs plotted{unavailableCount ? `; ${unavailableCount} unavailable in the chart and retained in the table below` : ""}.</p>}
@@ -102,22 +106,24 @@ const SweepFigure = forwardRef<SVGSVGElement, {
 }>(function SweepFigure({ rows, mode, title, description, xLabel, yLabel, xIsRatio, yIsRatio, onPoint }, ref) {
   const width = 960;
   const left = 96;
-  const top = 100;
+  const labels = [...new Set(rows.map((row) => row.series))];
+  const legendRows = Math.ceil(labels.length / 3);
+  const top = 108 + legendRows * 24;
   const plotWidth = 814;
   const plotHeight = 350;
-  const labels = [...new Set(rows.map((row) => row.series))];
-  const height = 540 + Math.ceil(labels.length / 3) * 24;
+  const height = top + plotHeight + 68;
   const valid = rows.filter((row): row is SweepPlotRow & { x: number; y: number } => row.x !== null && row.y !== null);
   const xValues = rows.map((row) => row.x).filter((value): value is number => value !== null);
   const rawMin = Math.min(...xValues);
   const rawMax = Math.max(...xValues);
   const padding = rawMin === rawMax ? Math.max(0.01, Math.abs(rawMin) * 0.05) : 0;
-  const xMin = xIsRatio ? 0 : rawMin - padding;
-  const xMax = xIsRatio ? 1 : rawMax + padding;
-  const yMax = yIsRatio ? 1 : Math.max(1, ...valid.map((row) => row.y));
+  const xTicks = xIsRatio ? [0, 0.25, 0.5, 0.75, 1] : niceTicks(rawMin - padding, rawMax + padding);
+  const yTicks = yIsRatio ? [0, 0.25, 0.5, 0.75, 1] : niceTicks(0, Math.max(1, ...valid.map((row) => row.y)));
+  const xMin = xTicks[0] ?? 0;
+  const xMax = xTicks.at(-1) ?? 1;
+  const yMax = yTicks.at(-1) ?? 1;
   const scaleX = (value: number) => left + (value - xMin) / Math.max(1e-12, xMax - xMin) * plotWidth;
   const scaleY = (value: number) => top + plotHeight - value / yMax * plotHeight;
-  const ticks = Array.from({ length: 5 }, (_, index) => index / 4);
   const id = `sweep-${mode}`;
   const points = new Map<string, typeof valid>();
   for (const row of valid) {
@@ -130,22 +136,19 @@ const SweepFigure = forwardRef<SVGSVGElement, {
   return <svg ref={ref} className="comparison-figure sweep-figure" viewBox={`0 0 ${width} ${height}`} role="group" aria-labelledby={`${id}-title ${id}-description`}>
     <title id={`${id}-title`}>{title}</title><desc id={`${id}-description`}>{description}</desc>
     <rect width={width} height={height} fill="#ffffff" />
-    <text x={24} y={35} fill="#172033" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
-    <text x={24} y={61} fill="#64748b" fontSize={12}>{truncate(description, 120)}</text>
-    {ticks.map((tick) => {
-      const x = left + tick * plotWidth;
-      const y = top + plotHeight - tick * plotHeight;
-      return <g key={tick}>
-        <line x1={x} y1={top} x2={x} y2={top + plotHeight} stroke="#e2e8f0" />
-        <line x1={left} y1={y} x2={left + plotWidth} y2={y} stroke="#e2e8f0" />
-        <text x={x} y={top + plotHeight + 21} fill="#64748b" fontSize={11} textAnchor="middle">{axisValue(xMin + tick * (xMax - xMin), xIsRatio)}</text>
-        <text x={left - 12} y={y + 4} fill="#64748b" fontSize={11} textAnchor="end">{axisValue(tick * yMax, yIsRatio)}</text>
-      </g>;
-    })}
-    <line x1={left} y1={top} x2={left} y2={top + plotHeight} stroke="#64748b" />
-    <line x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#64748b" />
-    <text x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#334155" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
-    <text transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#334155" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
+    <text x={24} y={35} fill="#16302b" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
+    <text x={24} y={61} fill="#586863" fontSize={12}>{truncate(description, 120)}</text>
+    {xTicks.map((tick) => <g key={`x${tick}`}>
+      <line x1={scaleX(tick)} y1={top} x2={scaleX(tick)} y2={top + plotHeight} stroke="#e6edea" />
+      <text x={scaleX(tick)} y={top + plotHeight + 21} fill="#586863" fontSize={11} textAnchor="middle">{axisValue(tick, xIsRatio)}</text>
+    </g>)}
+    {yTicks.map((tick) => <g key={`y${tick}`}>
+      <line x1={left} y1={scaleY(tick)} x2={left + plotWidth} y2={scaleY(tick)} stroke="#e6edea" />
+      <text x={left - 12} y={scaleY(tick) + 4} fill="#586863" fontSize={11} textAnchor="end">{axisValue(tick, yIsRatio)}</text>
+    </g>)}
+    <line x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#c3cfcb" />
+    <text x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#41534e" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
+    <text transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#41534e" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
     <defs><clipPath id={`${id}-clip`}><rect x={left} y={top} width={plotWidth} height={plotHeight} /></clipPath></defs>
     <g clipPath={`url(#${id}-clip)`}>
       {labels.map((label, index) => {
@@ -166,9 +169,9 @@ const SweepFigure = forwardRef<SVGSVGElement, {
         <title>{caption}</title>
       </circle>;
     })}
-    {labels.map((label, index) => <g key={label} transform={`translate(${30 + index % 3 * 305} ${525 + Math.floor(index / 3) * 24})`}>
+    {labels.map((label, index) => <g key={label} transform={`translate(${24 + index % 3 * 305} ${92 + Math.floor(index / 3) * 24})`}>
       <circle cx={5} cy={-4} r={5} fill={colors[index % colors.length]} />
-      <text x={17} fill="#334155" fontSize={11}>{truncate(label, 39)}</text>
+      <text x={17} fill="#41534e" fontSize={11}>{truncate(label, 39)}</text>
     </g>)}
   </svg>;
 });
@@ -190,6 +193,19 @@ function lineSegments(rows: SweepPlotRow[], scaleX: (value: number) => number, s
   }
   if (current) paths.push(current);
   return paths;
+}
+
+/** Round axis ticks (steps of 1, 2, 2.5 or 5 × 10^k) that cover [min, max]. */
+export function niceTicks(min: number, max: number, target = 5): number[] {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [0, 1];
+  if (max <= min) max = min + 1;
+  const raw = (max - min) / Math.max(1, target);
+  const power = 10 ** Math.floor(Math.log10(raw));
+  const step = ([1, 2, 2.5, 5, 10].find((factor) => factor * power >= raw) ?? 10) * power;
+  const start = Math.floor(min / step + 1e-9) * step;
+  const ticks: number[] = [];
+  for (let value = start; value < max + step - 1e-9; value += step) ticks.push(Number(value.toPrecision(12)));
+  return ticks;
 }
 
 function parameterLabel(name: string): string { return name.split(".").map(labelize).join(" · "); }

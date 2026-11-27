@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import { LockKeyhole } from "lucide-react";
 import type { ExtractionResponse, JsonValue } from "../types";
 
@@ -6,8 +6,15 @@ interface NetworkPreviewProps {
   graph: ExtractionResponse["graph"];
 }
 
+export const COMPONENT_COLORS = ["var(--accent)", "var(--second)", "var(--graph-3)", "var(--graph-4)", "var(--graph-5)", "var(--graph-6)"];
+
+export function componentColor(component: number): string {
+  return COMPONENT_COLORS[((component % COMPONENT_COLORS.length) + COMPONENT_COLORS.length) % COMPONENT_COLORS.length] ?? "var(--accent)";
+}
+
 export function NetworkPreview({ graph }: NetworkPreviewProps) {
   const markerId = useId();
+  const positions = useMemo(() => graph.truncated || graph.nodes.length > 80 ? new Map<string, { x: number; y: number }>() : forceLayout(graph), [graph]);
   if (graph.truncated || graph.nodes.length > 80) {
     return (
       <div className="graph-preview-locked" role="status">
@@ -22,17 +29,8 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
   const edges = graph.edges.filter(
     (edge) => visibleIds.has(String(edge.source)) && visibleIds.has(String(edge.target)),
   );
+  const componentOrder = [...new Set(nodes.filter((node) => !node.isolated && node.component != null).map((node) => Number(node.component)))].sort((a, b) => a - b);
   const arcs = graph.directed ? new Set(edges.map((edge) => arcKey(edge.source, edge.target))) : null;
-  const center = 260;
-  const radius = Math.min(205, 118 + nodes.length * 2.1);
-  const positions = new Map<string, { x: number; y: number }>();
-  nodes.forEach((node, index) => {
-    const angle = (index / Math.max(nodes.length, 1)) * Math.PI * 2 - Math.PI / 2;
-    positions.set(String(node.id), {
-      x: center + Math.cos(angle) * radius,
-      y: center + Math.sin(angle) * radius,
-    });
-  });
 
   return (
     <div className="graph-preview">
@@ -80,7 +78,7 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
           if (!position) return null;
           return (
             <g key={String(node.id)} transform={`translate(${position.x} ${position.y})`}>
-              <circle r="9" className={node.isolated ? "graph-node is-isolated" : node.retained ? "graph-node is-retained" : "graph-node"} style={node.isolated || node.component == null ? undefined : { fill: `hsl(${(node.component * 137.508) % 360} 65% 36%)` }}>
+              <circle r="9" className={node.isolated ? "graph-node is-isolated" : node.retained ? "graph-node is-retained" : "graph-node"} style={node.isolated || node.component == null ? undefined : { fill: componentColor(componentOrder.indexOf(Number(node.component))) }}>
                 <title>{shortLabel(node.id)}{node.isolated ? " · Isolated in backbone" : node.component != null ? ` · Component ${node.component}` : ""}</title>
               </circle>
               {nodes.length <= 24 && <text x="13" y="4">{shortLabel(node.id)}</text>}
@@ -100,6 +98,63 @@ export function NetworkPreview({ graph }: NetworkPreviewProps) {
       </div>
     </div>
   );
+}
+
+/** Deterministic Fruchterman-Reingold layout inside a 520 × 520 box. */
+export function forceLayout(graph: NetworkPreviewProps["graph"]): Map<string, { x: number; y: number }> {
+  const ids = graph.nodes.map((node) => String(node.id));
+  const index = new Map(ids.map((id, i) => [id, i]));
+  const links = graph.edges
+    .map((edge) => [index.get(String(edge.source)), index.get(String(edge.target))] as const)
+    .filter((pair): pair is readonly [number, number] => pair[0] !== undefined && pair[1] !== undefined && pair[0] !== pair[1]);
+  const count = ids.length;
+  const size = 440;
+  const k = Math.sqrt((size * size) / Math.max(count, 1)) * 0.75;
+  const x = ids.map((_, i) => Math.cos((i / Math.max(count, 1)) * Math.PI * 2 - Math.PI / 2) * size * 0.4);
+  const y = ids.map((_, i) => Math.sin((i / Math.max(count, 1)) * Math.PI * 2 - Math.PI / 2) * size * 0.4);
+  let temperature = size / 8;
+  for (let step = 0; step < 300 && count > 1; step += 1) {
+    const dx = new Array<number>(count).fill(0);
+    const dy = new Array<number>(count).fill(0);
+    for (let a = 0; a < count; a += 1) {
+      for (let b = a + 1; b < count; b += 1) {
+        const ox = x[a]! - x[b]!;
+        const oy = y[a]! - y[b]!;
+        const distance = Math.max(Math.hypot(ox, oy), 0.01);
+        const force = (k * k) / distance;
+        add(dx, a, (ox / distance) * force); add(dy, a, (oy / distance) * force);
+        add(dx, b, -((ox / distance) * force)); add(dy, b, -((oy / distance) * force));
+      }
+    }
+    for (const [a, b] of links) {
+      const ox = x[a]! - x[b]!;
+      const oy = y[a]! - y[b]!;
+      const distance = Math.max(Math.hypot(ox, oy), 0.01);
+      const force = (distance * distance) / k;
+      add(dx, a, -((ox / distance) * force)); add(dy, a, -((oy / distance) * force));
+      add(dx, b, (ox / distance) * force); add(dy, b, (oy / distance) * force);
+    }
+    for (let i = 0; i < count; i += 1) {
+      // Gentle pull to the centre keeps separate components on screen.
+      const px = x[i]!;
+      const py = y[i]!;
+      const fx = dx[i]! - px * 0.002 * k;
+      const fy = dy[i]! - py * 0.002 * k;
+      const length = Math.max(Math.hypot(fx, fy), 0.01);
+      x[i] = px + (fx / length) * Math.min(length, temperature);
+      y[i] = py + (fy / length) * Math.min(length, temperature);
+    }
+    temperature *= 0.985;
+  }
+  const minX = Math.min(...x), maxX = Math.max(...x), minY = Math.min(...y), maxY = Math.max(...y);
+  const scale = Math.min(size / Math.max(maxX - minX, 1), size / Math.max(maxY - minY, 1));
+  const offsetX = 260 - ((minX + maxX) / 2) * scale;
+  const offsetY = 260 - ((minY + maxY) / 2) * scale;
+  return new Map(ids.map((id, i) => [id, { x: count === 1 ? 260 : x[i]! * scale + offsetX, y: count === 1 ? 260 : y[i]! * scale + offsetY }]));
+}
+
+function add(values: number[], index: number, amount: number): void {
+  values[index] = (values[index] ?? 0) + amount;
 }
 
 function arcKey(source: JsonValue, target: JsonValue): string {

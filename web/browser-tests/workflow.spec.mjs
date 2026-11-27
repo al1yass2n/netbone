@@ -46,7 +46,7 @@ test("extract, compare and sweep backbones and download their experiments", asyn
   const fraction = page.getByRole("spinbutton", { name: /Retained fraction/ });
   const save = page.getByRole("button", { name: "Save this backbone" });
   await page.mouse.move(0, 0);
-  await expect(save).toHaveCSS("background-color", "rgb(23, 109, 88)");
+  await expect(save).toHaveCSS("background-color", "rgb(19, 107, 86)");
   const saveColors = await save.evaluate((button) => {
     const style = getComputedStyle(button);
     return { background: style.backgroundColor, foreground: style.color };
@@ -67,7 +67,7 @@ test("extract, compare and sweep backbones and download their experiments", asyn
   await expect(exportExperiment).toHaveCSS("background-color", saveColors.background);
   await expectZip(page, exportExperiment, "netbone-comparison-experiment.zip");
 
-  await page.getByRole("button", { name: "Back to analysis" }).click();
+  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
   await page.getByRole("button", { name: /^Sweep:/ }).click();
   await page.getByRole("combobox", { name: "Setting 1" }).selectOption("filter.fraction");
   await page.getByRole("textbox", { name: /Values for retained fraction/ }).fill("25%, 75%");

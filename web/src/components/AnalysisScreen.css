@@ -1,60 +1,4 @@
-.app-shell--analysis {
-  --canvas: #15191d;
-  --panel: #20262b;
-  --analysis-inset: #181d21;
-  --analysis-raised: #2a3238;
-  --ink: #fbf4e8;
-  --muted: #bdc3c3;
-  --line: #394349;
-  --line-strong: #657178;
-  --accent: #7edfc8;
-  --accent-soft: #223e3b;
-  --analysis-accent-ink: #0e2d27;
-  --analysis-accent-hover: #9cebd9;
-  --analysis-edge: #8b989f;
-  --analysis-warning: #f5dbad;
-  --analysis-warning-surface: #352b20;
-  --analysis-error-surface: #362623;
-  --analysis-error-border: #80534f;
-  --danger: #ffc2b8;
-  --shadow: none;
-  color-scheme: dark;
-  color: var(--ink);
-  background: radial-gradient(ellipse at 50% 0, #242b30, var(--canvas) 68%);
-}
 
-.app-shell--analysis[data-theme="light"] {
-  --canvas: #eef3f5;
-  --panel: #fff;
-  --analysis-inset: #f3f7f8;
-  --analysis-raised: #e6eef0;
-  --ink: #1e323b;
-  --muted: #49616e;
-  --line: #ccd9df;
-  --line-strong: #8298a4;
-  --accent: #087366;
-  --accent-soft: #dff2ee;
-  --analysis-accent-ink: #fff;
-  --analysis-accent-hover: #075e54;
-  --analysis-edge: #667d88;
-  --analysis-warning: #704612;
-  --analysis-warning-surface: #fff3da;
-  --analysis-error-surface: #fff1f0;
-  --analysis-error-border: #d79793;
-  --danger: #9e2c37;
-  color-scheme: light;
-  background: radial-gradient(ellipse at 50% 0, #e2eef0, var(--canvas) 68%);
-}
-
-.app-shell--analysis .app-header {
-  min-height: 64px;
-  padding-inline: max(24px, calc((100% - 1260px) / 2));
-  border-color: var(--line);
-  background: var(--canvas);
-}
-
-.app-shell--analysis .brand { color: var(--ink); cursor: default; }
-.app-shell--analysis .brand strong { font-size: 1.25rem; letter-spacing: -0.045em; }
 
 .app-shell--analysis .analysis-workbench { padding-block: clamp(24px, 4vw, 48px) 0; }
 
@@ -68,20 +12,11 @@
 .analysis-workbench .network-receipt h1 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(1.9rem, 3.75vw, 3.25rem);
-  line-height: 1.08;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
-
-.network-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px clamp(18px, 2.8vw, 34px);
-  margin: 16px 0 0;
-}
-
-.network-facts > div { min-width: 0; }
-.network-facts dt { color: var(--muted); font-size: var(--text-small); }
-.network-facts dd { margin: 1px 0 0; color: var(--ink); font-weight: 700; overflow-wrap: anywhere; }
 
 .analysis-workbench .analysis-canvas {
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -96,7 +31,7 @@
 .analysis-workbench .analysis-controls,
 .analysis-workbench .analysis-preview {
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: var(--panel);
 }
 
@@ -105,9 +40,10 @@
 .analysis-workbench .analysis-step { gap: 14px; }
 .analysis-step-intro { max-width: 40ch; color: var(--muted); font-size: var(--text-control); }
 .analysis-workbench .analysis-step-title > span {
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  background: var(--analysis-inset);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-soft-ink);
 }
 
 .analysis-workbench .analysis-preview { min-height: 0; gap: 16px; }
@@ -131,35 +67,6 @@
 .analysis-workbench .legend-line { background: var(--analysis-edge); }
 .analysis-workbench .legend-line.is-retained { background: var(--accent); }
 .analysis-workbench .preview-counts > div { background: var(--analysis-inset); }
-
-.app-shell--analysis .app-header .button,
-.analysis-workbench :is(.network-receipt, .analysis-controls) .button {
-  color: var(--ink);
-  background: var(--analysis-inset);
-  border-color: var(--line-strong);
-}
-
-.app-shell--analysis .app-header .button:hover:not(:disabled),
-.analysis-workbench :is(.network-receipt, .analysis-controls) .button:hover:not(:disabled) {
-  background: var(--analysis-raised);
-}
-
-.analysis-workbench :is(.step-actions, .scoring-settings) :is(.button--configure, .button--primary):not(:disabled) {
-  color: var(--analysis-accent-ink);
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.analysis-workbench :is(.step-actions, .scoring-settings) :is(.button--configure, .button--primary):hover:not(:disabled) {
-  background: var(--analysis-accent-hover);
-}
-
-.app-shell--analysis .app-header .button:disabled,
-.analysis-workbench :is(.network-receipt, .analysis-controls) .button:disabled {
-  color: var(--muted);
-  background: var(--analysis-raised);
-  border-color: var(--line);
-}
 
 .analysis-workbench .analysis-controls :is(.advanced-options, .range-control, .segmented, .toggle-row, .choice-option > span) {
   background: var(--analysis-inset);

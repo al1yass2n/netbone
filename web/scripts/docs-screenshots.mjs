@@ -112,7 +112,7 @@ try {
   await page.getByRole("combobox", { name: "Metric", exact: true }).selectOption("edge_overlap");
   await capturePage(page, "app-compare");
 
-  await page.getByRole("button", { name: "Back to analysis" }).click();
+  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
   await page.getByRole("button", { name: /^Sweep:/ }).click();
   await page.getByRole("combobox", { name: "Setting 1" }).selectOption("filter.fraction");
   await page.getByRole("textbox", { name: /Values for retained fraction/ }).fill("10%, 30%, 50%, 70%, 90%");

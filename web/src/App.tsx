@@ -21,6 +21,7 @@ import {
   Sun,
   Table2,
   Upload,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
@@ -34,6 +35,7 @@ import LauncherBackdrop from "./components/LauncherBackdrop";
 import { NetworkPreview } from "./components/NetworkPreview";
 import { ScoreDistribution } from "./components/ScoreDistribution";
 import { StatisticsTable } from "./components/StatisticsTable";
+import { METHOD_FAMILIES, methodFamily, methodGoalDetails, methodSource, methodTags } from "./methodGoals";
 import { SweepWorkspace } from "./components/ConfigurationSweepWorkspace";
 import "./components/NetworkLauncher.css";
 import { defaultContext, emptyDataDraft, guidedExamples } from "./examples";
@@ -417,36 +419,42 @@ export default function App() {
   }
 
   const nextTheme = theme === "dark" ? "light" : "dark";
+  const themeLabel = nextTheme === "dark" ? "Switch to dark theme" : "Switch to light theme";
   const themeButton = (
-    <button type="button" className="theme-toggle" onClick={() => {
+    <button type="button" className="theme-toggle" aria-label={themeLabel} title={themeLabel} onClick={() => {
       setTheme(nextTheme);
       try { localStorage.setItem("netbone-theme", nextTheme); } catch { /* Theme switching still works for this visit. */ }
     }}>
-      {nextTheme === "dark" ? <Moon size={16} aria-hidden="true" /> : <Sun size={16} aria-hidden="true" />}
-      {nextTheme === "dark" ? "Dark theme" : "Light theme"}
+      {nextTheme === "dark" ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
     </button>
   );
+  const sweepAvailable = !demoMode && Boolean(preview?.can_run && method);
+  const navigate = (next: typeof workspace) => {
+    if (next !== workspace) setWorkspace(next);
+  };
 
   return (
     <div className={`app-shell app-shell--${workspace === "start" ? "launcher" : workspace}`} data-theme={theme}>
       {workspace === "start" && <div className="launcher-theme">{themeButton}</div>}
       {workspace !== "start" && (
-        <header className="app-header app-header--start single-workbench-header">
-          {workspace === "analysis" ? (
-            <span className="brand"><strong>{demoMode ? "Netbone demo" : "Netbone"}</strong></span>
-          ) : (
-            <button className="brand" disabled={busy !== ""} onClick={() => setWorkspace("analysis")}>
-              <span className="brand-mark"><Network size={20} aria-hidden="true" /></span>
-              <span><strong>Netbone</strong><small>Network workbench</small></span>
+        <header className="app-header">
+          <button type="button" className="brand" disabled={busy !== ""} onClick={() => navigate("analysis")}>
+            <BrandMark />
+            <strong>{demoMode ? "Netbone demo" : "Netbone"}</strong>
+          </button>
+          {hasData && <nav className="seg workspace-tabs" aria-label="Workspace">
+            <button type="button" aria-current={workspace === "analysis" ? "page" : undefined} disabled={busy !== ""} onClick={() => navigate("analysis")}>Analysis</button>
+            <button type="button" aria-current={workspace === "compare" ? "page" : undefined} disabled={busy !== ""} onClick={() => navigate("compare")}>
+              Compare{savedResults.length > 0 && <span className="nav-count"><span className="visually-hidden">, </span>{savedResults.length}<span className="visually-hidden"> saved</span></span>}
             </button>
-          )}
+            {!demoMode && <button type="button" aria-current={workspace === "sweep" ? "page" : undefined} disabled={busy !== "" || !sweepAvailable} title={sweepAvailable ? undefined : "Choose a method first"} onClick={() => navigate("sweep")}>Sweep</button>}
+          </nav>}
           <div className="workbench-header-actions">
             {themeButton}
-            {demoMode && <a className="button button--quiet" href="../browser/launch/">Run locally</a>}
-            {!demoMode && hasData && workspace === "analysis" && <button className="button button--quiet new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
+            {demoMode && <a className="button" href="../browser/launch/">Run locally</a>}
+            {!demoMode && hasData && <button className="button new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
               Change network
             </button>}
-            {hasData && workspace !== "analysis" && <button className="button button--quiet new-analysis" onClick={() => setWorkspace("analysis")}><ArrowLeft size={16} /> Back to analysis</button>}
           </div>
         </header>
       )}
@@ -503,7 +511,7 @@ export default function App() {
       {workspace === "compare" && (
         <ComparisonWorkspace saved={savedResults} onChange={setSavedResults} onExtract={() => setWorkspace("analysis")} />
       )}
-      {workspace === "sweep" && preview?.can_run && method && (
+      {workspace === "sweep" && sweepAvailable && preview && method && (
         <SweepWorkspace
           schema={schema}
           method={method}
@@ -908,16 +916,17 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
     methodDialog.current?.close();
   }
 
-  const methodChoiceButton = (
-    <button className="button button--configure" onClick={() => methodDialog.current?.showModal()}>
-      <Search size={16} /> {method ? "Change method" : "Choose method"}
-    </button>
+  const methodChoiceButton = method ? (
+    <button className="button button--small" aria-label="Change method" onClick={() => methodDialog.current?.showModal()}>Change</button>
+  ) : (
+    <button className="button" onClick={() => methodDialog.current?.showModal()}><Search size={16} aria-hidden="true" /> Choose method</button>
   );
-  const filterChoiceButton = (
-    <button className="button button--configure" onClick={() => openFilterPicker(filterDialog.current)}>
-      <Settings2 size={16} /> {filterChosen ? "Change filter" : "Choose filter"}
-    </button>
+  const filterChoiceButton = filterChosen ? (
+    <button className="button button--small" aria-label="Change filter" onClick={() => openFilterPicker(filterDialog.current)}>Change</button>
+  ) : (
+    <button className="button" onClick={() => openFilterPicker(filterDialog.current)}><Settings2 size={16} aria-hidden="true" /> Choose filter</button>
   );
+  const methodGoal = method ? methodGoalDetails(method)?.goal : undefined;
 
   const advancedMethodSettings = advancedMethodSpecs.length > 0 && (
     <div className="control-stack method-controls">
@@ -958,16 +967,16 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           {waitingForData || !preview?.valid ? (
             <p role="status">{waitingForData ? "Checking network…" : "Check the data format and column mapping to continue."}</p>
           ) : (
-            <dl className="network-facts" aria-label="Network summary">
-              <div><dt>Nodes</dt><dd>{formatValue(preview.node_count)}</dd></div>
-              <div><dt>{preview.directed ? "Arcs" : "Edges"}</dt><dd>{formatValue(preview.edge_count)}</dd></div>
-              <div><dt>{preview.directed ? "Weakly connected components" : "Components"}</dt><dd>{formatValue(preview.component_count)}</dd></div>
-              <div><dt>Direction</dt><dd>{preview.directed ? "Directed" : "Undirected"}</dd></div>
-              <div><dt>Weights</dt><dd>{data.mode === "temporal" ? "Temporal weights" : data.weight || "Unweighted"}</dd></div>
-            </dl>
+            <ul className="fact-chips network-facts" aria-label="Network summary">
+              <li><strong>{formatValue(preview.node_count)}</strong> nodes</li>
+              <li><strong>{formatValue(preview.edge_count)}</strong> {preview.directed ? "arcs" : "edges"}</li>
+              <li><strong>{formatValue(preview.component_count)}</strong> {preview.directed ? "weakly connected components" : Number(preview.component_count) === 1 ? "component" : "components"}</li>
+              <li>{preview.directed ? "Directed" : "Undirected"}</li>
+              <li>{data.mode === "temporal" ? "Temporal weights" : data.weight ? <>Weighted by <strong>{data.weight}</strong></> : "Unweighted"}</li>
+            </ul>
           )}
         </div>
-        {!demoMode && <button className="button button--quiet" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>}
+        {!demoMode && <button className="button" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>}
       </header>
       {demoMode && <p className="demo-note">Two 25% backbones are ready to compare. Edge Weight favors strong ties, while Edge Betweenness favors links on shortest paths. Choose 50% to try a larger edge budget.</p>}
       <dialog className="workbench-dialog network-settings-dialog" ref={settingsDialog} aria-labelledby="network-settings-title" key={data.filename} onCancel={onMappingReviewFinished}>
@@ -995,7 +1004,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
       <Warnings warnings={preview?.warnings || []} />
       <dialog className="method-dialog" ref={methodDialog} aria-labelledby="method-dialog-title">
         <header className="method-library-header">
-          <div className="pane-heading"><h2 id="method-dialog-title">Choose a scoring method</h2><button className="button button--quiet" onClick={() => methodDialog.current?.close()}>Close</button></div>
+          <div className="pane-heading"><h2 id="method-dialog-title">Choose a scoring method</h2><button className="icon-button dialog-close" aria-label="Close" title="Close" onClick={() => methodDialog.current?.close()}><X size={18} aria-hidden="true" /></button></div>
           <label className="search-field"><Search size={17} aria-hidden="true" /><input type="search" aria-label="Search methods" value={methodSearch} placeholder="Search methods" onChange={(event) => onSearch(event.target.value)} /></label>
         </header>
         <div className="method-library-body" ref={methodLibraryBody} role="region" aria-label="Scoring methods" tabIndex={0}>
@@ -1019,14 +1028,31 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
             <span className="method-list-caption" role="status">{compatibleMethods.length} {compatibleMethods.length === 1 ? "method" : "methods"}</span>
           </div>
           <div className="method-list" role="group" aria-labelledby="method-results-title">
-            {compatibleMethods.map((candidate) => {
-              const blocked = compatibility(candidate);
+            {[...METHOD_FAMILIES, "Other methods"].map((family) => {
+              const members = compatibleMethods.filter((candidate) => methodFamily(candidate) === family);
+              if (!members.length) return null;
               return (
-                <button key={candidate.name} className={`${candidate.name === method?.name ? "is-active" : ""}${blocked ? " is-incompatible" : ""}`} disabled={!networkReady || Boolean(blocked)} aria-pressed={candidate.name === method?.name} onClick={() => pickMethod(candidate)}>
-                  <span><strong>{candidate.label}</strong><small>{conciseScoreMeaning(candidate, context)}</small></span>
-                  {!blocked && (candidate.name === method?.name ? <Check size={17} aria-hidden="true" /> : <ChevronRight size={17} aria-hidden="true" />)}
-                  {blocked && <em>{blocked}</em>}
-                </button>
+                <section className="method-family" key={family} aria-label={family}>
+                  <h4>{family}<span>{members.length}</span></h4>
+                  {members.map((candidate) => {
+                    const blocked = compatibility(candidate);
+                    const source = methodSource(candidate);
+                    return (
+                      <button key={candidate.name} className={`${candidate.name === method?.name ? "is-active" : ""}${blocked ? " is-incompatible" : ""}`} disabled={!networkReady || Boolean(blocked)} aria-pressed={candidate.name === method?.name} onClick={() => pickMethod(candidate)}>
+                        <span className="method-row-text">
+                          <strong>{candidate.label}</strong>
+                          <small>{methodGoalDetails(candidate)?.goal ?? conciseScoreMeaning(candidate, context)}</small>
+                          <span className="method-row-meta">
+                            {methodTags(candidate).map((tag) => <span className="tag" key={tag}>{tag}</span>)}
+                            {source && <span className="method-source">{source}</span>}
+                          </span>
+                        </span>
+                        {!blocked && (candidate.name === method?.name ? <Check size={17} aria-hidden="true" /> : <ChevronRight size={17} aria-hidden="true" />)}
+                        {blocked && <em>{blocked}</em>}
+                      </button>
+                    );
+                  })}
+                </section>
               );
             })}
             {!compatibleMethods.length && <div className="method-empty"><Search size={24} aria-hidden="true" /><strong>No methods match</strong><button className="button button--configure" onClick={clearMethodSearch}>Clear search and filters</button></div>}
@@ -1034,7 +1060,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         </div>
       </dialog>
       <dialog className="workbench-dialog filter-choice-dialog" ref={filterDialog} aria-labelledby="filter-choice-title">
-        <header><h2 id="filter-choice-title">Choose a filter</h2><button className="button button--quiet" onClick={() => filterDialog.current?.close()}>Close</button></header>
+        <header><h2 id="filter-choice-title">Choose a filter</h2><button className="icon-button dialog-close" aria-label="Close" title="Close" onClick={() => filterDialog.current?.close()}><X size={18} aria-hidden="true" /></button></header>
         {method && <div className="filter-choice-list">
           {filterOptions(method).map((name) => <button type="button" key={name} data-initial-focus={name === (filterChosen ? filterName : method.recommended_filter) ? "" : undefined} className={name === method.recommended_filter ? "is-recommended" : ""} aria-pressed={filterChosen && name === filterName} onClick={() => { onFilter(name); filterDialog.current?.close(); }}>
             <strong>{filterLabel(name)}</strong>
@@ -1048,14 +1074,18 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         <fieldset className="analysis-controls" disabled={busy !== ""}>
         <section className="analysis-step">
           <div className="pane-heading analysis-step-header">
-            <h2 className="analysis-step-title"><span aria-hidden="true">1</span> Scoring method</h2>
-            {method && methodChoiceButton}
+            <h2 className="analysis-step-title"><span aria-hidden="true">1</span> Method</h2>
           </div>
           {!method && <p className="analysis-step-intro">Choose how Netbone scores the nodes or edges in this network.</p>}
-          {method && <div className="analysis-selection-row">
-            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint>{method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}</div>
-            {!demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
+          {method && <div className="choice-card">
+            <div className="choice-card-head">
+              <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint></div>
+              {methodChoiceButton}
+            </div>
+            {methodGoal && <p>{methodGoal}.</p>}
+            {method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}
           </div>}
+          {method && !demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Method settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
           {!score && (selectedBlocked || basicMethodSpecs.length > 0 || advancedMethodSpecs.length > 0) && <div className="scoring-settings">{scoringSettings}</div>}
           {!score && <div className="step-actions">
             {method ? <button className="button button--primary" disabled={busy !== "" || !networkReady || Boolean(selectedBlocked)} onClick={onScore}>
@@ -1068,9 +1098,13 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         {score && method && <section className="analysis-step">
           <div className="pane-heading analysis-step-header">
             <h2 className="analysis-step-title" id="retention-title" tabIndex={-1}><span aria-hidden="true">2</span> Filter</h2>
-            {!demoMode && filterChosen && filterChoiceButton}
           </div>
-              {filterChosen && <div className="analysis-selection-row"><div className="label-with-hint"><strong>{filterLabel(filterName)}</strong><Hint label="How this filter works">{filterDescription(filterName, context, method)}</Hint></div></div>}
+              {filterChosen && <div className="choice-card">
+                <div className="choice-card-head">
+                  <div className="label-with-hint"><strong>{filterLabel(filterName)}</strong><Hint label="How this filter works">{filterDescription(filterName, context, method)}</Hint></div>
+                  {!demoMode && filterChoiceButton}
+                </div>
+              </div>}
               {!filterChosen && <div className="step-actions">{filterChoiceButton}</div>}
               <Warnings warnings={score.warnings} />
               {filterChosen && <>
@@ -1120,15 +1154,15 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
           <div className="analysis-actions">
             {score && filterChosen && <>
               <button className="button button--save" disabled={busy !== "" || saved || !draftReady} onClick={() => void onMaterialize(true)}>{busy === "filter" ? <LoaderCircle className="spin" size={17} /> : saved ? <Check size={17} /> : <Plus size={17} />} {saved ? "Backbone saved" : "Save this backbone"}</button>
-              <button className="button button--inspect" disabled={busy !== "" || !draftReady} onClick={() => { setResultTab("inspect"); resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
+              <button className="button" disabled={busy !== "" || !draftReady} onClick={() => { setResultTab("inspect"); resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
             </>}
-            {!demoMode && networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button button--explore" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
-            {savedCount >= 2 && <button className="button button--compare" disabled={busy !== ""} onClick={onCompare}><GitCompareArrows size={16} /> Compare</button>}
+            {!demoMode && networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
+            {savedCount >= 2 && <button className="button" disabled={busy !== ""} onClick={onCompare}><GitCompareArrows size={16} /> Compare</button>}
           </div>
         </div>
       </footer>}
       <dialog className="workbench-dialog result-details-dialog" ref={resultDialog} aria-labelledby="result-title">
-        <header><h2 id="result-title">Inspect &amp; export</h2><button className="button button--quiet" onClick={() => resultDialog.current?.close()}>Close</button></header>
+        <header><h2 id="result-title">Inspect &amp; export</h2><button className="icon-button dialog-close" aria-label="Close" title="Close" onClick={() => resultDialog.current?.close()}><X size={18} aria-hidden="true" /></button></header>
         {result && method ? <ResultDetails key={result.result_id} result={result} method={method} tab={resultTab} onTab={setResultTab} /> : <p role={error ? "alert" : "status"}>{error || "Preparing the backbone…"}</p>}
       </dialog>
       <span className="visually-hidden" role="status" aria-atomic="true">{message}</span>
@@ -1450,4 +1484,16 @@ function jumpToHeading(event: MouseEvent<HTMLAnchorElement>) {
   event.preventDefault();
   heading.focus({ preventScroll: true });
   heading.scrollIntoView({ block: "start" });
+}
+
+function BrandMark() {
+  return (
+    <svg className="brand-mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+      <rect width="30" height="30" rx="8" fill="#136b56" />
+      <path d="M9 20 15 9l6 10Z" fill="none" stroke="#a7eccb" strokeWidth="1.6" />
+      <circle cx="9" cy="20" r="2.6" fill="#ffffff" />
+      <circle cx="15" cy="9" r="2.6" fill="#ffffff" />
+      <circle cx="21" cy="19" r="2.6" fill="#ffffff" />
+    </svg>
+  );
 }

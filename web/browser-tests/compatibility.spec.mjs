@@ -27,7 +27,7 @@ async function compareAndSweep(page) {
   await page.getByRole("button", { name: "Compare 2 backbones" }).click();
   const exportButton = page.getByRole("button", { name: "Export full experiment" });
   await expectZip(page, exportButton, "netbone-comparison-experiment.zip");
-  await page.getByRole("button", { name: "Back to analysis" }).click();
+  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
 
   await page.getByRole("button", { name: /^Sweep:/ }).click();
   await page.getByRole("combobox", { name: "Setting 1" }).selectOption("filter.fraction");

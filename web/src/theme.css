@@ -1,0 +1,733 @@
+/*
+ * Netbone design system.
+ *
+ * Every workbench screen takes its colours, corners, type and controls from
+ * this file. It loads last, so these rules settle any older rule that sets the
+ * same property. Add new colours here as tokens instead of writing hex values
+ * in component styles. The start page keeps its own look in NetworkLauncher.css.
+ */
+
+.app-shell[data-theme] {
+  /* Colours */
+  --canvas: #f3f6f5;
+  --panel: #ffffff;
+  --subtle: #f7f9f8;
+  --track: #e6edea;
+  --line: #dde5e2;
+  --line-strong: #c3cfcb;
+  --ink: #16302b;
+  --ink-soft: #41534e;
+  --muted: #586863;
+  --accent: #136b56;
+  --accent-hover: #0e5745;
+  --accent-soft: #e4f2ec;
+  --accent-soft-ink: #0e5745;
+  --on-accent: #ffffff;
+  --second: #c2410c;
+  --graph-3: #6d4fc2;
+  --graph-4: #a16207;
+  --graph-5: #1d6fa5;
+  --graph-6: #be185d;
+  --edge-dropped: #c4cfcb;
+  --node-isolated: #9aa8a5;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --warning-ink: #6b4500;
+  --warning-soft: #fff6e0;
+  --warning-line: #f1dca4;
+  --focus: #136b56;
+  --shadow: 0 1px 2px rgb(22 48 43 / 6%);
+  --shadow-dialog: 0 24px 60px rgb(10 30 26 / 28%);
+  --scrim: rgb(22 48 43 / 42%);
+
+  /* Shape and type */
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --control-height: 44px;
+  --text-small: 0.8125rem;
+  --text-control: 0.875rem;
+  --button-radius: var(--radius-control);
+  --button-height: var(--control-height);
+
+  /* Names older component styles still read */
+  --blue: var(--accent);
+  --blue-dark: var(--accent-hover);
+  --green: var(--accent);
+  --green-dark: var(--accent-hover);
+  --cyan: #5aa9c9;
+  --amber: #b7791f;
+  --orange: var(--second);
+  --nav: var(--panel);
+  --mint: #a7eccb;
+  --surface: var(--panel);
+  --surface-soft: var(--subtle);
+  --surface-subtle: var(--subtle);
+  --line-soft: var(--track);
+  --radius-sm: 6px;
+  --text: var(--ink);
+  --accent-strong: var(--accent-hover);
+  --workspace-inset: var(--subtle);
+  --workspace-raise: var(--track);
+  --analysis-inset: var(--subtle);
+  --analysis-raised: var(--track);
+  --analysis-accent-ink: var(--on-accent);
+  --analysis-accent-hover: var(--accent-hover);
+  --analysis-edge: var(--edge-dropped);
+  --analysis-warning: var(--warning-ink);
+  --analysis-warning-surface: var(--warning-soft);
+  --analysis-error-surface: var(--danger-soft);
+  --analysis-error-border: #e7a5ad;
+  --dialog-header: var(--panel);
+  --dialog-disabled: var(--track);
+  --dialog-action: var(--accent);
+  --dialog-action-hover: var(--accent-hover);
+  --dialog-action-ink: var(--on-accent);
+  --dialog-selected-line: var(--accent);
+  --dialog-warning-surface: var(--warning-soft);
+  --dialog-warning-ink: var(--warning-ink);
+  --dialog-error-surface: var(--danger-soft);
+  --dialog-error-line: #e7a5ad;
+  --button-green: var(--accent);
+  --button-green-ink: var(--accent-soft-ink);
+  --button-green-fill: var(--accent-soft);
+  --button-green-border: var(--accent);
+  --button-green-hover: #d3eadf;
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app-shell[data-theme="dark"] {
+  --canvas: #14191b;
+  --panel: #1c2326;
+  --subtle: #20282b;
+  --track: #283236;
+  --line: #323d41;
+  --line-strong: #56656a;
+  --ink: #eef3f1;
+  --ink-soft: #c9d4d0;
+  --muted: #a9b7b3;
+  --accent: #6fd4bb;
+  --accent-hover: #93e2cf;
+  --accent-soft: #1d3a33;
+  --accent-soft-ink: #a9eedb;
+  --on-accent: #0b2420;
+  --second: #f28c5a;
+  --graph-3: #b5a2f0;
+  --graph-4: #e3b341;
+  --graph-5: #79b8e8;
+  --graph-6: #f08bb8;
+  --edge-dropped: #4b585c;
+  --node-isolated: #7d8b88;
+  --danger: #ffb4ab;
+  --danger-soft: #3b2422;
+  --warning-ink: #f5d9a8;
+  --warning-soft: #352b1d;
+  --warning-line: #6b5530;
+  --focus: #6fd4bb;
+  --shadow: none;
+  --shadow-dialog: 0 24px 60px rgb(0 0 0 / 50%);
+  --scrim: rgb(5 10 9 / 70%);
+  --analysis-error-border: #80534f;
+  --dialog-error-line: #9d5662;
+  --button-green-hover: #244a40;
+  color-scheme: dark;
+}
+
+/* Layout surfaces: one page background everywhere, white cards on top. */
+.app-shell[data-theme]:not(.app-shell--launcher) {
+  background: var(--canvas);
+}
+
+.app-shell[data-theme] :is(.panel, .analysis-step, .analysis-controls, .analysis-preview, .selection-pane, .comparison-canvas, .result-content, .method-config-pane, .filter-pane, .sweep-builder, .sweep-run-preview, .sweep-figure-panel, .sweep-table-panel) {
+  border-color: var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  box-shadow: none;
+}
+
+/* Header: the same bar on every workbench screen. */
+.app-shell[data-theme] .app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
+  height: auto;
+  min-height: 64px;
+  padding: 10px max(24px, calc((100% - 1232px) / 2));
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.app-shell[data-theme] .app-header .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.app-shell[data-theme] .app-header .brand strong { font-size: inherit; letter-spacing: inherit; }
+.app-shell[data-theme] .brand-mark { display: block; flex: none; }
+
+.workbench-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.launcher-theme {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px clamp(12px, 4vw, 48px) 0;
+}
+
+/* Segmented control: page tabs, dialog tabs and view switches share it. */
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--track);
+  box-shadow: none;
+}
+
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: var(--text-control);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is(a, button):hover:not(:disabled) { color: var(--ink); background: transparent; }
+
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is([aria-current="page"], [aria-pressed="true"], [aria-selected="true"], .is-active) {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgb(22 48 43 / 14%);
+}
+
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is(a, button):disabled { color: var(--muted); opacity: 0.55; cursor: not-allowed; }
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is(a, button):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) svg { flex: none; }
+
+.nav-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Buttons: one filled style for the main action, outlined for the rest. */
+.app-shell[data-theme] :is(.button, .theme-toggle) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-height);
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--text-control);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.app-shell[data-theme] :is(.button, .theme-toggle):hover:not(:disabled) { background: var(--subtle); border-color: var(--ink-soft); color: var(--ink); }
+
+.app-shell[data-theme] .button:is(.button--primary, .button--save, .button--success, .button--extract) {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.app-shell[data-theme] .button:is(.button--primary, .button--save, .button--success, .button--extract):hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.app-shell[data-theme] :is(.button--quiet, .theme-toggle) {
+  border-color: transparent;
+  background: transparent;
+}
+
+.app-shell[data-theme] :is(.button--quiet, .theme-toggle):hover:not(:disabled) { border-color: transparent; background: var(--track); }
+
+.app-shell[data-theme] .theme-toggle { width: var(--control-height); padding: 0; }
+
+.app-shell[data-theme] :is(.button, .theme-toggle, .icon-button):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.app-shell[data-theme] .button:disabled {
+  border-color: var(--track);
+  background: var(--track);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.app-shell[data-theme] .button:active:not(:disabled) { transform: none; }
+
+.app-shell[data-theme] .icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.app-shell[data-theme] .icon-button:hover:not(:disabled) { background: var(--track); color: var(--ink); }
+.app-shell[data-theme] .icon-button:disabled { opacity: 0.4; cursor: not-allowed; }
+.app-shell[data-theme] .icon-button--danger:hover:not(:disabled) { color: var(--danger); background: var(--danger-soft); }
+
+.dialog-close {
+  flex: none;
+  margin-left: auto;
+}
+
+/* Download menu: one button that lists the file types. */
+.download-menu { position: relative; }
+.download-menu > summary { list-style: none; }
+.download-menu > summary::-webkit-details-marker { display: none; }
+.download-menu-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  box-shadow: 0 10px 30px rgb(22 48 43 / 16%);
+}
+
+.download-menu-list button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-control);
+  text-align: left;
+  cursor: pointer;
+}
+
+.download-menu-list button:hover:not(:disabled) { background: var(--subtle); }
+.download-menu-list button:disabled { color: var(--muted); cursor: not-allowed; }
+
+/* Chips, tags and status badges. */
+.fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact-chips li {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  line-height: 1.4;
+}
+
+.fact-chips strong { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.status-badge--kept { background: var(--accent-soft); color: var(--accent-soft-ink); font-weight: 600; }
+
+/* Switch */
+.switch-field { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: var(--text-small); }
+.switch {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
+  cursor: pointer;
+}
+.switch > span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  transition: left 120ms ease;
+}
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"] > span { left: 17px; }
+.switch:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Tables */
+.app-shell[data-theme] .statistics-view > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.app-shell[data-theme] .statistics-view h3 { margin: 0; font-size: 0.9375rem; font-weight: 600; }
+.statistics-count { margin: 0; color: var(--muted); font-size: var(--text-small); }
+.statistics-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-left: auto; }
+
+.app-shell[data-theme] .statistics-view table,
+.app-shell[data-theme] .sweep-table-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-shell[data-theme] :is(.statistics-view, .sweep-table-panel) th {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--subtle);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.app-shell[data-theme] :is(.statistics-view, .sweep-table-panel) td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--track);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-control);
+}
+
+.app-shell[data-theme] .statistics-view tr.is-retained td { background: transparent; }
+.app-shell[data-theme] :is(.statistics-view, .sweep-table-panel) tbody tr:hover td { background: var(--subtle); }
+.app-shell[data-theme] :is(th, td).is-numeric { text-align: right; }
+
+.app-shell[data-theme] .statistics-scroll {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+}
+
+.table-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.table-pager > span { margin-right: auto; }
+
+/* Dialogs: page background, white header, an × to close. */
+.app-shell[data-theme] :is(.workbench-dialog, .method-dialog, .inspection-dialog) {
+  border: 0;
+  border-radius: 14px;
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: var(--shadow-dialog);
+}
+
+.app-shell[data-theme] :is(.workbench-dialog, .method-dialog)::backdrop { background: var(--scrim); }
+
+.app-shell[data-theme] :is(.workbench-dialog, .method-dialog) > header,
+.app-shell[data-theme] .method-library-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.app-shell[data-theme] :is(.workbench-dialog, .method-dialog) h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+
+/* Notices */
+.app-shell[data-theme] .demo-note {
+  border: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  color: var(--ink-soft);
+}
+
+@media (max-width: 520px) {
+  .app-shell[data-theme] .app-header { padding-inline: 16px; gap: 8px 12px; }
+  .app-shell[data-theme] :is(.seg, .segmented, .result-mode-tabs) > :is(a, button) { padding: 0 10px; }
+  .workbench-header-actions .button { padding-inline: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell[data-theme] :is(.button, .theme-toggle), .switch > span { transition: none; }
+}
+
+/* Analysis screen */
+.app-shell[data-theme] .analysis-workbench .network-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+}
+
+.app-shell[data-theme] .network-receipt-summary {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  min-width: 0;
+}
+
+.app-shell[data-theme] .network-receipt-summary h1 { margin: 0; }
+.app-shell[data-theme] .analysis-workbench { padding-top: 24px; }
+
+.app-shell[data-theme] .analysis-step-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.app-shell[data-theme] .analysis-step-title > span {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.app-shell[data-theme] .analysis-preview h2 { font-size: 1.0625rem; font-weight: 600; letter-spacing: 0; }
+
+.choice-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--subtle);
+}
+
+.choice-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.choice-card-head .label-with-hint { flex: 1 1 auto; min-width: 0; }
+.choice-card-head strong { font-size: 0.9375rem; font-weight: 600; }
+.choice-card > p { margin: 0; color: var(--muted); font-size: var(--text-small); line-height: 1.45; }
+.choice-card > .method-paper-link { justify-self: start; font-size: var(--text-small); }
+
+.app-shell[data-theme] .button.button--small {
+  flex: none;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 12px;
+  font-size: var(--text-small);
+}
+
+.app-shell[data-theme] .analysis-workbench .analysis-controls .advanced-options {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+}
+
+.app-shell[data-theme] .analysis-workbench .analysis-controls .advanced-options > summary {
+  min-height: 44px;
+  font-size: var(--text-control);
+  font-weight: 600;
+}
+
+.app-shell[data-theme] .analysis-workbench .analysis-controls .range-control { background: var(--subtle); border-color: var(--line); border-radius: var(--radius-control); }
+
+/* Bottom action bar */
+.app-shell[data-theme] .analysis-dock {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  box-shadow: 0 -8px 24px rgb(22 48 43 / 8%);
+}
+
+.app-shell[data-theme] .analysis-dock-status { color: var(--muted); font-weight: 500; }
+.app-shell[data-theme] .analysis-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.app-shell[data-theme] .analysis-actions .button--save { order: 10; }
+
+.app-shell[data-theme] .network-receipt > .button { margin-left: auto; }
+.app-shell[data-theme] .analysis-score-settings { margin-inline-start: 0; }
+.app-shell[data-theme] .analysis-step + .analysis-step { border-top: 1px solid var(--line); border-radius: 0; }
+
+/* Network preview */
+.app-shell[data-theme] .graph-node { stroke: var(--panel); stroke-width: 2; }
+.app-shell[data-theme] .graph-node.is-isolated, .app-shell[data-theme] .legend-isolate { fill: var(--line-strong); stroke: var(--muted); }
+.app-shell[data-theme] .graph-preview text { font-size: 12px; paint-order: stroke; stroke: var(--subtle); stroke-width: 3px; }
+.app-shell[data-theme] .graph-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: var(--text-small); }
+.app-shell[data-theme] .legend-components {
+  background: radial-gradient(circle at 4px 50%, var(--accent) 3.5px, transparent 4px),
+    radial-gradient(circle at 14px 50%, var(--second) 3.5px, transparent 4px);
+}
+.app-shell[data-theme] .legend-line { background: var(--line-strong); }
+.app-shell[data-theme] .legend-line.is-retained { background: var(--accent); }
+.app-shell[data-theme] .analysis-workbench .graph-edge { stroke: var(--line-strong); }
+.app-shell[data-theme] .analysis-workbench .graph-edge.is-retained { stroke: var(--accent); stroke-width: 2.5; }
+.app-shell[data-theme] .network-receipt-summary { flex: 1 1 0; }
+
+/* Method picker */
+.app-shell[data-theme] .method-list { gap: 20px; }
+.method-family { display: grid; gap: 8px; }
+.method-family > h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.method-family > h4 span { padding: 1px 7px; border-radius: var(--radius-pill); background: var(--track); color: var(--ink-soft); letter-spacing: 0; }
+.app-shell[data-theme] .method-list .method-family > button {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: none;
+  opacity: 1;
+}
+.app-shell[data-theme] .method-list .method-family > button:hover:not(:disabled) { border-color: var(--accent); }
+.app-shell[data-theme] .method-list .method-family > button.is-active { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 3px 0 var(--accent); }
+.app-shell[data-theme] .method-list .method-family > button.is-incompatible:not(.is-active) { border-style: dashed; background: var(--subtle); }
+.app-shell[data-theme] .method-list .method-family > button.is-incompatible .method-row-text { opacity: 0.6; }
+.app-shell[data-theme] .method-list .method-family > button > svg { color: var(--muted); }
+.app-shell[data-theme] .method-list .method-family > button > em { grid-column: 1 / -1; color: var(--second); font-weight: 600; }
+.method-row-text { display: grid; gap: 4px; min-width: 0; }
+.method-row-text > strong { font-size: 0.9375rem; font-weight: 600; }
+.method-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.method-source { margin-left: auto; color: var(--muted); font-size: 0.75rem; }
+.method-row-meta .tag { padding: 2px 8px; font-size: 0.75rem; }
+
+/* Compare and Sweep pages */
+.app-shell[data-theme] .workspace-header { margin-bottom: 20px; }
+.app-shell[data-theme] .workspace-header h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; }
+.app-shell[data-theme] .workspace-header p { color: var(--muted); font-size: var(--text-control); }
+.app-shell[data-theme] .sweep-figure-header h2 { font-size: 1.0625rem; font-weight: 600; }
+.app-shell[data-theme] .figure-actions { display: flex; gap: 8px; }
+.app-shell[data-theme] .comparison-figure { border-color: var(--line); border-radius: var(--radius-control); }
+.app-shell[data-theme] .workbench-dialog { --dialog-pad: 24px; padding: 0 var(--dialog-pad) var(--dialog-pad); }
+.app-shell[data-theme] .workbench-dialog.network-settings-dialog { padding: 0; }
+.app-shell[data-theme] .workbench-dialog.network-settings-dialog > header { margin: 0; }
+.app-shell[data-theme] .workbench-dialog > header {
+  align-items: center;
+  margin: 0 calc(-1 * var(--dialog-pad)) 20px;
+  padding: 16px var(--dialog-pad);
+}
+.app-shell[data-theme] .workbench-dialog > header h2 { margin: 0; }
+.app-shell[data-theme] .result-mode-tabs { justify-self: start; }
+@media (max-width: 760px) { .app-shell[data-theme] .workbench-dialog { --dialog-pad: 14px; } }
+
+.app-shell[data-theme] .advanced-options > summary span { background: var(--track); color: var(--ink-soft); }
+
+@media (max-width: 640px) {
+  .app-shell[data-theme] .app-header .workspace-tabs { order: 3; flex: 1 0 100%; }
+  .app-shell[data-theme] .app-header .workspace-tabs > button { flex: 1 1 0; justify-content: center; }
+  .app-shell[data-theme] .network-receipt > .button { margin-left: 0; }
+}

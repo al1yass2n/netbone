@@ -36,7 +36,7 @@ test("the real workbench compares, changes and exports precomputed Karate Club r
   await page.getByRole("button", { name: "Export full experiment" }).click();
   expect((await comparisonZip).suggestedFilename()).toMatch(/\.zip$/);
 
-  await page.getByRole("button", { name: "Back to analysis" }).click();
+  await page.getByRole("navigation", { name: "Workspace" }).getByRole("button", { name: "Analysis" }).click();
   await page.getByRole("button", { name: "Change method" }).click();
   await page.getByRole("dialog", { name: "Choose a scoring method" }).getByRole("button", { name: /^Edge Betweenness / }).click();
   await page.getByLabel("Retained fraction").selectOption("0.5");
