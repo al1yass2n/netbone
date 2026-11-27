@@ -21,7 +21,9 @@ edge. With `directed=False`, reverse rows belong to the same undirected edge and
 are rejected as duplicates. Node ids are read as written: a column of plain
 integers such as `1, 2, 10` becomes Python ints, and anything else, including
 `007`, `NA`, or `None`, stays a string label. Spaces after the delimiter are
-ignored. Weights must be finite numbers, and a self-loop row is rejected with
+ignored, and so is a trailing delimiter at the end of each row. A row with more
+non-empty values than the header has columns is rejected with its row number,
+because its columns would not line up. Weights must be finite numbers, and a self-loop row is rejected with
 its row number. GraphML or a NetworkX graph can represent isolated nodes
 explicitly.
 

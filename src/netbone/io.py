@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import math
 import warnings
 from collections.abc import Hashable
@@ -52,14 +53,51 @@ def _read_table(
 ) -> pd.DataFrame:
     """Read a delimited table keeping node ids exactly as written."""
 
-    return pd.read_csv(
-        path,
-        delimiter=delimiter,
-        dtype={column: str for column in id_columns},
-        keep_default_na=False,
-        na_values={column: list(_MISSING_VALUE_MARKERS) for column in value_columns},
-        skipinitialspace=True,
-    )
+    _check_row_widths(path, delimiter=delimiter)
+    with warnings.catch_warnings():
+        # Extra trailing empty fields are already known to be empty here.
+        warnings.simplefilter("ignore", pd.errors.ParserWarning)
+        return pd.read_csv(
+            path,
+            delimiter=delimiter,
+            dtype={column: str for column in id_columns},
+            keep_default_na=False,
+            na_values={
+                column: list(_MISSING_VALUE_MARKERS) for column in value_columns
+            },
+            skipinitialspace=True,
+            # Never promote the first column to an index when rows run long.
+            index_col=False,
+        )
+
+
+def _check_row_widths(path: Path, *, delimiter: str) -> None:
+    """Reject rows with more values than the header, allowing trailing empties.
+
+    Spreadsheet exports often end every row with a delimiter, which is harmless.
+    A non-empty extra value means the columns do not line up with the header.
+    """
+
+    if len(delimiter) != 1:
+        return
+    with path.open(newline="", encoding="utf-8-sig", errors="replace") as handle:
+        reader = csv.reader(handle, delimiter=delimiter, skipinitialspace=True)
+        header = next(reader, None)
+        if header is None:
+            return
+        width = len(header)
+        row_number = 1
+        for row in reader:
+            if not row:
+                continue
+            row_number += 1
+            extra = [value for value in row[width:] if value.strip()]
+            if extra:
+                raise ValidationError(
+                    f"Row {row_number} of {path.name} has {len(row)} values but the "
+                    f"header has {width} columns. Check the delimiter, or add a "
+                    "header for the extra column."
+                )
 
 
 def _node_id_columns(

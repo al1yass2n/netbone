@@ -2734,6 +2734,20 @@ def _temporal_data_from_payload(payload: Mapping[object, object]) -> dict[str, A
     }
 
 
+def _reject_extra_values(
+    row: Mapping[str | None, object], *, row_number: int, width: int
+) -> None:
+    """Reject non-empty values past the header; trailing empty fields are fine."""
+
+    extra = row.get(None)
+    if isinstance(extra, list) and any(str(value).strip() for value in extra):
+        raise ValidationError(
+            f"CSV row {row_number} has {width + len(extra)} values but the header "
+            f"has {width} columns. Check the delimiter, or add a header for the "
+            "extra column."
+        )
+
+
 def _csv_records_preview(
     csv_text: str,
     *,
@@ -2757,8 +2771,9 @@ def _csv_records_preview(
         )
     records: list[dict[str, JsonValue]] = []
     row_count = 0
-    for row in reader:
+    for row_number, row in enumerate(reader, start=2):
         row_count += 1
+        _reject_extra_values(row, row_number=row_number, width=len(headers))
         if len(records) < MAX_PREVIEW_ROWS:
             records.append(
                 {header: json_value(row.get(header, "")) for header in headers}
@@ -2845,6 +2860,7 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     row_count = 0
     for row_number, row in enumerate(reader, start=2):
         row_count += 1
+        _reject_extra_values(row, row_number=row_number, width=len(headers))
         source_value = (row.get(source) or "").strip()
         target_value = (row.get(target) or "").strip()
         if not source_value or not target_value:

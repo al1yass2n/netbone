@@ -340,3 +340,60 @@ def test_no_unexpected_warnings_from_auto_weight_on_plain_methods() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         nb.score(nx.karate_club_graph(), "disparity")
+
+
+def test_edgelist_rejects_rows_with_extra_values(tmp_path: Path) -> None:
+    path = tmp_path / "extra.csv"
+    path.write_text("source,target,weight\na,b,1,9\nb,c,2,3\n")
+
+    with pytest.raises(nb.ValidationError, match="Row 2 of extra.csv has 4 values"):
+        nb.from_edgelist(path)
+
+
+def test_edgelist_accepts_a_trailing_delimiter_on_every_row(tmp_path: Path) -> None:
+    path = tmp_path / "trailing.csv"
+    path.write_text("source,target,weight\na,b,1,\nb,c,2,\n")
+
+    network = nb.from_edgelist(path)
+
+    edges = {
+        (network.node_id_to_original[u], network.node_id_to_original[v]): data["weight"]
+        for u, v, data in network.graph.edges(data=True)
+    }
+    assert edges == {("a", "b"): 1.0, ("b", "c"): 2.0}
+
+
+def test_edgelist_quoted_delimiters_are_not_extra_values(tmp_path: Path) -> None:
+    path = tmp_path / "quoted.csv"
+    path.write_text('source,target,weight\na, "b,c", 1\n')
+
+    network = nb.from_edgelist(path)
+
+    assert set(network.node_id_to_original.values()) == {"a", "b,c"}
+
+
+def test_temporal_edgelist_accepts_trailing_delimiters(tmp_path: Path) -> None:
+    path = tmp_path / "events.csv"
+    path.write_text("source,target,time\na,b,1,\nb,c,2,\n")
+
+    temporal = nb.from_temporal_edgelist(path)
+
+    assert temporal.events["time"].tolist() == [1, 2]
+
+
+def test_temporal_edgelist_rejects_rows_with_extra_values(tmp_path: Path) -> None:
+    path = tmp_path / "events.csv"
+    path.write_text("source,target,time\na,b,1,x\n")
+
+    with pytest.raises(nb.ValidationError, match="has 4 values but the header"):
+        nb.from_temporal_edgelist(path)
+
+
+def test_web_csv_rejects_extra_values_and_accepts_trailing_delimiters() -> None:
+    extra = preview_payload(_csv_payload("source,target,weight\na,b,1,9\n"))
+    trailing = preview_payload(_csv_payload("source,target,weight\na,b,1,\nb,c,2,\n"))
+
+    assert extra["valid"] is False
+    assert "CSV row 2 has 4 values" in str(extra["errors"])
+    assert trailing["valid"] is True
+    assert trailing["edge_count"] == 2
