@@ -1,4 +1,4 @@
-# Registry discovery and lower-level helpers
+# Registry and helpers
 
 Use the top-level registry functions to discover available methods and filters
 and inspect their metadata. For direct calls, the helpers shown below operate
@@ -24,6 +24,12 @@ for paper in nb.describe_method("node_betweenness")["references"]:
 ```
 
 ## Scorers exported by netbone.methods
+
+[`nb.score(graph, name, **parameters)`](pipelines.md) runs any of the 20
+registered methods, checks its parameters, and resolves `weight="auto"`, so
+use it as the entry point. `netbone.methods` also exports four scorers for
+direct calls on a normalized `Network`. They skip the weight resolution, so
+pass `weight` explicitly.
 
 ::: netbone.methods.compute_disparity
 ::: netbone.methods.compute_edge_weight

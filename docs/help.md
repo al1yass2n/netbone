@@ -14,7 +14,13 @@
 
 | Symptom | What to check |
 | --- | --- |
-| Duplicate edge row | For a static undirected edge list, `A,B` and `B,A` denote the same edge. Aggregate duplicate observations before loading or use the temporal loader for events. |
+| "is not UTF-8 text" | Save the file as UTF-8, for example **CSV UTF-8** in Excel, and load it again. |
+| "has a header but no edges" | The file has column names but no rows below them. Check that you exported the data and not only the header. |
+| "Row N has M values but the header has K columns" | A row has more values than the header names. Check the delimiter (for example `;` instead of `,`), or add a header for the extra column. |
+| "repeats the edge between A and B from row N" | Each edge may appear once. In an undirected file `A,B` and `B,A` are the same edge. Merge repeated rows first, for example by summing their weights, pass `directed=True` to keep both directions, or use the [temporal loader](python/temporal.md) for repeated events. |
+| "has a boolean weight" | Weights must be numbers. Replace `true`/`false` with numbers, or pass `weight=None` for an unweighted network. |
+| "mixes numbers and dates" | A temporal time column must hold one kind of value. Use snapshot numbers on every row or dates on every row. |
+| The web app rejects an upload as too large | The local app accepts files up to 100 MB. Start it with a higher limit, for example `netbone-web --max-upload-mb 500`. |
 | A weighted method rejects the graph | Verify the selected weight attribute on each edge. Some methods require positive values or integer counts. See the [method catalog](reference/methods.md). |
 | A method is incompatible with directed data | Choose a directed-capable method or make an explicit [undirected projection](python/inputs.md#preserve-or-project-directed-links). |
 | Datetime events need a time setting | Provide a `snapshot_size` for snapshot weightings or `time_unit` for persistent elapsed-time weightings. See [temporal time scales](python/temporal.md#choose-the-time-scale). |

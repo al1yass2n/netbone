@@ -74,3 +74,16 @@ def test_report_lists_every_method_reference() -> None:
         "10.1080/0022250X.2001.9990249",
     ]
     assert "Brandes, U. (2001)" in nb.report(result).to_markdown()
+
+
+def test_docs_and_app_share_one_bibtex_entry() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "docs" / "index.md").read_text(encoding="utf-8")
+    docs_entry = page.split("```bibtex\n", 1)[1].split("```", 1)[0]
+    footer = (root / "web" / "src" / "components" / "CitationFooter.tsx").read_text(
+        encoding="utf-8"
+    )
+    doi = footer.split('const doi = "', 1)[1].split('"', 1)[0]
+    app_entry = footer.split("const bibtex = `", 1)[1].split("`;", 1)[0]
+
+    assert docs_entry == app_entry.replace("${doi}", doi)

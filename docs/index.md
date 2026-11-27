@@ -22,7 +22,7 @@ selected, and measure what the reduction preserves.
 Load a CSV edge list, read GraphML, work with NetworkX directly, or aggregate
 time-stamped interactions before scoring.
 
-[Prepare graph inputs](python/inputs.md)
+[Prepare network inputs](python/inputs.md)
 
 </section>
 
@@ -74,7 +74,24 @@ or the [method catalog](reference/methods.md).
 
 ## Cite Netbone
 
+If you use Netbone in published work, cite the paper that introduced it.
+Each [method page](reference/methods.md) also lists the papers that define
+that method, so cite those for the methods you report.
+
 Yassin, A., Haidar, A., Cherifi, H., Seba, H., & Togni, O. (2023).
 *An evaluation tool for backbone extraction techniques in weighted complex
 networks*. Scientific Reports, 13, Article 17000.
-[Journal article](https://doi.org/10.1038/s41598-023-42076-3)
+[doi:10.1038/s41598-023-42076-3](https://doi.org/10.1038/s41598-023-42076-3)
+
+```bibtex
+@article{yassin2023netbone,
+  author = {Yassin, Ali and Haidar, Abbas and Cherifi, Hocine and Seba, Hamida and Togni, Olivier},
+  title = {An evaluation tool for backbone extraction techniques in weighted complex networks},
+  journal = {Scientific Reports},
+  year = {2023},
+  volume = {13},
+  number = {1},
+  pages = {17000},
+  doi = {10.1038/s41598-023-42076-3}
+}
+```
