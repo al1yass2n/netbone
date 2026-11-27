@@ -100,6 +100,24 @@ def test_source_distribution_manifest_includes_docs_site_config() -> None:
 
     assert "include mkdocs.yml" in manifest
     assert "recursive-include docs_hooks *.py" in manifest
+    assert "recursive-include docs/assets/screens *.png" in manifest
+    assert "recursive-include web/scripts *.mjs" in manifest
+
+
+def test_every_web_app_screenshot_is_shown_with_a_description() -> None:
+    screens = Path("docs/assets/screens")
+    pages = "\n".join(
+        path.read_text(encoding="utf-8") for path in Path("docs").rglob("*.md")
+    )
+    images = re.findall(r"!\[([^\]]*)\]\(\.\./assets/screens/([^)]+)\)", pages)
+    shown = {name for _alt, name in images}
+
+    assert shown == {path.name for path in screens.glob("*.png")}
+    assert all(len(alt.split()) >= 5 for alt, _name in images)
+    script = Path("web/scripts/docs-screenshots.mjs").read_text(encoding="utf-8")
+    assert {f"{path.stem}" for path in screens.glob("*.png")} <= set(
+        re.findall(r'"([a-z-]+)"\);', script)
+    )
 
 
 def _parse_toml(content: str) -> dict[str, Any]:

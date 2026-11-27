@@ -4,6 +4,13 @@ Select **Open a network** or drag a file onto that button. Review the
 detected settings and the rows or graph summary before accepting the mapping.
 You can reopen the settings from the network summary.
 
+<figure class="docs-screenshot" markdown>
+
+[![The Review network settings dialog for a CSV edge list, with Strength selected for the weights](../assets/screens/app-network-settings.png){ loading=lazy }](../assets/screens/app-network-settings.png){ .docs-shot-link title="Open the full-size screenshot" }
+
+<figcaption markdown="span">The detected mapping for a weighted edge list. Choose what higher weights mean, then use the mapping.</figcaption>
+</figure>
+
 | Input format | Settings to verify |
 | --- | --- |
 | CSV or TSV edge list | Delimiter, source and target columns, optional weight, and direction. A static edge list represents one row per edge or arc. |

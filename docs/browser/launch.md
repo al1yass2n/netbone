@@ -16,6 +16,13 @@ Keep the terminal open while you work. Press Ctrl+C there to stop the server.
 The installed distribution includes the browser assets. A separate frontend
 build is only needed when developing the UI.
 
+<figure class="docs-screenshot" markdown>
+
+[![The Netbone start screen with the Open a network and Try an example buttons](../assets/screens/app-start.png){ loading=lazy }](../assets/screens/app-start.png){ .docs-shot-link title="Open the full-size screenshot" }
+
+<figcaption markdown="span">The start screen. Open your own file or try one of the built-in examples.</figcaption>
+</figure>
+
 ## Startup options
 
 `netbone-web --help` lists the startup settings.

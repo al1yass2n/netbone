@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "build:demo": "tsc --noEmit && vite build --mode demo",
+    "screenshots": "node scripts/docs-screenshots.mjs",
     "dev": "vite --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "playwright test",

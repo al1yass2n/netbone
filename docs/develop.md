@@ -40,6 +40,21 @@ new examples from an installed environment.
 Open the demo from the homepage. Regenerate its files after changing the
 dataset, supported settings, web interface, or Python result format.
 
+## Refresh the web app screenshots
+
+The browser guides show screenshots of the web app. A script regenerates
+them from the local app and the built demo, so they match the current
+interface. Run it after a visible UI change, once the demo is built.
+
+```bash
+npm run screenshots --prefix web
+```
+
+It writes PNG files to `docs/assets/screens`. Set `NETBONE_PYTHON` to choose
+the Python interpreter, and `NETBONE_BROWSER_EXECUTABLE` or
+`NETBONE_BROWSER_CHANNEL` to choose the browser Playwright starts. Review the
+images before committing them.
+
 ## Run project checks
 
 ```bash
