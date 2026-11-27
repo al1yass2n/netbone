@@ -6,6 +6,7 @@
   "Python": "code",
   "Web app": "window-maximize",
   "Methods": "diagram-project",
+  "Filters": "filter",
   "API reference": "book-open",
   "Project": "circle-info"
 } %}
@@ -167,5 +168,17 @@
         </nav>
       {% endif %}
     </main>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <div class="docs-footer-inner">
+    <p>Netbone {{ config.extra.version }} · Released under the
+      <a href="{{ config.repo_url }}/blob/main/LICENSE">MIT License</a></p>
+    <ul class="docs-footer-links">
+      <li><a href="{{ nav.homepage.url | url }}#cite-netbone">Cite Netbone</a></li>
+      <li><a href="{{ 'changelog/' | url }}">Release notes</a></li>
+      <li><a href="{{ config.repo_url }}">GitHub</a></li>
+    </ul>
   </div>
 {% endblock %}

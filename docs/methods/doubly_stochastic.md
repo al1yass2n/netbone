@@ -27,7 +27,11 @@ has unit row and column sums. The score of an edge is its entry in \(P\). The
 default selection adds edges in descending score order until each input
 component is connected. In `"relative"` mode \(\epsilon\) is multiplied by the
 mean edge weight of the component; in `"absolute"` mode it is used as given.
-Check convergence warnings before interpreting the scores.
+
+!!! warning "Check convergence"
+    If balancing stops at `max_iterations`, the result carries a warning and
+    the scores are not fully balanced. Check `result.warnings` before you
+    interpret them.
 
 ## Parameters
 
@@ -63,9 +67,9 @@ Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
 compatible graph of your own.
 
 ```python
-candidate = nb.pipeline().score("doubly_stochastic", weight="weight")
-result = candidate.filter("default").run(graph)
-print(result.summary())
+pipeline = nb.pipeline().score("doubly_stochastic", weight="weight")
+backbone = pipeline.filter("default").run(graph)
+print(backbone.summary())
 ```
 
 ## References

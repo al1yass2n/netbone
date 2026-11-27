@@ -56,9 +56,9 @@ Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
 compatible graph of your own.
 
 ```python
-candidate = nb.pipeline().score("marginal_likelihood", weight="weight")
-result = candidate.filter("significance", alpha=0.05, correction="holm").run(graph)
-print(result.summary())
+pipeline = nb.pipeline().score("marginal_likelihood", weight="weight")
+backbone = pipeline.filter("significance", alpha=0.05, correction="holm").run(graph)
+print(backbone.summary())
 ```
 
 ## References

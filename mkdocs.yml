@@ -82,16 +82,19 @@ plugins:
 
 hooks:
   - docs_hooks/mathml.py
+  - docs_hooks/site.py
 
 markdown_extensions:
+  - admonition
   - attr_list
-  - fenced_code
   - md_in_html
   - toc:
       permalink: true
-  - codehilite:
+  - pymdownx.highlight:
+      css_class: codehilite
       guess_lang: false
-      noclasses: false
+      pygments_lang_class: true
+  - pymdownx.superfences
   - pymdownx.arithmatex:
       generic: true
 

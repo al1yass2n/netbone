@@ -78,9 +78,9 @@ Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
 compatible graph of your own.
 
 ```python
-candidate = nb.pipeline().score("lans", weight="weight", leaf_policy="ignore")
-result = candidate.filter("default").run(graph)
-print(result.summary())
+pipeline = nb.pipeline().score("lans", weight="weight", leaf_policy="ignore")
+backbone = pipeline.filter("default").run(graph)
+print(backbone.summary())
 ```
 
 ## References

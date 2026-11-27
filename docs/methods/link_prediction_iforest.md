@@ -19,9 +19,12 @@ The chosen [Link Prediction](link_prediction.md) similarities are computed for
 every edge and used as features. scikit-learn's Isolation Forest is fitted to
 those feature vectors, and the score is the negated `score_samples` value, so
 higher scores mark more anomalous edges. The Netbone filter, not the model's
-`contamination`, decides how many edges to keep. Install the
-[ml extra](../start/install.md#optional-tools) first, and inspect the warnings
-if the features are identical across edges.
+`contamination`, decides how many edges to keep. Inspect the warnings if the
+features are identical across edges.
+
+!!! note "Needs scikit-learn"
+    Install the [ml extra](../start/install.md#optional-tools) to use this
+    method.
 
 ## Parameters
 
@@ -59,13 +62,13 @@ Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
 compatible graph of your own.
 
 ```python
-candidate = nb.pipeline().score(
+pipeline = nb.pipeline().score(
     "link_prediction_iforest",
     similarities=["preferential_attachment", "shortest_path"],
     random_state=0,
 )
-result = candidate.filter("fraction", fraction=0.5).run(graph)
-print(result.summary())
+backbone = pipeline.filter("fraction", fraction=0.5).run(graph)
+print(backbone.summary())
 ```
 
 ## References

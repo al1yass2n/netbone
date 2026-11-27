@@ -4,6 +4,7 @@ include mkdocs.yml
 include README.md
 recursive-include docs *.md *.css *.js
 recursive-include docs_theme *.html
+recursive-include docs_hooks *.py
 recursive-include docs/assets/fonts *.woff2 *.txt
 prune docs/demo
 recursive-include examples *.csv *.py

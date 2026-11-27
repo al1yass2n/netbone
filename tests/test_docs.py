@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import contextlib
+import io
 import re
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 import netbone as nb
 
@@ -69,12 +73,33 @@ def test_docs_extra_declares_documentation_tooling() -> None:
     assert any(
         str(dependency).startswith("mkdocstrings") for dependency in docs_dependencies
     )
+    for hook_dependency in ("pymdown-extensions", "latex2mathml"):
+        assert any(
+            str(dependency).startswith(hook_dependency)
+            for dependency in docs_dependencies
+        )
+
+
+@pytest.mark.parametrize("name", nb.list_methods())
+def test_method_page_example_runs_on_the_sample_graph(name: str) -> None:
+    catalog = Path("docs/reference/methods.md").read_text(encoding="utf-8")
+    setup = catalog.split("## Try a method", 1)[1].split("```python\n", 1)[1]
+    page = Path(f"docs/methods/{name}.md").read_text(encoding="utf-8")
+    example = page.split("## Run the method", 1)[1].split("```python\n", 1)[1]
+    namespace: dict[str, Any] = {}
+
+    exec(setup.split("```", 1)[0], namespace)
+    with contextlib.redirect_stdout(io.StringIO()):
+        exec(example.split("```", 1)[0], namespace)
+
+    assert namespace["backbone"].method_result.method_name == name
 
 
 def test_source_distribution_manifest_includes_docs_site_config() -> None:
     manifest = Path("MANIFEST.in").read_text(encoding="utf-8")
 
     assert "include mkdocs.yml" in manifest
+    assert "recursive-include docs_hooks *.py" in manifest
 
 
 def _parse_toml(content: str) -> dict[str, Any]:

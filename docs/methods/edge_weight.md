@@ -44,9 +44,9 @@ Use the [sample graph](../reference/methods.md#try-a-method) or substitute a
 compatible graph of your own.
 
 ```python
-candidate = nb.pipeline().score("edge_weight", weight="weight")
-result = candidate.filter("threshold", value=5, operator="greater_equal").run(graph)
-print(result.summary())
+pipeline = nb.pipeline().score("edge_weight", weight="weight")
+backbone = pipeline.filter("threshold", value=5, operator="greater_equal").run(graph)
+print(backbone.summary())
 ```
 
 ## References

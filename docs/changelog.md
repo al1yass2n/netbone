@@ -21,8 +21,9 @@ ported. It adds:
 
 ### Changes since the 0.3.0 source tree was first published
 
-If you installed Netbone from the repository before this release, these
-changes can alter your results.
+!!! warning "Results can change"
+    If you installed Netbone from the repository before this release, these
+    changes can alter your results.
 
 **Scores that change**
 
