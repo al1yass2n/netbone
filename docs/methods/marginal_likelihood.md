@@ -4,8 +4,9 @@ Registered name `marginal_likelihood`
 
 Uses an inclusive binomial upper tail for the observed edge count. If `W` is
 total edge count and the two endpoint strengths are `s` and `t`, the method
-uses `W` trials and probability `s * t / (2 * W ** 2)`. Use `weight="weight"`
-(default) or name a count attribute. Floating-point representations of whole
+uses `W` trials and probability `s * t / (2 * W ** 2)`. Weights are required;
+the default `weight="auto"` reads the `weight` attribute, or name a count
+attribute. Floating-point representations of whole
 counts are accepted. Use a continuous-weight method when the observed values
 are rates or averaged measurements.
 

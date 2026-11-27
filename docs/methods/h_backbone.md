@@ -7,7 +7,8 @@ betweenness divided by the number of nodes. A link is marked if it meets at
 least one positive cutoff. This combines raw strength with a shortest-path
 measure of bridging.
 
-Use `weight="weight"` (default) and `distance_transform="inverse"` for
+Weights are required. The default `weight="auto"` reads the `weight` attribute.
+Use `distance_transform="inverse"` (default) for
 strengths or `"identity"` for path distances. Inspect `h_backbone_h_strength`
 and `h_backbone_h_bridge` in the score table for the chosen cutoffs.
 

@@ -26,6 +26,8 @@ DISPARITY_METADATA: dict[str, object] = {
     "directed_semantics": "source_outgoing_and_target_incoming_distributions",
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
+    "default_weight": "auto",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,

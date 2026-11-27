@@ -1,4 +1,4 @@
-import type { ControlSpec, ControlValue, FilterName, JsonRecord, JsonValue, UiSchema } from "./types";
+import type { ControlSpec, ControlValue, FilterName, JsonRecord, JsonValue, UiSchema, WeightSign } from "./types";
 
 export type SettingKind = "method" | "filter";
 
@@ -28,6 +28,7 @@ export interface SweepEnvironment {
   directed: boolean;
   weighted: boolean;
   positiveIntegerWeights?: boolean;
+  weightSign?: WeightSign | null;
 }
 
 export function record(value: JsonValue | undefined): JsonRecord | undefined {

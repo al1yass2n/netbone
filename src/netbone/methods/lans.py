@@ -26,6 +26,8 @@ LANS_METADATA: dict[str, object] = {
     "directed_semantics": "source_outgoing_distribution",
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
+    "default_weight": "auto",
     "requires_positive_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,

@@ -2,7 +2,8 @@
 
 Use `fraction` for a retention budget on score, p-value, or numeric custom
 statistics. Give a number from 0 to 1. The requested count is
-`ceil(fraction * number_of_rows)`. A fraction of zero keeps zero items and a
+`ceil(fraction * number_of_rows)`, computed after rounding away floating-point
+noise so that `0.07` of 100 rows keeps 7. A fraction of zero keeps zero items and a
 fraction of one keeps all items.
 
 The filter defaults to the primary statistic and the method's preferred

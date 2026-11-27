@@ -51,8 +51,9 @@ method's target was selected. A temporal extraction can include
 `temporal_aggregation.json`. Review the bundle before sharing it because
 labels, attributes, or supplied analysis context may be present.
 
-`save_experiment()` requires a new destination by default. Use
-`overwrite=True` only for a directory you intend to replace.
+`save_experiment()` requires a new destination by default. With
+`overwrite=True` it replaces an empty directory or an earlier Netbone bundle,
+and refuses to delete any other existing directory.
 
 ## Store settings without the outputs
 

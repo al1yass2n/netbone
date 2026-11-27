@@ -7,7 +7,8 @@ directed arc the method follows outgoing paths and divides by all roots,
 including those that cannot reach the arc. Equal shortest paths can include
 multiple predecessors.
 
-`weight="weight"` is the default. Pass `weight=None` for hop counts.
+The default `weight="auto"` uses the `weight` attribute when every edge has
+one and hop counts otherwise. Pass `weight=None` to force hop counts.
 `distance_transform="inverse"` treats weights as strengths and `"identity"`
 treats them as distances.
 

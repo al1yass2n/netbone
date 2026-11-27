@@ -21,6 +21,7 @@ MULTIPLE_LINKAGE_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": False,
     "requires_nonnegative_weights": True,
     "supports_multigraph": False,
@@ -30,11 +31,15 @@ MULTIPLE_LINKAGE_METADATA: dict[str, object] = {
         "value": 1.0,
         "operator": "equal",
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
     "tie_policy": "stable_edge_id",
     "reference": "Nocaj, Ortmann, and Brandes, Computer Graphics Forum 28(3), 2009.",
     "doi": "10.1111/j.1467-9663.2009.00547.x",
 }
+
+
+_COD_TOLERANCE = 1e-9
+_VARIANCE_TOLERANCE = 1e-9
 
 
 def compute_multiple_linkage(
@@ -137,7 +142,9 @@ def _cutoff_index(sorted_weights: list[float]) -> int:
             real_distribution,
             _ideal_distribution(index, len(sorted_weights)),
         )
-        if cod > best_cod:
+        # Treat values within floating-point noise as ties and keep the
+        # smallest cutoff, so rescaling weights cannot change the selection.
+        if cod > best_cod + _COD_TOLERANCE:
             best_cod = cod
             best_index = index
     return best_index
@@ -155,9 +162,11 @@ def _coefficient_of_determination(left: list[float], right: list[float]) -> floa
     right_offsets = [value - right_mean for value in right]
     left_variance = sum(value * value for value in left_offsets)
     right_variance = sum(value * value for value in right_offsets)
-    if left_variance == 0.0 and right_variance == 0.0:
+    left_constant = left_variance <= _VARIANCE_TOLERANCE
+    right_constant = right_variance <= _VARIANCE_TOLERANCE
+    if left_constant and right_constant:
         return 1.0
-    if left_variance == 0.0 or right_variance == 0.0:
+    if left_constant or right_constant:
         return 0.0
     covariance = sum(
         left_value * right_value

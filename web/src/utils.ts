@@ -6,6 +6,7 @@ import type {
   JsonRecord,
   MethodSpec,
   NetworkContext,
+  WeightSign,
 } from "./types";
 
 export function parseHeaders(text: string, delimiter: string): string[] {
@@ -101,16 +102,23 @@ export function initialControlValues(controls: ControlSpec[]): Record<string, Co
 
 export function methodCompatibilityReason(
   method: MethodSpec,
-  { directed, weighted, positiveIntegerWeights }: {
+  { directed, weighted, positiveIntegerWeights, weightSign }: {
     directed: boolean;
     weighted: boolean;
     positiveIntegerWeights?: boolean;
+    weightSign?: WeightSign | null;
   },
 ): string {
   if (directed && !method.supports_directed) return "Not available for directed networks";
   if (!weighted && method.requires_weights) return "Requires a weight column";
   if (method.requires_integer_weights && positiveIntegerWeights === false) {
     return "Requires positive whole-number weights";
+  }
+  if (weighted && method.requires_positive_weights && weightSign && weightSign !== "positive") {
+    return "Requires positive weights";
+  }
+  if (weighted && method.requires_nonnegative_weights && weightSign === "mixed") {
+    return "Requires non-negative weights";
   }
   return "";
 }

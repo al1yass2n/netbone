@@ -3,7 +3,9 @@
 Registered name `node_betweenness`
 
 Ranks nodes by the share of shortest paths that pass through them.
-`weight=None` (default) uses hop counts. For positive weights use
+The default `weight="auto"` uses the `weight` attribute when every edge has one
+and hop counts otherwise; `weight=None` forces hop counts. For positive weights
+use
 `distance_transform="inverse"` (default) for strengths or `"identity"` for
 distances. Defaults are `normalized=True` and `endpoints=False`. Set
 `endpoints=True` to count path endpoints in the centrality. The extracted graph

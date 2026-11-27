@@ -7,7 +7,8 @@ strength under a uniform allocation model. For degree `k > 1` and weight share
 `p`, the endpoint p-value is `(1 - p) ** (k - 1)`. Directed arcs use the
 source's outgoing and target's incoming weight distributions.
 
-`weight="weight"` names the strength attribute. Combine the endpoint p-values
+Weights are required; the default `weight="auto"` reads the `weight`
+attribute, or name another strength attribute. Combine the endpoint p-values
 with `pvalue_aggregation="min"` (default), `"max"`, or `"average"`.
 `leaf_policy="ignore"` omits a degree-one endpoint and `"zero"` assigns it
 p-value zero. When both endpoints are ignored, the primary p-value is 1. The

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 
-from netbone.exceptions import ConfigurationError
+from netbone.exceptions import ConfigurationError, ValidationError
 from netbone.methods.disparity import DISPARITY_METADATA, compute_disparity
 from netbone.methods.doubly_stochastic import (
     DOUBLY_STOCHASTIC_METADATA,
@@ -86,6 +87,22 @@ class MethodDefinition:
         object.__setattr__(self, "metadata", MappingProxyType(dict(self.metadata)))
 
 
+AUTO_WEIGHT = "auto"
+CANONICAL_WEIGHT = "weight"
+WEIGHT_MODES = ("ignored", "optional", "required")
+_DISTANCE_METHODS = frozenset(
+    {
+        "edge_betweenness",
+        "h_backbone",
+        "link_prediction",
+        "link_prediction_iforest",
+        "link_salience",
+        "node_betweenness",
+    }
+)
+_EDGE_REFERENCE = re.compile(r"\b(edge|Edge|arc|Arc) \((\d+), (\d+)\)")
+
+
 def list_methods() -> tuple[str, ...]:
     """Return registered built-in method names."""
 
@@ -112,6 +129,123 @@ def get_method(name: str) -> MethodDefinition:
         raise ConfigurationError(
             f"Unknown scoring method {name!r}. Available methods: {allowed}."
         ) from exc
+
+
+def run_method(
+    definition: MethodDefinition,
+    network: Network,
+    parameters: Mapping[str, object],
+) -> MethodResult:
+    """Run a registered method with automatic weight resolution.
+
+    Methods whose metadata declares ``weight_mode`` ``"optional"`` or
+    ``"required"`` accept ``weight="auto"`` (the default). Auto uses the
+    canonical ``weight`` edge attribute when every edge has it and runs
+    unweighted when no edge has it. The resolved value is recorded in the
+    returned ``MethodResult.parameters``. Validation messages that mention
+    internal node ids are rewritten to use the network's original labels.
+    """
+
+    resolved_parameters, warnings = _resolve_weight_parameter(
+        definition, network, parameters
+    )
+    try:
+        result = definition.compute(network, resolved_parameters)
+    except ValidationError as exc:
+        raise ValidationError(_with_original_labels(str(exc), network)) from exc
+    if warnings:
+        result = replace(result, warnings=(*warnings, *result.warnings))
+    return result
+
+
+def _resolve_weight_parameter(
+    definition: MethodDefinition,
+    network: Network,
+    parameters: Mapping[str, object],
+) -> tuple[dict[str, object], tuple[str, ...]]:
+    resolved = dict(parameters)
+    mode = definition.metadata.get("weight_mode", "ignored")
+    if mode == "ignored":
+        if resolved.get("weight", None) == AUTO_WEIGHT:
+            resolved.pop("weight")
+        return resolved, ()
+    requested = resolved.get("weight", AUTO_WEIGHT)
+    if requested != AUTO_WEIGHT:
+        return resolved, ()
+
+    weight = _auto_weight(network, definition)
+    resolved["weight"] = weight
+    warnings: tuple[str, ...] = ()
+    if (
+        weight is not None
+        and _uses_shortest_paths(definition.name, resolved)
+        and "distance_transform" not in resolved
+    ):
+        warnings = (
+            f"{definition.metadata.get('display_name', definition.name)} used the "
+            f"{weight!r} edge attribute as tie strength "
+            "(distance_transform='inverse'). Pass distance_transform='identity' "
+            "if larger weights mean longer or costlier links, or weight=None to "
+            "ignore weights.",
+        )
+    return resolved, warnings
+
+
+def _uses_shortest_paths(method_name: str, parameters: Mapping[str, object]) -> bool:
+    if method_name not in _DISTANCE_METHODS:
+        return False
+    if method_name == "link_prediction":
+        return parameters.get("similarity") == "shortest_path"
+    if method_name == "link_prediction_iforest":
+        similarities = parameters.get("similarities")
+        if isinstance(similarities, str):
+            return similarities == "shortest_path"
+        return isinstance(similarities, Sequence) and "shortest_path" in similarities
+    return True
+
+
+def _auto_weight(network: Network, definition: MethodDefinition) -> str | None:
+    edge_count = network.edge_count
+    weighted_count = sum(
+        1
+        for _, _, attributes in network.graph.edges(data=True)
+        if CANONICAL_WEIGHT in attributes
+    )
+    required = definition.metadata.get("weight_mode") == "required"
+    display_name = definition.metadata.get("display_name", definition.name)
+    if edge_count == 0:
+        return CANONICAL_WEIGHT if required else None
+    if weighted_count == edge_count:
+        return CANONICAL_WEIGHT
+    if weighted_count == 0:
+        if required:
+            raise ValidationError(
+                f"{display_name} requires edge weights, but no edge has a "
+                f"{CANONICAL_WEIGHT!r} attribute. Pass weight='<attribute>' to use "
+                "another edge attribute."
+            )
+        return None
+    raise ValidationError(
+        f"Only {weighted_count} of {edge_count} edges have a {CANONICAL_WEIGHT!r} "
+        f"attribute, so {display_name} cannot tell whether the network is "
+        "weighted. Add the missing weights, pass weight=None to ignore weights, "
+        "or pass weight='<attribute>' explicitly."
+    )
+
+
+def _with_original_labels(message: str, network: Network) -> str:
+    def edge_label(match: re.Match[str]) -> str:
+        source_id, target_id = int(match.group(2)), int(match.group(3))
+        if (
+            source_id not in network.node_id_to_original
+            or target_id not in network.node_id_to_original
+        ):
+            return match.group(0)
+        source = network.node_id_to_original[source_id]
+        target = network.node_id_to_original[target_id]
+        return f"{match.group(1)} ({source!r}, {target!r})"
+
+    return _EDGE_REFERENCE.sub(edge_label, message)
 
 
 def _reject_unknown_parameters(
@@ -147,7 +281,7 @@ def _compute_disparity(
         parameters,
         {"leaf_policy", "pvalue_aggregation", "weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     pvalue_aggregation = parameters.get("pvalue_aggregation", "min")
     leaf_policy = parameters.get("leaf_policy", "ignore")
     if not isinstance(weight, str):
@@ -207,7 +341,7 @@ def _compute_doubly_stochastic(
         parameters,
         {"epsilon", "epsilon_mode", "max_iterations", "tolerance", "weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     epsilon = parameters.get("epsilon", 1e-4)
     epsilon_mode = parameters.get("epsilon_mode", "relative")
     tolerance = parameters.get("tolerance", 1e-12)
@@ -275,7 +409,7 @@ def _compute_h_backbone(
         parameters,
         {"distance_transform", "weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     distance_transform = parameters.get("distance_transform", "inverse")
     if not isinstance(weight, str):
         raise ConfigurationError("h_backbone parameter 'weight' must be a string.")
@@ -299,7 +433,7 @@ def _compute_link_salience(
         parameters,
         {"distance_transform", "weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     distance_transform = parameters.get("distance_transform", "inverse")
     if weight is not None and not isinstance(weight, str):
         raise ConfigurationError("link_salience parameter 'weight' must be a string.")
@@ -496,7 +630,7 @@ def _compute_lans(
         parameters,
         {"leaf_policy", "pvalue_aggregation", "weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     pvalue_aggregation = parameters.get("pvalue_aggregation", "min")
     leaf_policy = parameters.get("leaf_policy", "zero")
     if not isinstance(weight, str):
@@ -519,7 +653,7 @@ def _compute_noise_corrected(
     network: Network, parameters: Mapping[str, object]
 ) -> MethodResult:
     _reject_unknown_parameters("noise_corrected", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError("noise_corrected parameter 'weight' must be a string.")
     return compute_noise_corrected(network, weight=weight)
@@ -530,7 +664,7 @@ def _compute_marginal_likelihood(
     parameters: Mapping[str, object],
 ) -> MethodResult:
     _reject_unknown_parameters("marginal_likelihood", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError(
             "marginal_likelihood parameter 'weight' must be a string."
@@ -543,7 +677,7 @@ def _compute_maximum_spanning_forest(
     parameters: Mapping[str, object],
 ) -> MethodResult:
     _reject_unknown_parameters("maximum_spanning_forest", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if weight is not None and not isinstance(weight, str):
         raise ConfigurationError(
             "maximum_spanning_forest parameter 'weight' must be a string or None."
@@ -556,7 +690,7 @@ def _compute_multiple_linkage(
     parameters: Mapping[str, object],
 ) -> MethodResult:
     _reject_unknown_parameters("multiple_linkage", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError(
             "multiple_linkage parameter 'weight' must be a string."
@@ -577,7 +711,7 @@ def _compute_node_strength(
     parameters: Mapping[str, object],
 ) -> MethodResult:
     _reject_unknown_parameters("node_strength", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError("node_strength parameter 'weight' must be a string.")
     return compute_node_strength(network, weight=weight)
@@ -630,7 +764,7 @@ def _compute_planar_maximally_filtered_graph(
         parameters,
         {"weight"},
     )
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if weight is not None and not isinstance(weight, str):
         raise ConfigurationError(
             "planar_maximally_filtered_graph parameter 'weight' must be a string or "
@@ -644,7 +778,7 @@ def _compute_primary_linkage(
     parameters: Mapping[str, object],
 ) -> MethodResult:
     _reject_unknown_parameters("primary_linkage", parameters, {"weight"})
-    weight = parameters.get("weight", "weight")
+    weight = parameters.get("weight")
     if not isinstance(weight, str):
         raise ConfigurationError("primary_linkage parameter 'weight' must be a string.")
     return compute_primary_linkage(network, weight=weight)

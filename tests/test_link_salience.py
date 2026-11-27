@@ -101,7 +101,7 @@ def test_directed_graph_rejects_method_without_directed_support() -> None:
     graph.add_edge("a", "b", weight=1.0)
 
     with pytest.raises(nb.CompatibilityError, match="does not support directed"):
-        nb.score(graph, method="edge_weight")
+        nb.score(graph, method="node_strength")
 
 
 def test_link_salience_identity_transform_uses_weights_as_distances() -> None:

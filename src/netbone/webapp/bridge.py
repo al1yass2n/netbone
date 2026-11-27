@@ -1509,6 +1509,25 @@ def _cached_result(result_id: str) -> nb.BackboneResult:
         return result
 
 
+def _weight_sign(graph: nx.Graph, weight: str | None) -> str | None:
+    """Summarize selected weights as positive, nonnegative, or mixed."""
+
+    if weight is None or graph.number_of_edges() == 0:
+        return None
+    values = [
+        float(attributes[weight])
+        for _, _, attributes in graph.edges(data=True)
+        if _is_finite_number(attributes.get(weight))
+    ]
+    if len(values) != graph.number_of_edges():
+        return "mixed"
+    if all(value > 0 for value in values):
+        return "positive"
+    if all(value >= 0 for value in values):
+        return "nonnegative"
+    return "mixed"
+
+
 def preview_payload(payload: object) -> dict[str, JsonValue]:
     """Return parsed CSV readiness metadata for the guided web UI."""
 
@@ -1584,6 +1603,7 @@ def preview_payload(payload: object) -> dict[str, JsonValue]:
             for _, _, attributes in graph.edges(data=True)
             for value in (attributes.get(selected_weight),)
         ),
+        "weight_sign": _weight_sign(graph, selected_weight),
         "likely_weight_columns": json_value(parsed["likely_weight_columns"]),
         "records": json_value(parsed["records"]),
     }
@@ -1660,6 +1680,12 @@ def _method_card(name: str, metadata: Mapping[str, object]) -> dict[str, object]
         "requires_weights": bool(metadata.get("requires_weights", False)),
         "requires_integer_weights": bool(
             metadata.get("requires_integer_weights", False)
+        ),
+        "requires_positive_weights": bool(
+            metadata.get("requires_positive_weights", False)
+        ),
+        "requires_nonnegative_weights": bool(
+            metadata.get("requires_nonnegative_weights", False)
         ),
         "supports_weighted": bool(metadata.get("supports_weighted", False)),
         "supports_directed": bool(metadata.get("supports_directed", False)),
@@ -2616,6 +2642,8 @@ def _csv_records_preview(
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
+    # Look rows up by the stripped names so "source, target, weight" works.
+    reader.fieldnames = headers
     missing_columns = [
         column
         for column in required_columns
@@ -2699,6 +2727,8 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
     if reader.fieldnames is None:
         raise ValidationError("CSV input must include a header row.")
     headers = [field.strip() for field in reader.fieldnames if field is not None]
+    # Look rows up by the stripped names so "source, target, weight" works.
+    reader.fieldnames = headers
     missing_columns = [
         column
         for column in (source, target, weight)
@@ -2735,6 +2765,12 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
                 f"({source_value!r}, {target_value!r})."
             )
         seen_edges.add(edge_key)
+        if source_value == target_value:
+            raise ValidationError(
+                f"CSV row {row_number} is a self-loop on {source_value!r}. "
+                "Self-loops are not supported; remove the row or load the file as "
+                "a temporal event list, which drops them."
+            )
         attributes: dict[str, object] = {}
         if weight is not None:
             raw_weight = (row.get(weight) or "").strip()
@@ -2743,11 +2779,17 @@ def _csv_graph_from_payload(payload: Mapping[object, object]) -> dict[str, Any]:
                     f"CSV row {row_number} has an empty weight value."
                 )
             try:
-                attributes[weight] = float(raw_weight)
+                numeric_weight = float(raw_weight)
             except ValueError as exc:
                 raise ValidationError(
                     f"CSV row {row_number} weight {raw_weight!r} is not numeric."
                 ) from exc
+            if not math.isfinite(numeric_weight):
+                raise ValidationError(
+                    f"CSV row {row_number} weight {raw_weight!r} must be a finite "
+                    "number."
+                )
+            attributes[weight] = numeric_weight
         graph.add_edge(source_value, target_value, **attributes)
         if len(records) < MAX_PREVIEW_ROWS:
             records.append(

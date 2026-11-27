@@ -7,7 +7,8 @@ retained graph stays planar. Use PMFG when the output needs cycles and must
 also admit a drawing without crossings. The algorithm tests available links
 only.
 
-`weight="weight"` is the default. Pass `weight=None` to make weights equal.
+The default `weight="auto"` uses the `weight` attribute when every edge has
+one and equal weights otherwise. Pass `weight=None` to make weights equal.
 Ties use internal `edge_id`. The result warns when equal weights appear on both
 sides of the final selection.
 

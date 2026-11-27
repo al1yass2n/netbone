@@ -144,9 +144,10 @@ export default function App() {
   const effectiveDirected = Boolean(preview?.directed);
   const weighted = data.mode === "temporal" || Boolean(data.weight);
   const positiveIntegerWeights = preview?.positive_integer_weights;
+  const weightSign = preview?.weight_sign;
   const methodCompatibility = useCallback((candidate: MethodSpec) => methodCompatibilityReason(
-    candidate, { directed: effectiveDirected, weighted, positiveIntegerWeights },
-  ), [effectiveDirected, weighted, positiveIntegerWeights]);
+    candidate, { directed: effectiveDirected, weighted, positiveIntegerWeights, weightSign },
+  ), [effectiveDirected, weighted, positiveIntegerWeights, weightSign]);
 
   const combinedControls = useMemo(
     () => ({ ...methodControls, ...filterControls }),
@@ -487,6 +488,7 @@ export default function App() {
           directed={Boolean(preview.directed)}
           weighted={weighted}
           positiveIntegerWeights={positiveIntegerWeights}
+          weightSign={weightSign}
           basePayload={currentPayload()}
           initialConfiguration={result?.resolved_config ?? filterPreview?.resolved_config}
         />

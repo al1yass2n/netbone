@@ -7,7 +7,8 @@ empirical distribution of fractions at that endpoint. This empirical tail
 differs from the uniform model used by [Disparity](disparity.md). Directed arcs
 are evaluated against the source's outgoing distribution alone.
 
-Use `weight="weight"` (default) or name your strength attribute. In an
+Weights are required. The default `weight="auto"` reads the `weight`
+attribute, or name your strength attribute. In an
 undirected graph, `pvalue_aggregation` combines endpoint values using `"min"`
 (default), `"max"`, or `"average"`. The default `leaf_policy="zero"` assigns
 p-value zero at degree one. Choose `"ignore"` to omit that endpoint. If no

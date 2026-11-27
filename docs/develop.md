@@ -57,9 +57,10 @@ run individual examples with Python, for instance
 `python examples/parameter_sweep.py`.
 
 If working on the frontend, CI uses Node.js 24. Use `npm ci --prefix web` to
-install frontend dependencies and `npm run build --prefix web` to build the
-packaged assets. Build assets only if working on the UI or preparing a
-package release.
+install frontend dependencies, `npm test --prefix web` to run the frontend unit
+tests, and `npm run build --prefix web` to build the packaged assets. Commit the
+rebuilt `src/netbone/webapp/static` files with any UI change; CI fails when they
+differ from a fresh build.
 
 ## Publish the static site
 

@@ -23,6 +23,7 @@ NODE_STRENGTH_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": False,
     "supports_multigraph": False,
     "supports_self_loops": False,
@@ -30,7 +31,7 @@ NODE_STRENGTH_METADATA: dict[str, object] = {
     "default_filter_parameters": {
         "fraction": 0.1,
     },
-    "default_weight": "weight",
+    "default_weight": "auto",
 }
 
 

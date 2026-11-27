@@ -7,8 +7,9 @@ cycle. The result spans each original connected component. Use this to retain
 connectivity with a minimum number of links, at the cost of removing every
 cycle.
 
-The weight attribute defaults to `"weight"`. Pass `weight=None` to give each
-edge the same weight. Equal weights are ordered by internal `edge_id`. The
+The default `weight="auto"` uses the `weight` attribute when every edge has one
+and equal weights otherwise. Pass `weight=None` to give each edge the same
+weight. Equal weights are ordered by internal `edge_id`. The
 primary statistic is a 1/0 membership flag. Use the default filter to extract
 marked edges.
 

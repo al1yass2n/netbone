@@ -6,8 +6,9 @@ Measures significance from shortest-path involvement and local edge shares. It
 aggregates the more significant of the two endpoint values. Set the required
 non-negative parameter `c` explicitly and record it when comparing results. At
 an endpoint of degree `k > 1` and involvement `p`, the statistic is
-`(1 - p) ** ((k - 1) ** c)`. Use `weight=None` (default) for hop counts or
-provide positive strength weights, which are inverted for path distances.
+`(1 - p) ** ((k - 1) ** c)`. The default `weight="auto"` uses positive strength
+weights when every edge has a `weight` attribute, inverted for path distances,
+and hop counts otherwise. Pass `weight=None` to force hop counts.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |
 | --- | --- | --- | --- | --- |

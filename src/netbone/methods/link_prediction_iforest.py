@@ -31,6 +31,7 @@ LINK_PREDICTION_IFOREST_METADATA: dict[str, object] = {
     "supports_directed": True,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "optional",
     "requires_positive_weights": True,
     "uses_weights": True,
     "supports_multigraph": False,
@@ -40,7 +41,7 @@ LINK_PREDICTION_IFOREST_METADATA: dict[str, object] = {
         "fraction": 0.1,
     },
     "similarity_options": tuple(sorted(SIMILARITIES)),
-    "default_weight": None,
+    "default_weight": "auto",
     "default_weight_alpha": 1.0,
     "default_distance_transform": "inverse",
     "distance_transform_options": tuple(sorted(DISTANCE_TRANSFORMS)),
@@ -98,14 +99,20 @@ def compute_link_prediction_iforest(
     statistics: pd.DataFrame | None = None
     feature_columns: list[str] = []
     for similarity in similarity_names:
-        result = compute_link_prediction(
-            network,
-            similarity=similarity,
-            epsilon=epsilon,
-            weight=weight,
-            weight_alpha=weight_alpha,
-            distance_transform=distance_transform,
-        )
+        try:
+            result = compute_link_prediction(
+                network,
+                similarity=similarity,
+                epsilon=epsilon,
+                weight=weight,
+                weight_alpha=weight_alpha,
+                distance_transform=distance_transform,
+            )
+        except ValidationError as exc:
+            message = str(exc).replace(
+                "link_prediction scoring", "link_prediction_iforest scoring"
+            )
+            raise ValidationError(message) from exc
         if statistics is None:
             statistics = result.statistics[identity_columns].copy()
         elif result.statistics["edge_id"].tolist() != statistics["edge_id"].tolist():
@@ -310,8 +317,9 @@ def _isolation_forest_class() -> Any:
         module = import_module("sklearn.ensemble")
     except ImportError as exc:
         raise ConfigurationError(
-            "link_prediction_iforest requires scikit-learn. Install Netbone with "
-            "`netbone[ml]` to use this method."
+            "link_prediction_iforest requires scikit-learn. Install the ml extra "
+            'from your Netbone checkout with `python -m pip install ".[ml]"`, '
+            "or install scikit-learn directly."
         ) from exc
     return module.IsolationForest
 

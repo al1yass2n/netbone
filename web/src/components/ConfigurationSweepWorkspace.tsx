@@ -25,8 +25,8 @@ interface Props extends SweepEnvironment {
 
 const runLimit = 100;
 
-export function SweepWorkspace({ schema, method, filterName, directed, weighted, positiveIntegerWeights, basePayload, initialConfiguration }: Props) {
-  const environment = { directed, weighted, positiveIntegerWeights };
+export function SweepWorkspace({ schema, method, filterName, directed, weighted, positiveIntegerWeights, weightSign, basePayload, initialConfiguration }: Props) {
+  const environment = { directed, weighted, positiveIntegerWeights, weightSign };
   const baseMethod = schema.methods.find((item) => item.name === method.name && methodIsCompatible(item, environment))
     ?? schema.methods.find((item) => methodIsCompatible(item, environment)) ?? method;
   const baseFilter = baseMethod.name === method.name ? filterName : baseMethod.recommended_filter;

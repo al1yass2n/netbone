@@ -4,7 +4,8 @@ Registered name `node_strength`
 
 Ranks nodes by the sum of the weights on their incident links. An isolated node
 has strength zero. Use the `weight` parameter to choose the numeric attribute,
-which defaults to `"weight"`. This measure can rank a node with a few strong
+which defaults to `"auto"` and reads the `weight` attribute. Weights are
+required. This measure can rank a node with a few strong
 links ahead of a node with many weak links.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |

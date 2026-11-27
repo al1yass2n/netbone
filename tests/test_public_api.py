@@ -106,14 +106,14 @@ def test_public_discovery_api_lists_methods_and_filters() -> None:
     assert nb.describe_method("disparity")["default_filter"] == "significance"
     assert nb.describe_method("edge_betweenness")["default_filter"] == "fraction"
     assert nb.describe_method("glanb")["default_filter"] == "significance"
-    assert nb.describe_method("glanb")["default_weight"] is None
+    assert nb.describe_method("glanb")["default_weight"] == "auto"
     assert nb.describe_method("gspar")["default_filter"] == "fraction"
     assert nb.describe_method("gspar")["neighborhood"] == "open"
     assert nb.describe_method("h_backbone")["default_filter"] == "threshold"
     assert nb.describe_method("lans")["default_filter"] == "significance"
     assert nb.describe_method("lans")["default_leaf_policy"] == "zero"
     assert nb.describe_method("link_prediction")["default_filter"] == "fraction"
-    assert nb.describe_method("link_prediction")["default_weight"] is None
+    assert nb.describe_method("link_prediction")["default_weight"] == "auto"
     assert nb.describe_method("link_prediction")["default_weight_alpha"] == 1.0
     assert nb.describe_method("link_prediction")["default_distance_transform"] == (
         "inverse"

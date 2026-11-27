@@ -19,6 +19,7 @@ NODE_DEGREE_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": False,
+    "weight_mode": "ignored",
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "fraction",

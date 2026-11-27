@@ -207,6 +207,11 @@ def aggregate_temporal(
         future_warning = (
             f"Ignored {future_event_count} temporal event(s) after the evaluation time."
         )
+        if included_event_count == 0:
+            future_warning += (
+                " No event happens at or before the evaluation time, so the "
+                "aggregated network has no edges."
+            )
         warnings.warn(future_warning, UserWarning, stacklevel=2)
 
     graph = nx.DiGraph() if temporal_network.directed else nx.Graph()
@@ -574,6 +579,11 @@ def _snapshot_integer(value: float, *, name: str) -> int:
 
 
 def _timestamp(value: object, *, name: str) -> pd.Timestamp:
+    if isinstance(value, bool | Real):
+        raise ValidationError(
+            f"Temporal {name} must be a datetime such as '2024-01-31', because "
+            "the events use datetime times; a bare number is not accepted."
+        )
     try:
         parsed = pd.to_datetime(value, errors="raise", utc=True)
     except (TypeError, ValueError, OverflowError) as exc:

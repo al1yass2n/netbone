@@ -29,6 +29,7 @@ from netbone.webapp.bridge import (
     ui_schema_payload,
 )
 
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 ASSET_TYPES = {
@@ -70,7 +71,15 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         """Serve the app shell or registry metadata."""
 
+        if not self._host_allowed():
+            self.send_error(HTTPStatus.FORBIDDEN, "Unexpected Host header.")
+            return
         path = urlparse(self.path).path
+        if path == "/favicon.ico":
+            self.send_response(HTTPStatus.NO_CONTENT)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         if path == "/api/ui-schema":
             self._write_json(HTTPStatus.OK, ui_schema_payload())
             return
@@ -82,6 +91,12 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         """Run a web pipeline request."""
 
+        if not self._host_allowed() or not self._same_origin():
+            self.send_error(
+                HTTPStatus.FORBIDDEN,
+                "Cross-origin requests to the Netbone web app are not allowed.",
+            )
+            return
         path = urlparse(self.path).path
         if path == "/api/preview":
             self._handle_json_request(preview_payload)
@@ -158,6 +173,31 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(export.content)
 
+    def _request_host(self) -> str:
+        return (self.headers.get("Host") or "").strip().lower()
+
+    def _host_allowed(self) -> bool:
+        """Reject DNS-rebinding requests when the server listens on loopback."""
+
+        address = self.server.server_address
+        bound_host = str(address[0] if isinstance(address, tuple) else address)
+        bound_host = bound_host.lower()
+        if bound_host not in LOOPBACK_HOSTS:
+            return True
+        host = self._request_host()
+        if not host:
+            return False
+        hostname = urlparse(f"http://{host}").hostname or ""
+        return hostname in LOOPBACK_HOSTS
+
+    def _same_origin(self) -> bool:
+        """Reject browser requests sent by another website."""
+
+        origin = self.headers.get("Origin")
+        if origin is None or origin == "null":
+            return origin is None
+        return urlparse(origin).netloc.lower() == self._request_host()
+
     def log_message(self, format: str, *args: object) -> None:
         """Keep local server output focused on startup and fatal errors."""
 
@@ -195,7 +235,11 @@ class NetboneWebHandler(BaseHTTPRequestHandler):
         if length < 0:
             raise ValidationError("Request Content-Length cannot be negative.")
         raw_body = self.rfile.read(length)
-        decoded = json.loads(raw_body.decode("utf-8"))
+        try:
+            text = raw_body.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValidationError("Request body must be UTF-8 encoded JSON.") from exc
+        decoded = json.loads(text)
         if not isinstance(decoded, Mapping):
             raise ValidationError("Request body must contain a JSON object.")
         return decoded

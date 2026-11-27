@@ -9,7 +9,8 @@ incoming margins. The score table contains `noise_corrected_score` (lift),
 deviation). A degenerate margin can leave the uncertainty undefined. Inspect
 the warnings and the corresponding rows.
 
-Use `weight="weight"` (default) or name the count attribute. The default
+Weights are required. The default `weight="auto"` reads the `weight`
+attribute, or name the count attribute. The default
 threshold is a strict inequality at 1.64 standard deviations. This statistic is
 a score, so use the default, threshold, or fraction filter.
 

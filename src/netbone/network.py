@@ -450,12 +450,15 @@ def normalize_loaded_graph(
 def _validate_supported_graph(graph: nx.Graph) -> None:
     if graph.is_multigraph():
         raise CompatibilityError(
-            "Multigraphs and multidigraphs are not supported in the current "
-            "simple-graph slice."
+            "Multigraphs and multidigraphs are not supported. Merge parallel "
+            "edges into a simple Graph or DiGraph first."
         )
     if nx.number_of_selfloops(graph) > 0:
+        node = next(iter(nx.nodes_with_selfloops(graph)))
         raise CompatibilityError(
-            "Self-loops are not supported in the current simple-graph slice."
+            f"Self-loops are not supported; node {node!r} links to itself. "
+            "Remove self-loops before scoring, for example with "
+            "graph.remove_edges_from(nx.selfloop_edges(graph))."
         )
 
 

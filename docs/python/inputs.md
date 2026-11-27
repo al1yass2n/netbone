@@ -18,9 +18,12 @@ node labels and input attributes. The input graph stays available as
 By default, static edge lists expect `source`, `target`, and `weight` columns.
 Pass their actual names as keyword arguments. A static file needs one row per
 edge. With `directed=False`, reverse rows belong to the same undirected edge and
-are rejected as duplicates. CSV input infers column types through pandas, so use
-string labels with a prefix if leading zeros are meaningful. GraphML or a
-NetworkX graph can represent isolated nodes explicitly.
+are rejected as duplicates. Node ids are read as written: a column of plain
+integers such as `1, 2, 10` becomes Python ints, and anything else, including
+`007`, `NA`, or `None`, stays a string label. Spaces after the delimiter are
+ignored. Weights must be finite numbers, and a self-loop row is rejected with
+its row number. GraphML or a NetworkX graph can represent isolated nodes
+explicitly.
 
 ## Preserve or project directed links
 

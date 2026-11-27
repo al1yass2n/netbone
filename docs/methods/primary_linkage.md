@@ -4,8 +4,8 @@ Registered name `primary_linkage`
 
 Each node nominates its strongest incident link. An edge is marked if at least
 one endpoint nominates it. Choose this when each node's leading connection is
-the relevant signal. Use `weight="weight"` (default) or name another finite
-numeric attribute. Equal weights are ordered by internal `edge_id`. The score
+the relevant signal. Weights are required. The default `weight="auto"` reads the
+`weight` attribute, or name another finite numeric attribute. Equal weights are ordered by internal `edge_id`. The score
 table also reports the number of nominations per edge.
 
 | Target | Primary statistic | Preferred direction | Directed input | Weight requirement |

@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from netbone.exceptions import ValidationError
 from netbone.methods._utils import binomial_upper_tail, integer_edge_weights
 from netbone.network import EDGE_ID_ATTR, Network
 from netbone.results import MethodResult
@@ -20,12 +21,13 @@ MARGINAL_LIKELIHOOD_METADATA: dict[str, object] = {
     "supports_directed": False,
     "supports_weighted": True,
     "requires_weights": True,
+    "weight_mode": "required",
     "requires_positive_weights": True,
     "requires_integer_weights": True,
     "supports_multigraph": False,
     "supports_self_loops": False,
     "default_filter": "significance",
-    "default_weight": "weight",
+    "default_weight": "auto",
     "reference": "Dianati, Physical Review E 93, 012304 (2016).",
     "doi": "10.1103/PhysRevE.93.012304",
 }
@@ -54,13 +56,24 @@ def compute_marginal_likelihood(
         edge_id = int(attributes[EDGE_ID_ATTR])
         source_strength = strengths[source_id]
         target_strength = strengths[target_id]
-        probability = source_strength * target_strength / (2.0 * total_weight**2)
-        pvalue = binomial_upper_tail(
-            observed=weights[edge_id],
-            trials=total_weight,
-            probability=probability,
-            inclusive=True,
-        )
+        try:
+            probability = (
+                (source_strength / total_weight)
+                * (target_strength / total_weight)
+                / 2.0
+            )
+            pvalue = binomial_upper_tail(
+                observed=weights[edge_id],
+                trials=total_weight,
+                probability=probability,
+                inclusive=True,
+            )
+        except OverflowError as exc:
+            raise ValidationError(
+                "Edge weights are too large for marginal_likelihood scoring; the "
+                f"total weight {total_weight:.3e} cannot be represented. Rescale "
+                "the counts before scoring."
+            ) from exc
         rows.append(
             {
                 "edge_id": edge_id,

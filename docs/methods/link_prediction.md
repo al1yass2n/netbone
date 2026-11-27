@@ -10,7 +10,9 @@ sets the contribution of length-three paths in Local Path. Directed support
 uses the source's outgoing and target's incoming topology. Path-based
 similarities follow the arc direction.
 
-Weights are optional. With `weight` set, positive weights are required.
+Weights are optional. The default `weight="auto"` uses the `weight` attribute
+when every edge has one and ignores weights otherwise; pass `weight=None` to
+ignore them. Weighted scoring requires positive weights.
 `weight_alpha=1.0` is the weight exponent. `distance_transform="inverse"`
 treats weights as strengths and `"identity"` as distances. For fraction or
 default filtering, explicitly choose `direction="higher"` for well-supported

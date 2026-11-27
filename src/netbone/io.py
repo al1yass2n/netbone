@@ -12,11 +12,85 @@ from xml.etree.ElementTree import ParseError
 import networkx as nx
 import pandas as pd
 
-from netbone.exceptions import ValidationError
+from netbone.exceptions import CompatibilityError, ValidationError
 from netbone.network import Network, normalize_edgelist_graph, normalize_loaded_graph
 from netbone.temporal.model import EVENT_COLUMNS, TemporalNetwork
 
 TemporalTime: TypeAlias = int | float | pd.Timestamp
+
+# Markers pandas would read as missing. Node id columns ignore them so labels
+# such as "NA" (Namibia) or "None" stay ordinary node ids.
+_MISSING_VALUE_MARKERS = (
+    "",
+    "#N/A",
+    "#N/A N/A",
+    "#NA",
+    "-1.#IND",
+    "-1.#QNAN",
+    "-NaN",
+    "-nan",
+    "1.#IND",
+    "1.#QNAN",
+    "<NA>",
+    "N/A",
+    "NA",
+    "NULL",
+    "NaN",
+    "None",
+    "n/a",
+    "nan",
+    "null",
+)
+
+
+def _read_table(
+    path: Path,
+    *,
+    delimiter: str,
+    id_columns: tuple[str, ...],
+    value_columns: tuple[str, ...],
+) -> pd.DataFrame:
+    """Read a delimited table keeping node ids exactly as written."""
+
+    return pd.read_csv(
+        path,
+        delimiter=delimiter,
+        dtype={column: str for column in id_columns},
+        keep_default_na=False,
+        na_values={column: list(_MISSING_VALUE_MARKERS) for column in value_columns},
+        skipinitialspace=True,
+    )
+
+
+def _node_id_columns(
+    table: pd.DataFrame, source: str, target: str
+) -> tuple[list[Hashable], list[Hashable]]:
+    """Convert source and target ids together so both use the same id type."""
+
+    combined = _node_id_values(pd.concat([table[source], table[target]]))
+    return combined[: len(table)], combined[len(table) :]
+
+
+def _node_id_values(values: pd.Series) -> list[Hashable]:
+    """Return node ids, converting to numbers only when no label would change.
+
+    A column of plain integers such as ``1, 2, 10`` becomes Python ints. Labels
+    with leading zeros, signs, decimals or text stay strings, so ``007`` and
+    ``7`` remain different nodes.
+    """
+
+    texts = ["" if pd.isna(value) else str(value).strip() for value in values]
+    present = [text for text in texts if text]
+    if present and all(_is_canonical_integer(text) for text in present):
+        return [int(text) if text else "" for text in texts]
+    return list(texts)
+
+
+def _is_canonical_integer(text: str) -> bool:
+    try:
+        return str(int(text)) == text
+    except ValueError:
+        return False
 
 
 def from_edgelist(
@@ -49,7 +123,12 @@ def from_edgelist(
 
     edge_path = Path(path)
     try:
-        table = pd.read_csv(edge_path, delimiter=delimiter)
+        table = _read_table(
+            edge_path,
+            delimiter=delimiter,
+            id_columns=(source, target),
+            value_columns=() if weight is None else (weight,),
+        )
     except FileNotFoundError as exc:
         raise ValidationError(f"Edge-list file does not exist: {edge_path}.") from exc
     except pd.errors.EmptyDataError as exc:
@@ -71,13 +150,21 @@ def from_edgelist(
 
     graph = nx.DiGraph() if directed else nx.Graph()
     seen_edges: set[tuple[Hashable, Hashable]] = set()
+    source_ids, target_ids = _node_id_columns(table, source, target)
 
-    for row_number, row in table.iterrows():
-        source_value = row[source]
-        target_value = row[target]
-        if pd.isna(source_value) or pd.isna(target_value):
+    for position, (_, row) in enumerate(table.iterrows()):
+        row_number = position + 2
+        source_value = source_ids[position]
+        target_value = target_ids[position]
+        if source_value == "" or target_value == "":
             raise ValidationError(
-                f"Edge-list row {row_number + 2} has a missing source or target id."
+                f"Edge-list row {row_number} has a missing source or target id."
+            )
+        if source_value == target_value:
+            raise CompatibilityError(
+                f"Edge-list row {row_number} is a self-loop on node "
+                f"{source_value!r}. Self-loops are not supported; remove the row "
+                "or load the data as a temporal event list, which drops them."
             )
 
         edge_attributes: dict[str, object] = {}
@@ -85,24 +172,31 @@ def from_edgelist(
             weight_value = row[weight]
             if pd.isna(weight_value):
                 raise ValidationError(
-                    f"Edge-list row {row_number + 2} has a missing weight value."
+                    f"Edge-list row {row_number} has a missing weight value."
                 )
             try:
-                edge_attributes["weight"] = float(weight_value)
+                numeric_weight = float(weight_value)
             except (TypeError, ValueError) as exc:
                 raise ValidationError(
-                    f"Edge-list row {row_number + 2} has a non-numeric weight "
+                    f"Edge-list row {row_number} has a non-numeric weight "
                     f"value in column {weight!r}."
                 ) from exc
+            if not math.isfinite(numeric_weight):
+                raise ValidationError(
+                    f"Edge-list row {row_number} has a non-finite weight value "
+                    f"in column {weight!r}."
+                )
+            edge_attributes["weight"] = numeric_weight
 
-        edge_key = (
+        first, second = (
             (source_value, target_value)
             if directed
-            else tuple(sorted((source_value, target_value), key=repr))
+            else sorted((source_value, target_value), key=repr)
         )
+        edge_key: tuple[Hashable, Hashable] = (first, second)
         if edge_key in seen_edges:
             raise ValidationError(
-                f"Duplicate simple-graph edge found in edge-list row {row_number + 2}."
+                f"Duplicate simple-graph edge found in edge-list row {row_number}."
             )
         seen_edges.add(edge_key)
         graph.add_edge(source_value, target_value, **edge_attributes)
@@ -194,7 +288,12 @@ def from_temporal_edgelist(
 
     event_path = Path(path)
     try:
-        table = pd.read_csv(event_path, delimiter=delimiter)
+        table = _read_table(
+            event_path,
+            delimiter=delimiter,
+            id_columns=(source, target),
+            value_columns=(time,) if event_weight is None else (time, event_weight),
+        )
     except FileNotFoundError as exc:
         raise ValidationError(
             f"Temporal event-list file does not exist: {event_path}."
@@ -234,11 +333,12 @@ def from_temporal_edgelist(
     seen_nodes: set[Hashable] = set()
     records: list[dict[str, object]] = []
     self_interaction_count = 0
-    for position, (_, row) in enumerate(table.iterrows()):
+    source_ids, target_ids = _node_id_columns(table, source, target)
+    for position in range(len(table)):
         row_number = position + 2
-        source_value = row[source]
-        target_value = row[target]
-        if pd.isna(source_value) or pd.isna(target_value):
+        source_value = source_ids[position]
+        target_value = target_ids[position]
+        if source_value == "" or target_value == "":
             raise ValidationError(
                 f"Temporal event-list row {row_number} has a missing source or "
                 "target id."

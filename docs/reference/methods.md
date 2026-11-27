@@ -9,7 +9,7 @@ induced subgraph after filtering. The other methods select edges.
 
 | Method | Weights | Directed | Suggested selection |
 | --- | --- | --- | --- |
-| [Edge Weight](../methods/edge_weight.md) | Finite numeric or unit weights | No | Threshold or fraction |
+| [Edge Weight](../methods/edge_weight.md) | Finite numeric or unit weights | Yes | Threshold or fraction |
 
 ## Paths and neighborhoods
 
@@ -49,6 +49,24 @@ induced subgraph after filtering. The other methods select edges.
 | [Node Degree](../methods/node_degree.md) | Weights ignored | No | 10% fraction |
 | [Node Strength](../methods/node_strength.md) | Finite numeric | No | 10% fraction |
 | [Node Betweenness](../methods/node_betweenness.md) | Positive when weighted | No | 10% fraction |
+
+## How weights are chosen
+
+Every method that can read weights defaults to `weight="auto"`:
+
+- If every edge has a `weight` attribute, the method uses it.
+- If no edge has one, methods that can run unweighted use hop counts or equal
+  weights, and methods that need weights raise an error that says so.
+- If only some edges have it, the method raises an error instead of guessing.
+  Fill in the missing values, pass `weight=None`, or name an attribute.
+
+Pass `weight=None` to ignore weights, or `weight="duration"` to use another
+attribute. The resolved value is recorded in `result.parameters["weight"]`, so
+saved results show what was used. When auto picks weights for a shortest-path
+method, a warning reminds you that `distance_transform="inverse"` reads larger
+weights as stronger, closer ties. Pass `distance_transform="identity"` if
+larger weights mean longer or costlier links. `nb.describe_method(name)` reports
+`weight_mode` as `"required"`, `"optional"`, or `"ignored"`.
 
 The 10% defaults use [fraction filtering](../filters/fraction.md), which
 can retain more when scores tie. Significance defaults use alpha 0.05 with

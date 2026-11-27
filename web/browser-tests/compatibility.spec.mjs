@@ -118,3 +118,32 @@ test("Noise Corrected applies the published cutoff and allows it to be changed",
   const configuration = JSON.parse(await inspect.locator("pre").textContent());
   expect(configuration.filter.parameters).toMatchObject({ value: 2.32, operator: "greater" });
 });
+
+test("a CSV header with spaces after commas maps cleanly", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "spaced.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("source, target, weight\na, b, 4\nb, c, 2\n"),
+  });
+  const mapping = page.getByRole("dialog", { name: "Review network settings" });
+  await mapping.getByRole("radio", { name: /^Strength/ }).check();
+  await expect(mapping.getByRole("button", { name: "Use this mapping" })).toBeEnabled();
+});
+
+test("negative weights disable methods that need positive weights", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "signed.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("source,target,weight\na,b,-4\nb,c,2\nc,a,3\n"),
+  });
+  const mapping = page.getByRole("dialog", { name: "Review network settings" });
+  await mapping.getByRole("radio", { name: /^Strength/ }).check();
+  await mapping.getByRole("button", { name: "Use this mapping" }).click();
+  const picker = page.getByRole("dialog", { name: "Choose a scoring method" });
+  const card = (label) => picker.getByRole("button").filter({ has: page.getByText(label, { exact: true }) });
+  await expect(card("Disparity")).toBeDisabled();
+  await expect(card("Disparity")).toContainText("Requires positive weights");
+  await expect(card("Primary Linkage")).toBeEnabled();
+});

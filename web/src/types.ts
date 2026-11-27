@@ -49,6 +49,8 @@ export interface MethodSpec {
   default_filter_parameters: Record<string, ControlValue>;
   requires_weights: boolean;
   requires_integer_weights?: boolean;
+  requires_positive_weights?: boolean;
+  requires_nonnegative_weights?: boolean;
   supports_directed: boolean;
   supports_weighted: boolean;
   approaches: string[];
@@ -130,8 +132,11 @@ export interface NetworkContext {
   time: string;
 }
 
+export type WeightSign = "positive" | "nonnegative" | "mixed";
+
 export interface PreviewResponse {
   positive_integer_weights?: boolean;
+  weight_sign?: WeightSign | null;
   status?: string;
   valid?: boolean;
   can_run?: boolean;

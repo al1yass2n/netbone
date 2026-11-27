@@ -6,7 +6,8 @@ Fits a local set of strongest links for each node. It orders positive incident
 weights, compares their weight shares to equal-share top-k patterns, and uses
 the prefix with the best fit. An edge is marked if either endpoint selects it.
 
-`weight="weight"` names the non-negative numeric attribute. Zero-weight rows
+Weights are required; the default `weight="auto"` reads the non-negative
+`weight` attribute, or name another one. Zero-weight rows
 remain in the statistics and are excluded from the local fit. Equal weights use
 internal `edge_id` ordering.
 

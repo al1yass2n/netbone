@@ -8,7 +8,7 @@ sufficient to connect each input component. Read `doubly_stochastic_score` for
 the balanced values and `doubly_stochastic_connected_selected` for the
 selection used by `default`.
 
-Parameters default to `weight="weight"`, `epsilon=1e-4`,
+Parameters default to `weight="auto"` (see [weights](../reference/methods.md#how-weights-are-chosen)), `epsilon=1e-4`,
 `epsilon_mode="relative"`, `tolerance=1e-12`, and `max_iterations=1000`.
 Epsilon fills the matrix and is added to observed weights. In relative mode it
 is multiplied by mean edge weight within the component. In `"absolute"` mode it
