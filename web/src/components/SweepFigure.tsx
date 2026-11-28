@@ -1,6 +1,6 @@
 import { BarChart3, Table2 } from "lucide-react";
 import { forwardRef, useMemo, useRef, useState } from "react";
-import { figureColor, niceTicks } from "../chart";
+import { figureColor, niceTicks, seriesClass } from "../chart";
 import { downloadPngFigure, downloadSvgFigure } from "../figureExport";
 import { formatMetric, isRatioMetric, metricLabel, sentenceCase } from "../labels";
 import { numericSweepParameters, sweepRunLabels, tradeoffRows, trajectoryRows } from "../sweepFigureData";
@@ -170,26 +170,26 @@ const SweepFigure = forwardRef<SVGSVGElement, {
 
   return <svg ref={ref} className="comparison-figure sweep-figure" viewBox={`0 0 ${width} ${height}`} role="group" aria-labelledby={`${id}-title ${id}-description`}>
     <title id={`${id}-title`}>{title}</title><desc id={`${id}-description`}>{description}</desc>
-    <rect width={width} height={height} fill="#ffffff" />
-    <text x={24} y={35} fill="#1a1f25" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
-    <text x={24} y={61} fill="#5d6670" fontSize={12}>{truncate(description, 120)}</text>
+    <rect className="figure-paper" width={width} height={height} fill="#ffffff" />
+    <text className="figure-ink" x={24} y={35} fill="#1a1f25" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
+    <text className="figure-muted" x={24} y={61} fill="#5d6670" fontSize={12}>{truncate(description, 120)}</text>
     {xTicks.map((tick) => <g key={`x${tick}`}>
-      <line x1={scaleX(tick)} y1={top} x2={scaleX(tick)} y2={top + plotHeight} stroke="#eceef1" />
-      <text x={scaleX(tick)} y={top + plotHeight + 21} fill="#5d6670" fontSize={11} textAnchor="middle">{axisValue(tick, xIsRatio)}</text>
+      <line className="figure-grid" x1={scaleX(tick)} y1={top} x2={scaleX(tick)} y2={top + plotHeight} stroke="#eceef1" />
+      <text className="figure-muted" x={scaleX(tick)} y={top + plotHeight + 21} fill="#5d6670" fontSize={11} textAnchor="middle">{axisValue(tick, xIsRatio)}</text>
     </g>)}
     {yTicks.map((tick) => <g key={`y${tick}`}>
-      <line x1={left} y1={scaleY(tick)} x2={left + plotWidth} y2={scaleY(tick)} stroke="#eceef1" />
-      <text x={left - 12} y={scaleY(tick) + 4} fill="#5d6670" fontSize={11} textAnchor="end">{axisValue(tick, yIsRatio)}</text>
+      <line className="figure-grid" x1={left} y1={scaleY(tick)} x2={left + plotWidth} y2={scaleY(tick)} stroke="#eceef1" />
+      <text className="figure-muted" x={left - 12} y={scaleY(tick) + 4} fill="#5d6670" fontSize={11} textAnchor="end">{axisValue(tick, yIsRatio)}</text>
     </g>)}
-    <line x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#c6ccd3" />
-    <text x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
-    <text transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
+    <line className="figure-axis" x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#c6ccd3" />
+    <text className="figure-soft" x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
+    <text className="figure-soft" transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
     <defs><clipPath id={`${id}-clip`}><rect x={left} y={top} width={plotWidth} height={plotHeight} /></clipPath></defs>
     <g clipPath={`url(#${id}-clip)`}>
       {labels.map((label, index) => {
         const series = rows.filter((row) => row.series === label).sort((a, b) => (a.x || 0) - (b.x || 0));
         return <g key={label}>
-          {mode === "trajectory" && lineSegments(series, scaleX, scaleY).map((path, pathIndex) => <path key={pathIndex} d={path} fill="none" stroke={figureColor(index)} strokeWidth={2.5} />)}
+          {mode === "trajectory" && lineSegments(series, scaleX, scaleY).map((path, pathIndex) => <path className={seriesClass(index)} key={pathIndex} d={path} fill="none" stroke={figureColor(index)} strokeWidth={2.5} />)}
         </g>;
       })}
     </g>
@@ -197,15 +197,15 @@ const SweepFigure = forwardRef<SVGSVGElement, {
       const row = matches.at(-1);
       if (!row) return null;
       const caption = matches.map((match) => match.runLabel).join("\n");
-      return <circle className="sweep-plot-point" key={key} cx={scaleX(row.x)} cy={scaleY(row.y)} r={mode === "trajectory" ? 5 : 7}
+      return <circle className={`sweep-plot-point ${seriesClass(labels.indexOf(row.series))} figure-ring`} key={key} cx={scaleX(row.x)} cy={scaleY(row.y)} r={mode === "trajectory" ? 5 : 7}
         fill={figureColor(labels.indexOf(row.series))} fillOpacity={0.86} stroke="#ffffff" strokeWidth={1.5}
         tabIndex={0} aria-label={caption} onFocus={() => onPoint(matches)} onPointerEnter={() => onPoint(matches)} onClick={() => onPoint(matches)}>
         <title>{caption}</title>
       </circle>;
     })}
     {legendRows > 0 && labels.map((label, index) => <g key={label} transform={`translate(${24 + index % 3 * 305} ${92 + Math.floor(index / 3) * 24})`}>
-      <circle cx={5} cy={-4} r={5} fill={figureColor(index)} />
-      <text x={17} fill="#3f4750" fontSize={11}>{truncate(label, 39)}</text>
+      <circle className={seriesClass(index)} cx={5} cy={-4} r={5} fill={figureColor(index)} />
+      <text className="figure-soft" x={17} fill="#3f4750" fontSize={11}>{truncate(label, 39)}</text>
     </g>)}
   </svg>;
 });

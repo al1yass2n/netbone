@@ -2,7 +2,7 @@ import { BarChart3, GitCompareArrows, LoaderCircle, MoreHorizontal, Table2, X } 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { demoMode } from "../demo-api";
 import { api, downloadCsv, downloadWorkspaceExperiment } from "../api";
-import { figureColor } from "../chart";
+import { seriesColor } from "../chart";
 import { downloadPngFigure, downloadSvgFigure } from "../figureExport";
 import { formatMetric, metricDescription, metricLabel, sentenceCase } from "../labels";
 import { moveSavedBackbone, uniqueResultLabel } from "../savedBackbones";
@@ -166,7 +166,7 @@ export function ComparisonWorkspace({ schema, saved, onChange, onBack }: Compari
                   key={item.resultId}
                   item={item}
                   schema={schema}
-                  color={item.selected ? figureColor(selected.indexOf(item)) : undefined}
+                  color={item.selected ? seriesColor(selected.indexOf(item)) : undefined}
                   first={index === 0}
                   last={index === saved.length - 1}
                   onToggle={() => toggleResult(item.resultId)}

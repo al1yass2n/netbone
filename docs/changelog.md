@@ -70,7 +70,8 @@ ported. It adds:
 - The web app follows the system's light or dark setting. The theme button
   switches to the other theme and remembers the choice; switching back to the
   system's theme follows the system again. Colors are calmer gray with one
-  teal accent, and small text is one step larger.
+  teal accent, and small text is one step larger. Charts follow the dark
+  theme on screen, while downloaded figures keep light colors.
 
 **Stricter input checks**
 

@@ -98,10 +98,10 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
         >
         <title id={titleId}>{title}</title>
         <desc id={descriptionId}>{description}</desc>
-        <rect width={width} height={height} fill="#ffffff" />
-        <text x={24} y={34} fill="#1a1f25" fontSize={22} fontWeight={750}>Importance-rank alignment</text>
-        <text x={24} y={59} fill="#5d6670" fontSize={13}>{title}</text>
-        <text x={24} y={82} fill="#3f4750" fontSize={12}>
+        <rect className="figure-paper" width={width} height={height} fill="#ffffff" />
+        <text className="figure-ink" x={24} y={34} fill="#1a1f25" fontSize={22} fontWeight={750}>Importance-rank alignment</text>
+        <text className="figure-muted" x={24} y={59} fill="#5d6670" fontSize={13}>{title}</text>
+        <text className="figure-soft" x={24} y={82} fill="#3f4750" fontSize={12}>
           {alignment.points.length} aligned {alignment.target === "node" ? "nodes" : "edges"}
           {spearman?.status === "ok" && Number.isFinite(spearman.value) ? ` · ${metricLabel("score_spearman")} ${formatMetric("score_spearman", spearman.value)}` : ""}
           {overlap?.status === "ok" && Number.isFinite(overlap.value) ? ` · ${metricLabel(overlap.metric)} ${formatMetric(overlap.metric, overlap.value)}` : ""}
@@ -110,8 +110,8 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
           const x = scaleX(tick);
           return (
             <g key={`x-${tick}`}>
-              <line x1={x} y1={margin.top} x2={x} y2={margin.top + plotHeight} stroke="#eceef1" />
-              <text x={x} y={margin.top + plotHeight + 24} fill="#5d6670" fontSize={11} textAnchor="middle">{formatValue(tick)}</text>
+              <line className="figure-grid" x1={x} y1={margin.top} x2={x} y2={margin.top + plotHeight} stroke="#eceef1" />
+              <text className="figure-muted" x={x} y={margin.top + plotHeight + 24} fill="#5d6670" fontSize={11} textAnchor="middle">{formatValue(tick)}</text>
             </g>
           );
         })}
@@ -119,23 +119,23 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
           const y = scaleY(tick);
           return (
             <g key={`y-${tick}`}>
-              <line x1={margin.left} y1={y} x2={margin.left + plotWidth} y2={y} stroke="#eceef1" />
-              <text x={margin.left - 14} y={y + 4} fill="#5d6670" fontSize={11} textAnchor="end">{formatValue(tick)}</text>
+              <line className="figure-grid" x1={margin.left} y1={y} x2={margin.left + plotWidth} y2={y} stroke="#eceef1" />
+              <text className="figure-muted" x={margin.left - 14} y={y + 4} fill="#5d6670" fontSize={11} textAnchor="end">{formatValue(tick)}</text>
             </g>
           );
         })}
         <defs><clipPath id="alignment-plot-clip"><rect x={margin.left} y={margin.top} width={plotWidth} height={plotHeight} /></clipPath></defs>
         <g clipPath="url(#alignment-plot-clip)">
-          <line x1={scaleX(Math.max(view.xMin, view.yMin))} y1={scaleY(Math.max(view.xMin, view.yMin))} x2={scaleX(Math.min(view.xMax, view.yMax))} y2={scaleY(Math.min(view.xMax, view.yMax))} stroke="#c6ccd3" strokeDasharray="6 6" />
+          <line className="figure-axis" x1={scaleX(Math.max(view.xMin, view.yMin))} y1={scaleY(Math.max(view.xMin, view.yMin))} x2={scaleX(Math.min(view.xMax, view.yMax))} y2={scaleY(Math.min(view.xMax, view.yMax))} stroke="#c6ccd3" strokeDasharray="6 6" />
           {alignment.points.map((point, index) => (
-            <circle key={index} cx={scaleX(point.importance_rank_a)} cy={scaleY(point.importance_rank_b)} r={5.5} fill="#0f766e" fillOpacity={0.66} stroke="#ffffff" strokeWidth={1}>
+            <circle className="figure-series-0 figure-ring" key={index} cx={scaleX(point.importance_rank_a)} cy={scaleY(point.importance_rank_b)} r={5.5} fill="#0f766e" fillOpacity={0.66} stroke="#ffffff" strokeWidth={1}>
               <title>{pointLabel(point)}; {alignment.result_a}: value {formatValue(point.value_a)}, rank {formatValue(point.importance_rank_a)}; {alignment.result_b}: value {formatValue(point.value_b)}, rank {formatValue(point.importance_rank_b)}</title>
             </circle>
           ))}
         </g>
-        <text x={margin.left + plotWidth / 2} y={height - 28} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_a} importance rank</text>
-        <text transform={`translate(27 ${margin.top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_b} importance rank</text>
-        <text x={margin.left + plotWidth} y={height - 8} fill="#5d6670" fontSize={11} textAnchor="end">Higher rank means greater importance</text>
+        <text className="figure-soft" x={margin.left + plotWidth / 2} y={height - 28} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_a} importance rank</text>
+        <text className="figure-soft" transform={`translate(27 ${margin.top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_b} importance rank</text>
+        <text className="figure-muted" x={margin.left + plotWidth} y={height - 8} fill="#5d6670" fontSize={11} textAnchor="end">Higher rank means greater importance</text>
         </svg>
       </div>
     );

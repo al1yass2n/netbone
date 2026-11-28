@@ -774,6 +774,34 @@
 .app-shell[data-theme] .workspace-header p { color: var(--muted); font-size: var(--text-control); }
 .app-shell[data-theme] .figure-actions { display: flex; gap: 8px; }
 .app-shell[data-theme] .comparison-figure { border-color: var(--line); border-radius: var(--radius-control); }
+
+/*
+ * Charts. Each figure carries light colours inline, so a downloaded SVG or PNG
+ * stays light. On screen, dark mode recolours the same elements by class.
+ */
+.app-shell[data-theme="dark"] .comparison-figure { background: var(--panel); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-paper { fill: var(--panel); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-ink { fill: var(--ink); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-soft { fill: var(--ink-soft); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-muted { fill: var(--muted); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-warning { fill: var(--second); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-grid { stroke: var(--track); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-axis { stroke: var(--line-strong); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-track { fill: var(--track); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-empty { fill: var(--subtle); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-invalid { fill: var(--danger-soft); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-ring { stroke: var(--panel); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-stop-paper { stop-color: var(--panel); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-stop-soft { stop-color: var(--accent-soft); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-0 { --series: var(--accent); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-1 { --series: var(--second); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-2 { --series: var(--graph-3); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-3 { --series: var(--graph-4); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-4 { --series: var(--graph-5); }
+.app-shell[data-theme="dark"] .comparison-figure .figure-series-5 { --series: var(--graph-6); }
+.app-shell[data-theme="dark"] .comparison-figure :is(rect, circle)[class*="figure-series-"] { fill: var(--series); }
+.app-shell[data-theme="dark"] .comparison-figure path[class*="figure-series-"] { stroke: var(--series); }
+.app-shell[data-theme] .comparison-figure .sweep-plot-point:is(:hover, :focus-visible) { stroke: var(--ink); }
 .app-shell[data-theme] .workbench-dialog { --dialog-pad: 24px; padding: 0 var(--dialog-pad) var(--dialog-pad); }
 .app-shell[data-theme] .workbench-dialog.network-settings-dialog { padding: 0; }
 .app-shell[data-theme] .workbench-dialog.network-settings-dialog > header { margin: 0; }

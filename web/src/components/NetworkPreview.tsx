@@ -1,16 +1,17 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { LockKeyhole } from "lucide-react";
+import { SERIES_COLORS, seriesColor } from "../chart";
 import type { ExtractionResponse, JsonValue } from "../types";
 
 interface NetworkPreviewProps {
   graph: ExtractionResponse["graph"];
 }
 
-export const COMPONENT_COLORS = ["var(--accent)", "var(--second)", "var(--graph-3)", "var(--graph-4)", "var(--graph-5)", "var(--graph-6)"];
+export const COMPONENT_COLORS = SERIES_COLORS;
 
 export function componentColor(component: number): string {
-  return COMPONENT_COLORS[((component % COMPONENT_COLORS.length) + COMPONENT_COLORS.length) % COMPONENT_COLORS.length] ?? "var(--accent)";
+  return seriesColor(component);
 }
 
 type Point = { x: number; y: number };
