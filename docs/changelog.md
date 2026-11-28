@@ -72,7 +72,7 @@ ported. It adds:
   system's theme follows the system again. Colors are calmer gray with one
   teal accent, and small text is one step larger. Charts follow the dark
   theme on screen, while downloaded figures keep light colors. The app has a
-  new logo, a bone made of nodes, which is also the browser tab icon.
+  new logo, an N drawn from four nodes, which is also the browser tab icon.
 
 **Stricter input checks**
 

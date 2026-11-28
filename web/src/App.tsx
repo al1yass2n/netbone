@@ -1412,10 +1412,10 @@ function jumpToHeading(event: MouseEvent<HTMLAnchorElement>) {
   heading.scrollIntoView({ block: "start" });
 }
 
-/** The Netbone bone: four nodes and one strong link, inside a faint network. index.html uses the same drawing as the tab icon. */
+/** The Netbone N: four nodes, and the diagonal is the strong link. index.html uses the same drawing as the tab icon. */
 function BrandMark() {
   return (
-    <svg className="brand-mark" width="30" height="30" viewBox="0 0 48 48" aria-hidden="true">
+    <svg className="brand-mark" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true">
       <defs>
         <linearGradient id="brand-tile" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#14897d" />
@@ -1423,13 +1423,10 @@ function BrandMark() {
         </linearGradient>
       </defs>
       <rect width="48" height="48" rx="12" fill="url(#brand-tile)" />
-      <path d="M12.6 28.4 6.5 21M18.4 34.6 26 41.5M29.6 13.4 22 6.5M35.4 19.6 41.5 27" stroke="#ffffff" strokeOpacity="0.38" strokeWidth="1.6" strokeLinecap="round" />
-      <g fill="#ffffff" fillOpacity="0.45">
-        <circle cx="6.5" cy="21" r="2.1" /><circle cx="26" cy="41.5" r="2.1" /><circle cx="22" cy="6.5" r="2.1" /><circle cx="41.5" cy="27" r="2.1" />
-      </g>
-      <path d="M15.5 32.5 32.5 15.5" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
+      <path d="M14 35V13M34 35V13" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M14 13 34 35" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" />
       <g fill="#ffffff">
-        <circle cx="12.6" cy="28.4" r="5.4" /><circle cx="19.6" cy="35.4" r="5.4" /><circle cx="28.4" cy="12.6" r="5.4" /><circle cx="35.4" cy="19.6" r="5.4" />
+        <circle cx="14" cy="35" r="4" /><circle cx="14" cy="13" r="5" /><circle cx="34" cy="35" r="5" /><circle cx="34" cy="13" r="4" />
       </g>
     </svg>
   );
