@@ -23,7 +23,7 @@ from netbone.webapp.bridge import (
     ui_schema_payload,
 )
 
-METHOD_LABELS = {"edge_weight": "EW", "edge_betweenness": "EB"}
+METHOD_LABELS = {"edge_weight": "Edge Weight", "edge_betweenness": "Edge Betweenness"}
 FRACTIONS = (0.25, 0.50)
 
 
@@ -68,7 +68,7 @@ def build_demo(destination: Path) -> None:
             }
             results[result_id] = {
                 "result_id": result_id,
-                "label": f"{label} {fraction:.0%}",
+                "label": f"{label} · {fraction:.0%}",
             }
             if fraction == FRACTIONS[0]:
                 baseline.append(result_id)

@@ -1,54 +1,4 @@
-.app-shell--analysis :is(.workbench-dialog, .method-dialog) {
-  --canvas: #eef3f6;
-  --panel: #ffffff;
-  --ink: #162832;
-  --muted: #49606e;
-  --line: #ccd9e0;
-  --line-strong: #7a929f;
-  --accent: #00695f;
-  --accent-soft: #d9f4ee;
-  --danger: #a52d3c;
-  --dialog-header: #e1f0f3;
-  --dialog-disabled: #e5edf1;
-  --dialog-action: #00695f;
-  --dialog-action-hover: #00584f;
-  --dialog-action-ink: #ffffff;
-  --dialog-selected-line: #238779;
-  --dialog-warning-surface: #fff4de;
-  --dialog-warning-ink: #744710;
-  --dialog-error-surface: #fff0f1;
-  --dialog-error-line: #e7a5ad;
-  --button-green-ink: var(--accent);
-  --button-green-fill: var(--accent-soft);
-  --button-green-border: var(--dialog-selected-line);
-  --button-green-hover: var(--accent-soft);
-  color-scheme: light;
-  border-radius: 16px;
-  box-shadow: 0 22px 65px rgb(11 14 17 / 32%);
-}
 
-.app-shell--analysis[data-theme="dark"] :is(.workbench-dialog, .method-dialog) {
-  --canvas: #111c25;
-  --panel: #1b2934;
-  --ink: #edf5f8;
-  --muted: #b2c4ce;
-  --line: #3a5261;
-  --line-strong: #668392;
-  --accent: #79e0ca;
-  --accent-soft: #1b423f;
-  --danger: #ffb6bd;
-  --dialog-header: #18323c;
-  --dialog-disabled: #223440;
-  --dialog-action: #70d9c4;
-  --dialog-action-hover: #9debdc;
-  --dialog-action-ink: #0b2824;
-  --dialog-selected-line: #56bbaa;
-  --dialog-warning-surface: #382e21;
-  --dialog-warning-ink: #f9d49d;
-  --dialog-error-surface: #3d242d;
-  --dialog-error-line: #9d5662;
-  color-scheme: dark;
-}
 
 .app-shell--analysis :is(.workbench-dialog, .method-dialog)::backdrop {
   background: rgb(14 17 20 / 72%);
@@ -64,13 +14,13 @@
   background: var(--accent-soft);
 }
 
-.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):not(:disabled) {
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success):not(:disabled) {
   color: var(--dialog-action-ink);
   border-color: var(--dialog-action);
   background: var(--dialog-action);
 }
 
-.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success, .button--export):hover:not(:disabled) {
+.app-shell--analysis :is(.workbench-dialog, .method-dialog) :is(.button--primary, .button--success):hover:not(:disabled) {
   background: var(--dialog-action-hover);
 }
 
@@ -211,12 +161,12 @@
   background: var(--panel);
 }
 
-.app-shell--analysis .method-dialog :is(.search-field, .method-list > button) { background: var(--panel); }
+.app-shell--analysis .method-dialog :is(.search-field, .method-list .method-family > button) { background: var(--panel); }
 .app-shell--analysis .method-dialog .search-field input { background: transparent; }
-.app-shell--analysis .method-dialog .method-list > button.is-incompatible:not(.is-active) { background: var(--dialog-disabled); }
-.app-shell--analysis .method-dialog .method-list > button > em { color: var(--dialog-warning-ink); }
+.app-shell--analysis .method-dialog .method-list .method-family > button.is-incompatible:not(.is-active) { background: var(--dialog-disabled); }
+.app-shell--analysis .method-dialog .method-list .method-family > button > em { color: var(--dialog-warning-ink); }
 
-.app-shell--analysis .method-dialog .method-library-body .method-list > button:is(:hover:not(:disabled), .is-active) {
+.app-shell--analysis .method-dialog .method-library-body .method-list .method-family > button:is(:hover:not(:disabled), .is-active) {
   border-color: var(--button-green-border);
   background: var(--accent-soft);
 }

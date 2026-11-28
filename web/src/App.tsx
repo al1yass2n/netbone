@@ -1,5 +1,4 @@
 import {
-  Archive,
   ArrowLeft,
   ArrowRight,
   BarChart3,
@@ -19,12 +18,13 @@ import {
   Settings2,
   SlidersHorizontal,
   Sun,
-  Table2,
   Upload,
+  X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
-import { api, downloadExperiment, downloadGraph, downloadJson } from "./api";
+import { api } from "./api";
+import { BackboneDetails } from "./components/BackboneDetails";
 import { CitationFooter } from "./components/CitationFooter";
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
 import { ControlField } from "./components/ControlField";
@@ -33,11 +33,12 @@ import { Hint } from "./components/Hint";
 import LauncherBackdrop from "./components/LauncherBackdrop";
 import { NetworkPreview } from "./components/NetworkPreview";
 import { ScoreDistribution } from "./components/ScoreDistribution";
-import { StatisticsTable } from "./components/StatisticsTable";
+import { METHOD_FAMILIES, methodFamily, methodGoalDetails, methodSource, methodTags } from "./methodGoals";
 import { SweepWorkspace } from "./components/ConfigurationSweepWorkspace";
 import "./components/NetworkLauncher.css";
 import { defaultContext, emptyDataDraft, guidedExamples } from "./examples";
-import { shortBackboneLabel, uniqueResultLabel } from "./savedBackbones";
+import { backboneLabel, uniqueResultLabel } from "./savedBackbones";
+import { filterLabel } from "./labels";
 import type {
   ControlSpec,
   ControlValue,
@@ -71,15 +72,26 @@ import { demoMode, loadDemo } from "./demo-api";
 
 const BACKBONE_READY_MESSAGE = "Backbone ready to inspect and export.";
 
+type Theme = "light" | "dark";
+const THEME_KEY = "netbone-theme";
+const darkSystem = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+/** The theme someone picked with the switch, or null to follow the system. */
+function storedTheme(): Theme | null {
+  try {
+    const value = localStorage.getItem(THEME_KEY);
+    return value === "dark" || value === "light" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [schema, setSchema] = useState<UiSchema | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    try {
-      return localStorage.getItem("netbone-theme") === "dark" ? "dark" : "light";
-    } catch {
-      return "light";
-    }
-  });
+  // The app follows the system theme until someone picks the other one.
+  const [systemTheme, setSystemTheme] = useState<Theme>(() => (darkSystem?.matches ? "dark" : "light"));
+  const [themeChoice, setThemeChoice] = useState<Theme | null>(storedTheme);
+  const theme = themeChoice ?? systemTheme;
   const [workspace, setWorkspace] = useState<Workspace>(demoMode ? "analysis" : "start");
   const [data, setData] = useState<DataDraft>({ ...emptyDataDraft });
   const [context, setContext] = useState<NetworkContext>({ ...defaultContext });
@@ -88,7 +100,6 @@ export default function App() {
   const [methodName, setMethodName] = useState("");
   const [methodControls, setMethodControls] = useState<Record<string, ControlValue>>({});
   const [filterName, setFilterName] = useState<FilterName>("fraction");
-  const [filterChosen, setFilterChosen] = useState(false);
   const [filterControls, setFilterControls] = useState<Record<string, ControlValue>>({});
   const [score, setScore] = useState<ScoreResponse | null>(null);
   const [filterPreview, setFilterPreview] = useState<FilterPreview | null>(null);
@@ -106,7 +117,28 @@ export default function App() {
   const analysisOpen = workspace !== "start";
 
   useEffect(() => {
+    if (!darkSystem) return;
+    const follow = () => setSystemTheme(darkSystem.matches ? "dark" : "light");
+    darkSystem.addEventListener("change", follow);
+    return () => darkSystem.removeEventListener("change", follow);
+  }, []);
+  // The page behind the app and the loading screen use the same theme.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  const shownWorkspace = useRef(workspace);
+  useEffect(() => {
     window.scrollTo(0, 0);
+    if (shownWorkspace.current === workspace) return;
+    shownWorkspace.current = workspace;
+    // The button that switched pages is gone, so keyboard focus continues at the new page's title.
+    const frame = window.requestAnimationFrame(() => {
+      if (!document.activeElement || document.activeElement === document.body) {
+        document.querySelector<HTMLElement>("main h1[tabindex]")?.focus({ preventScroll: true });
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [workspace]);
 
   useEffect(() => {
@@ -128,11 +160,13 @@ export default function App() {
       setPreview(demo.preview);
       setMethodName(initialMethod.name);
       setFilterControls(filterDefaults(demo.schema, "fraction", initialMethod, initialScore));
-      setFilterChosen(true);
       setScore(initialScore);
       setResult(first.result);
       setSavedResults(baseline.map(({ result }) => ({
-        resultId: result.result_id, label: shortBackboneLabel(result), selected: true, result,
+        resultId: result.result_id,
+        label: backboneLabel(result, demo.schema.methods.find(({ name }) => name === result.extraction.method)?.label),
+        selected: true,
+        result,
       })));
       setSchema(demo.schema);
     }) : api.schema().then(setSchema);
@@ -210,7 +244,7 @@ export default function App() {
   }, [schema, data.text, analysisOpen, previewPayload]);
 
   useEffect(() => {
-    if (!score?.score_id || !method || !filterChosen) {
+    if (!score?.score_id || !method) {
       setFilterPreview(null);
       setFilterPreviewError("");
       return;
@@ -234,7 +268,7 @@ export default function App() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [score, method, filterChosen, filterName, filterControls, currentPayload]);
+  }, [score, method, filterName, filterControls, currentPayload]);
 
   // The screen-reader status describes the current scores and backbone, so it
   // must not keep announcing them after a change clears them.
@@ -250,20 +284,19 @@ export default function App() {
     setMethodName(selected.name);
     const controls = initialControlValues(resolvedControls(schema.controls.methods[selected.name] || [], data, effectiveDirected, context));
     setMethodControls(controls);
+    // The recommended filter starts selected; the on-page switch changes it.
     setFilterName(selected.recommended_filter);
-    setFilterChosen(false);
     const defaults = filterDefaults(schema, selected.recommended_filter, selected);
     setFilterControls(defaults);
     setScore(null);
     setFilterPreview(null);
     setResult(null);
-    void scoreMethod(selected, buildPayload(data, context, selected, selected.recommended_filter, { ...controls, ...defaults }));
+    void scoreMethod(selected, buildPayload(data, context, selected, selected.recommended_filter, { ...controls, ...defaults }), selected.recommended_filter);
   }
 
   function chooseFilter(name: FilterName) {
-    if (!schema || !method || !score || (filterChosen && name === filterName)) return;
+    if (!schema || !method || !score || name === filterName) return;
     setFilterName(name);
-    setFilterChosen(true);
     setFilterControls(filterDefaults(schema, name, method, score));
     setFilterPreview(null);
     setResult(null);
@@ -309,7 +342,6 @@ export default function App() {
   function resetAnalysis() {
     setMethodName("");
     setMethodControls({});
-    setFilterChosen(false);
     graphmlWeightDetected.current = false;
     setPreview(null);
     setScore(null);
@@ -350,19 +382,25 @@ export default function App() {
 
   function computeScores() {
     if (!method || !preview?.can_run || previewBusy || busy || methodCompatibility(method) || (weighted && !context.weightSemantics)) return;
-    void scoreMethod(method, currentPayload());
+    void scoreMethod(method, currentPayload(), filterName);
   }
 
-  async function scoreMethod(scoringMethod: MethodSpec, payload: JsonRecord) {
+  async function scoreMethod(scoringMethod: MethodSpec, payload: JsonRecord, filter: FilterName) {
     setBusy("score");
     setError("");
     setMessage(`Computing ${scoringMethod.label} scores…`);
     try {
       const nextScore = await api.score(payload);
-      setFilterChosen(demoMode);
+      // Keep the chosen filter values, fitted to the range of the new scores.
+      if (schema) setFilterControls((current) => filterDefaults(schema, filter, scoringMethod, nextScore, current));
       setScore(nextScore);
       setResult(null);
       setMessage(`${nextScore.score_summary.score_row_count} ${scoringMethod.target} scores are ready.`);
+      // Choosing a method closes its dialog and the buttons wait while scoring, so keyboard focus is
+      // lost by now. It continues at the filter, which these scores just made available.
+      window.requestAnimationFrame(() => {
+        if (!document.activeElement || document.activeElement === document.body) document.getElementById("retention-title")?.focus();
+      });
     } catch (reason) {
       setError(errorMessage(reason));
       setMessage("");
@@ -372,7 +410,7 @@ export default function App() {
   }
 
   async function materializeBackbone(save: boolean) {
-    if (!score?.score_id || !filterChosen) return;
+    if (!score?.score_id) return;
     if (result) {
       if (save) saveBackbone(result);
       return;
@@ -394,7 +432,7 @@ export default function App() {
   }
 
   function saveBackbone(extraction: ExtractionResponse) {
-    const normalized = uniqueResultLabel(shortBackboneLabel(extraction), savedResults, extraction.result_id);
+    const normalized = uniqueResultLabel(backboneLabel(extraction, method?.label), savedResults, extraction.result_id);
     setSavedResults((current) => current.some((item) => item.resultId === extraction.result_id)
       ? current
       : [...current, {
@@ -417,36 +455,38 @@ export default function App() {
   }
 
   const nextTheme = theme === "dark" ? "light" : "dark";
+  const themeLabel = nextTheme === "dark" ? "Switch to dark theme" : "Switch to light theme";
   const themeButton = (
-    <button type="button" className="theme-toggle" onClick={() => {
-      setTheme(nextTheme);
-      try { localStorage.setItem("netbone-theme", nextTheme); } catch { /* Theme switching still works for this visit. */ }
+    <button type="button" className="theme-toggle" aria-label={themeLabel} title={themeLabel} onClick={() => {
+      // Picking the system's own theme goes back to following the system.
+      const choice = nextTheme === systemTheme ? null : nextTheme;
+      setThemeChoice(choice);
+      try {
+        if (choice) localStorage.setItem(THEME_KEY, choice);
+        else localStorage.removeItem(THEME_KEY);
+      } catch { /* Theme switching still works for this visit. */ }
     }}>
-      {nextTheme === "dark" ? <Moon size={16} aria-hidden="true" /> : <Sun size={16} aria-hidden="true" />}
-      {nextTheme === "dark" ? "Dark theme" : "Light theme"}
+      {nextTheme === "dark" ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
     </button>
   );
+  const sweepAvailable = !demoMode && Boolean(preview?.can_run && method);
+  const backToAnalysis = () => setWorkspace("analysis");
 
   return (
     <div className={`app-shell app-shell--${workspace === "start" ? "launcher" : workspace}`} data-theme={theme}>
       {workspace === "start" && <div className="launcher-theme">{themeButton}</div>}
       {workspace !== "start" && (
-        <header className="app-header app-header--start single-workbench-header">
-          {workspace === "analysis" ? (
-            <span className="brand"><strong>{demoMode ? "Netbone demo" : "Netbone"}</strong></span>
-          ) : (
-            <button className="brand" disabled={busy !== ""} onClick={() => setWorkspace("analysis")}>
-              <span className="brand-mark"><Network size={20} aria-hidden="true" /></span>
-              <span><strong>Netbone</strong><small>Network workbench</small></span>
-            </button>
-          )}
+        <header className="app-header">
+          <span className="brand">
+            <BrandMark />
+            <strong>{demoMode ? "Netbone demo" : "Netbone"}</strong>
+          </span>
           <div className="workbench-header-actions">
             {themeButton}
-            {demoMode && <a className="button button--quiet" href="../browser/launch/">Run locally</a>}
-            {!demoMode && hasData && workspace === "analysis" && <button className="button button--quiet new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
+            {demoMode && <a className="button" href="../browser/launch/">Run locally</a>}
+            {!demoMode && hasData && <button className="button new-analysis" disabled={busy !== ""} onClick={() => { setError(""); setWorkspace("start"); }}>
               Change network
             </button>}
-            {hasData && workspace !== "analysis" && <button className="button button--quiet new-analysis" onClick={() => setWorkspace("analysis")}><ArrowLeft size={16} /> Back to analysis</button>}
           </div>
         </header>
       )}
@@ -474,7 +514,6 @@ export default function App() {
           methodSearch={methodSearch}
           methodControls={methodControls}
           filterName={filterName}
-          filterChosen={filterChosen}
           filterControls={filterControls}
           score={score}
           filterPreview={filterPreview}
@@ -501,9 +540,9 @@ export default function App() {
         />
       )}
       {workspace === "compare" && (
-        <ComparisonWorkspace saved={savedResults} onChange={setSavedResults} onExtract={() => setWorkspace("analysis")} />
+        <ComparisonWorkspace schema={schema} saved={savedResults} onChange={setSavedResults} onBack={backToAnalysis} />
       )}
-      {workspace === "sweep" && preview?.can_run && method && (
+      {workspace === "sweep" && sweepAvailable && preview && method && (
         <SweepWorkspace
           schema={schema}
           method={method}
@@ -514,6 +553,7 @@ export default function App() {
           weightSign={weightSign}
           basePayload={currentPayload()}
           initialConfiguration={result?.resolved_config ?? filterPreview?.resolved_config}
+          onBack={backToAnalysis}
         />
       )}
 
@@ -552,7 +592,7 @@ function StartWorkspace({ onExample, onImport, onDropFile, onBack, error }: {
       <LauncherBackdrop />
       <div className="launcher-content">
         <header className="launcher-intro">
-          <h1 id="start-title">Find the structure within.</h1>
+          <h1 id="start-title" tabIndex={-1}>Find the structure within.</h1>
           <p>One network, different backbones.</p>
         </header>
         <div className="launcher-actions">
@@ -797,7 +837,6 @@ interface AnalysisWorkspaceProps extends Omit<NetworkSettingsProps, "busy"> {
   methodSearch: string;
   methodControls: Record<string, ControlValue>;
   filterName: FilterName;
-  filterChosen: boolean;
   filterControls: Record<string, ControlValue>;
   score: ScoreResponse | null;
   filterPreview: FilterPreview | null;
@@ -827,26 +866,25 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
   const [compatibleOnly, setCompatibleOnly] = useState(false);
   const methodDialog = useRef<HTMLDialogElement>(null);
   const methodLibraryBody = useRef<HTMLDivElement>(null);
-  const filterDialog = useRef<HTMLDialogElement>(null);
   const settingsDialog = useRef<HTMLDialogElement>(null);
   const resultDialog = useRef<HTMLDialogElement>(null);
-  const [resultTab, setResultTab] = useState<ResultTab>("inspect");
-  const previousScore = useRef(props.score);
   const {
     schema, data, context, preview, previewBusy, mappingReviewPending, onMappingReviewFinished,
     method, methods, methodSearch, methodControls,
-    filterName, filterChosen, filterControls, score, filterPreview, filterPreviewError, result, saved, savedCount, busy, message, error,
+    filterName, filterControls, score, filterPreview, filterPreviewError, result, saved, savedCount, busy, message, error,
     compatibility, onSearch, onMethod, onMethodControl, onFilter,
     onFilterControl, onScore, onMaterialize, onCompare, onSweep,
   } = props;
-  const methodSpecs = method ? resolvedControls(schema.controls.methods[method.name] || [], data, Boolean(preview?.directed), context) : [];
+  // Notices only restate what the compatibility check already says, so the page shows real settings only.
+  const methodSpecs = method ? resolvedControls(schema.controls.methods[method.name] || [], data, Boolean(preview?.directed), context).filter((control) => control.control !== "notice") : [];
   const basicMethodSpecs = methodSpecs.filter((control) => !control.advanced);
   const advancedMethodSpecs = methodSpecs.filter((control) => control.advanced);
-  const filterSpecs = method && filterChosen
+  const filterSpecs = method && score
     ? adjustedFilterControls(schema.controls.filters[filterName] || [], score, method).filter((control) => isControlShown(control, (name) => filterControls[name]))
     : [];
   const basicFilterSpecs = filterSpecs.filter((control) => !control.advanced && control.name !== "drop_isolates");
   const advancedFilterSpecs = filterSpecs.filter((control) => control.advanced || control.name === "drop_isolates");
+  const filterChoices = method ? filterOptions(method) : [];
   const searchTerms = methodSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
   const activeMethodFilterCount = [targetFilter !== "all", approachFilter !== "all", supportFilter !== "all", compatibleOnly].filter(Boolean).length;
   const hasMethodFilters = activeMethodFilterCount > 0;
@@ -908,66 +946,43 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
     methodDialog.current?.close();
   }
 
-  const methodChoiceButton = (
-    <button className="button button--configure" onClick={() => methodDialog.current?.showModal()}>
-      <Search size={16} /> {method ? "Change method" : "Choose method"}
-    </button>
+  const methodChoiceButton = method ? (
+    <button className="button button--small" aria-label="Change method" onClick={() => methodDialog.current?.showModal()}>Change</button>
+  ) : (
+    <button className="button" onClick={() => methodDialog.current?.showModal()}><Search size={16} aria-hidden="true" /> Choose method</button>
   );
-  const filterChoiceButton = (
-    <button className="button button--configure" onClick={() => openFilterPicker(filterDialog.current)}>
-      <Settings2 size={16} /> {filterChosen ? "Change filter" : "Choose filter"}
-    </button>
-  );
-
-  const advancedMethodSettings = advancedMethodSpecs.length > 0 && (
+  const methodGoal = method ? methodGoalDetails(method)?.goal : undefined;
+  const methodControlFields = (controls: ControlSpec[]) => (
     <div className="control-stack method-controls">
-      {advancedMethodSpecs.map((control) => (
+      {controls.map((control) => (
         <ControlField key={control.name} control={control} value={methodControls[control.name]} onChange={onMethodControl} compactChoices />
       ))}
     </div>
   );
-  const scoringSettings = <>
-    {selectedBlocked && <div className="compatibility-warning"><CircleAlert size={17} /><span>{selectedBlocked}. Browse methods to choose one for this network.</span></div>}
-    {basicMethodSpecs.length > 0 && <div className="control-stack method-controls">
-      {basicMethodSpecs.map((control) => (
-        <ControlField key={control.name} control={control} value={methodControls[control.name]} onChange={onMethodControl} compactChoices />
-      ))}
-    </div>}
-    {advancedMethodSettings && (score ? advancedMethodSettings : (
-      <details className="advanced-options advanced-method-settings">
-        <summary>Advanced method settings</summary>
-        {advancedMethodSettings}
-      </details>
-    ))}
-    {score && <button className="button button--primary" disabled={!networkReady || Boolean(selectedBlocked)} onClick={onScore}><Play size={16} /> Recompute scores</button>}
-  </>;
-
-  useEffect(() => {
-    const dialog = filterDialog.current;
-    if (!busy && score && score !== previousScore.current && !filterChosen && dialog && !dialog.open) {
-      openFilterPicker(dialog);
-    }
-    if (!busy) previousScore.current = score;
-  }, [busy, score, filterChosen]);
+  const dockStatus = busy === "score" ? message : score
+    ? filterPreviewError ? "Preview unavailable" : !draftReady ? "Updating preview…"
+      : savedCount === 1 ? "1 saved · save one more to compare" : graph?.truncated ? "Backbone counts ready" : "Preview ready"
+    : networkReady ? selectedBlocked ? "Choose a compatible method" : "Compute scores to see the backbone"
+      : waitingForData ? "Checking network…" : "Review Network settings to continue";
 
   return (
     <main className="workspace analysis-workbench" aria-labelledby="analysis-title">
       <header className="network-receipt">
         <div className="network-receipt-summary">
-          <h1 id="analysis-title">{context.dataset.trim() || data.filename || "Network analysis"}</h1>
+          <h1 id="analysis-title" tabIndex={-1}>{context.dataset.trim() || data.filename || "Network analysis"}</h1>
           {waitingForData || !preview?.valid ? (
             <p role="status">{waitingForData ? "Checking network…" : "Check the data format and column mapping to continue."}</p>
           ) : (
-            <dl className="network-facts" aria-label="Network summary">
-              <div><dt>Nodes</dt><dd>{formatValue(preview.node_count)}</dd></div>
-              <div><dt>{preview.directed ? "Arcs" : "Edges"}</dt><dd>{formatValue(preview.edge_count)}</dd></div>
-              <div><dt>{preview.directed ? "Weakly connected components" : "Components"}</dt><dd>{formatValue(preview.component_count)}</dd></div>
-              <div><dt>Direction</dt><dd>{preview.directed ? "Directed" : "Undirected"}</dd></div>
-              <div><dt>Weights</dt><dd>{data.mode === "temporal" ? "Temporal weights" : data.weight || "Unweighted"}</dd></div>
-            </dl>
+            <ul className="fact-chips network-facts" aria-label="Network summary">
+              <li><strong>{formatValue(preview.node_count)}</strong> nodes</li>
+              <li><strong>{formatValue(preview.edge_count)}</strong> {preview.directed ? "arcs" : "edges"}</li>
+              <li><strong>{formatValue(preview.component_count)}</strong> {preview.directed ? "weakly connected components" : Number(preview.component_count) === 1 ? "component" : "components"}</li>
+              <li>{preview.directed ? "Directed" : "Undirected"}</li>
+              <li>{data.mode === "temporal" ? "Temporal weights" : data.weight ? <>Weighted by <strong>{data.weight}</strong></> : "Unweighted"}</li>
+            </ul>
           )}
         </div>
-        {!demoMode && <button className="button button--quiet" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>}
+        {!demoMode && <button className="button" disabled={busy !== ""} onClick={() => settingsDialog.current?.showModal()}><Settings2 size={17} aria-hidden="true" /> Network settings</button>}
       </header>
       {demoMode && <p className="demo-note">Two 25% backbones are ready to compare. Edge Weight favors strong ties, while Edge Betweenness favors links on shortest paths. Choose 50% to try a larger edge budget.</p>}
       <dialog className="workbench-dialog network-settings-dialog" ref={settingsDialog} aria-labelledby="network-settings-title" key={data.filename} onCancel={onMappingReviewFinished}>
@@ -995,7 +1010,7 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
       <Warnings warnings={preview?.warnings || []} />
       <dialog className="method-dialog" ref={methodDialog} aria-labelledby="method-dialog-title">
         <header className="method-library-header">
-          <div className="pane-heading"><h2 id="method-dialog-title">Choose a scoring method</h2><button className="button button--quiet" onClick={() => methodDialog.current?.close()}>Close</button></div>
+          <div className="pane-heading"><h2 id="method-dialog-title">Choose a scoring method</h2><button className="icon-button dialog-close" aria-label="Close" title="Close" onClick={() => methodDialog.current?.close()}><X size={18} aria-hidden="true" /></button></div>
           <label className="search-field"><Search size={17} aria-hidden="true" /><input type="search" aria-label="Search methods" value={methodSearch} placeholder="Search methods" onChange={(event) => onSearch(event.target.value)} /></label>
         </header>
         <div className="method-library-body" ref={methodLibraryBody} role="region" aria-label="Scoring methods" tabIndex={0}>
@@ -1019,44 +1034,67 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
             <span className="method-list-caption" role="status">{compatibleMethods.length} {compatibleMethods.length === 1 ? "method" : "methods"}</span>
           </div>
           <div className="method-list" role="group" aria-labelledby="method-results-title">
-            {compatibleMethods.map((candidate) => {
-              const blocked = compatibility(candidate);
+            {[...METHOD_FAMILIES, "Other methods"].map((family) => {
+              const members = compatibleMethods.filter((candidate) => methodFamily(candidate) === family);
+              if (!members.length) return null;
               return (
-                <button key={candidate.name} className={`${candidate.name === method?.name ? "is-active" : ""}${blocked ? " is-incompatible" : ""}`} disabled={!networkReady || Boolean(blocked)} aria-pressed={candidate.name === method?.name} onClick={() => pickMethod(candidate)}>
-                  <span><strong>{candidate.label}</strong><small>{conciseScoreMeaning(candidate, context)}</small></span>
-                  {!blocked && (candidate.name === method?.name ? <Check size={17} aria-hidden="true" /> : <ChevronRight size={17} aria-hidden="true" />)}
-                  {blocked && <em>{blocked}</em>}
-                </button>
+                <section className="method-family" key={family} aria-label={family}>
+                  <h4>{family}<span>{members.length}</span></h4>
+                  {members.map((candidate) => {
+                    const blocked = compatibility(candidate);
+                    const source = methodSource(candidate);
+                    return (
+                      <button key={candidate.name} className={`${candidate.name === method?.name ? "is-active" : ""}${blocked ? " is-incompatible" : ""}`} disabled={!networkReady || Boolean(blocked)} aria-pressed={candidate.name === method?.name} onClick={() => pickMethod(candidate)}>
+                        <span className="method-row-text">
+                          <strong>{candidate.label}</strong>
+                          <small>{methodGoalDetails(candidate)?.goal ?? conciseScoreMeaning(candidate, context)}</small>
+                          <span className="method-row-meta">
+                            {methodTags(candidate).map((tag) => <span className="tag" key={tag}>{tag}</span>)}
+                            {source && <span className="method-source">{source}</span>}
+                          </span>
+                        </span>
+                        {!blocked && (candidate.name === method?.name ? <Check size={17} aria-hidden="true" /> : <ChevronRight size={17} aria-hidden="true" />)}
+                        {blocked && <em>{blocked}</em>}
+                      </button>
+                    );
+                  })}
+                </section>
               );
             })}
             {!compatibleMethods.length && <div className="method-empty"><Search size={24} aria-hidden="true" /><strong>No methods match</strong><button className="button button--configure" onClick={clearMethodSearch}>Clear search and filters</button></div>}
           </div>
         </div>
       </dialog>
-      <dialog className="workbench-dialog filter-choice-dialog" ref={filterDialog} aria-labelledby="filter-choice-title">
-        <header><h2 id="filter-choice-title">Choose a filter</h2><button className="button button--quiet" onClick={() => filterDialog.current?.close()}>Close</button></header>
-        {method && <div className="filter-choice-list">
-          {filterOptions(method).map((name) => <button type="button" key={name} data-initial-focus={name === (filterChosen ? filterName : method.recommended_filter) ? "" : undefined} className={name === method.recommended_filter ? "is-recommended" : ""} aria-pressed={filterChosen && name === filterName} onClick={() => { onFilter(name); filterDialog.current?.close(); }}>
-            <strong>{filterLabel(name)}</strong>
-            {name === method.recommended_filter && <span>Recommended</span>}
-            <small>{filterDescription(name, context, method)}</small>
-          </button>)}
-        </div>}
-      </dialog>
-
       <div className="analysis-canvas">
         <fieldset className="analysis-controls" disabled={busy !== ""}>
         <section className="analysis-step">
           <div className="pane-heading analysis-step-header">
-            <h2 className="analysis-step-title"><span aria-hidden="true">1</span> Scoring method</h2>
-            {method && methodChoiceButton}
+            <h2 className="analysis-step-title"><span aria-hidden="true">1</span> Method</h2>
           </div>
           {!method && <p className="analysis-step-intro">Choose how Netbone scores the nodes or edges in this network.</p>}
-          {method && <div className="analysis-selection-row">
-            <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint>{method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}</div>
-            {!demoMode && score && <details className="advanced-options analysis-score-settings"><summary aria-label="Scoring settings">Settings</summary><div className="scoring-settings">{scoringSettings}</div></details>}
+          {method && <div className="choice-card">
+            <div className="choice-card-head">
+              <div className="label-with-hint"><strong>{method.label}</strong><Hint label={`How ${method.label} scores the network`}>{contextualMeaning(method, context)}</Hint></div>
+              {methodChoiceButton}
+            </div>
+            {methodGoal && <p>{methodGoal}.</p>}
+            {method.references?.[0] && <a className="method-paper-link" href={method.references[0].url} target="_blank" rel="noreferrer" title={method.references[0].citation}>Paper<span className="visually-hidden"> for {method.label} (opens in a new tab)</span></a>}
           </div>}
-          {!score && (selectedBlocked || basicMethodSpecs.length > 0 || advancedMethodSpecs.length > 0) && <div className="scoring-settings">{scoringSettings}</div>}
+          {selectedBlocked && <div className="compatibility-warning"><CircleAlert size={17} /><span>{selectedBlocked}. Browse methods to choose one for this network.</span></div>}
+          {method && !demoMode && methodSpecs.length > 0 && (
+            <details className="advanced-options analysis-score-settings" open={!score && busy !== "score" ? true : undefined}>
+              <summary>Method settings</summary>
+              <div className="scoring-settings">
+                {basicMethodSpecs.length > 0 && methodControlFields(basicMethodSpecs)}
+                {advancedMethodSpecs.length > 0 && (basicMethodSpecs.length > 0 ? (
+                  <details className="advanced-options advanced-method-settings">
+                    <summary>Advanced method settings</summary>
+                    {methodControlFields(advancedMethodSpecs)}
+                  </details>
+                ) : methodControlFields(advancedMethodSpecs))}
+              </div>
+            </details>
+          )}
           {!score && <div className="step-actions">
             {method ? <button className="button button--primary" disabled={busy !== "" || !networkReady || Boolean(selectedBlocked)} onClick={onScore}>
               {busy === "score" ? <LoaderCircle className="spin" size={17} /> : <Play size={17} fill="currentColor" />}
@@ -1068,38 +1106,47 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         {score && method && <section className="analysis-step">
           <div className="pane-heading analysis-step-header">
             <h2 className="analysis-step-title" id="retention-title" tabIndex={-1}><span aria-hidden="true">2</span> Filter</h2>
-            {!demoMode && filterChosen && filterChoiceButton}
           </div>
-              {filterChosen && <div className="analysis-selection-row"><div className="label-with-hint"><strong>{filterLabel(filterName)}</strong><Hint label="How this filter works">{filterDescription(filterName, context, method)}</Hint></div></div>}
-              {!filterChosen && <div className="step-actions">{filterChoiceButton}</div>}
-              <Warnings warnings={score.warnings} />
-              {filterChosen && <>
-              {basicFilterSpecs.length > 0 && <div className="control-stack filter-controls">{basicFilterSpecs.map((control) => <ControlField key={control.name} control={control} value={filterControls[control.name]} onChange={onFilterControl} />)}</div>}
-              <details className="advanced-options"><summary>Inspect score distribution</summary><div className="scoring-settings">
-                {score.statistics.length < score.score_summary.score_row_count && <p>Showing {formatValue(score.statistics.length)} of {formatValue(score.score_summary.score_row_count)} scores.</p>}
-                <ScoreDistribution
-                  statistics={score.statistics}
-                  method={method}
-                  boundary={boundary}
-                  direction={filterDirection(filterName, filterControls, method)}
-                  operator={filterName === "significance" ? "less" : filterName === "threshold" ? String(filterControls.operator || "") : undefined}
-                />
-              </div></details>
-              {advancedFilterSpecs.length > 0 && <details className="advanced-options"><summary>Advanced filter options <span>{advancedFilterSpecs.length}</span></summary><div className="control-stack">{advancedFilterSpecs.map((control) => <ControlField key={control.name} control={control} value={filterControls[control.name]} onChange={onFilterControl} />)}</div></details>}
-              </>}
+          {!demoMode && filterChoices.length > 1 && (
+            <div className="filter-switch" role="radiogroup" aria-labelledby="retention-title">
+              {filterChoices.map((name) => (
+                <label key={name}>
+                  <input type="radio" name="analysis-filter" value={name} checked={name === filterName} onChange={() => onFilter(name)} />
+                  <span>{filterLabel(name)}</span>
+                </label>
+              ))}
+            </div>
+          )}
+          <p className="filter-description">
+            {demoMode && <strong>{filterLabel(filterName)}. </strong>}
+            {filterDescription(filterName, context, method)}
+            {filterName === method.recommended_filter && !demoMode && <> Recommended{method.filter_reason ? `: ${method.filter_reason}` : " for this method."}</>}
+          </p>
+          <Warnings warnings={score.warnings} />
+          {basicFilterSpecs.length > 0 && <div className="control-stack filter-controls">{basicFilterSpecs.map((control) => <ControlField key={control.name} control={control} value={filterControls[control.name]} onChange={onFilterControl} />)}</div>}
+          <details className="advanced-options"><summary>Score distribution</summary><div className="scoring-settings">
+            {score.statistics.length < score.score_summary.score_row_count && <p>Showing {formatValue(score.statistics.length)} of {formatValue(score.score_summary.score_row_count)} scores.</p>}
+            <ScoreDistribution
+              statistics={score.statistics}
+              method={method}
+              boundary={boundary}
+              direction={filterDirection(filterName, filterControls, method)}
+              operator={filterName === "significance" ? "less" : filterName === "threshold" ? String(filterControls.operator || "") : undefined}
+            />
+          </div></details>
+          {advancedFilterSpecs.length > 0 && <details className="advanced-options"><summary>Advanced filter options <span>{advancedFilterSpecs.length}</span></summary><div className="control-stack">{advancedFilterSpecs.map((control) => <ControlField key={control.name} control={control} value={filterControls[control.name]} onChange={onFilterControl} />)}</div></details>}
         </section>}
         </fieldset>
 
         <section className="analysis-preview" data-waiting-for-scores={!score} aria-labelledby="live-preview-title">
           <header>
             <div className="label-with-hint"><h2 id="live-preview-title" tabIndex={-1} ref={previewHeading}>Network preview</h2><Hint label="How to read the network preview">Thicker teal edges belong to the backbone. Gray edges were left out. The drawing is available for networks with up to 80 nodes and 1,000 edges.</Hint></div>
-            {saved && <span className="analysis-status"><Check size={14} /> Saved</span>}
           </header>
           {filterPreview && <RetentionPreview preview={filterPreview} directed={Boolean(graph?.directed)} />}
           {graph ? <NetworkPreview graph={graph} /> : (
             <div className="analysis-preview-empty">
               <div aria-hidden="true"><BackboneIllustration /></div>
-              <p role="status">{filterPreviewError || (score && filterChosen ? "Updating the preview…" : "The backbone preview appears after you choose a filter.")}</p>
+              <p role="status">{filterPreviewError || (score ? "Updating the preview…" : "The backbone preview appears once the scores are ready.")}</p>
             </div>
           )}
           <Warnings warnings={[...new Set([...(filterPreview?.warnings || []), ...(result?.warnings || [])])].filter((warning) => !score?.warnings.includes(warning))} />
@@ -1110,129 +1157,35 @@ function AnalysisWorkspace(props: AnalysisWorkspaceProps) {
         {error && <div className="workbench-error" role="alert"><CircleAlert size={17} /><span>{error}</span></div>}
         <div className="analysis-dock-row">
           <div className="analysis-dock-context">
-            <span className="analysis-dock-status">{busy === "score" ? message : score
-              ? !filterChosen ? "Choose a filter to continue" : filterPreviewError ? "Preview unavailable" : !draftReady ? "Updating preview…"
-                : savedCount > 0 ? `${savedCount} saved${savedCount === 1 ? " · Save another to compare" : ""}` : graph?.truncated ? "Backbone counts ready" : "Preview ready"
-              : networkReady ? selectedBlocked ? "Choose a compatible method" : "Compute scores to unlock filtering"
-                : waitingForData ? "Checking network…" : "Review Network settings to continue"}</span>
+            <span className="analysis-dock-status">{dockStatus}</span>
             {score && !previewHeadingVisible && <a className="analysis-preview-link" href="#live-preview-title" onClick={jumpToHeading}>{graph?.truncated ? "Jump to counts" : "Jump to graph"}</a>}
           </div>
           <div className="analysis-actions">
-            {score && filterChosen && <>
-              <button className="button button--save" disabled={busy !== "" || saved || !draftReady} onClick={() => void onMaterialize(true)}>{busy === "filter" ? <LoaderCircle className="spin" size={17} /> : saved ? <Check size={17} /> : <Plus size={17} />} {saved ? "Backbone saved" : "Save this backbone"}</button>
-              <button className="button button--inspect" disabled={busy !== "" || !draftReady} onClick={() => { setResultTab("inspect"); resultDialog.current?.showModal(); void onMaterialize(false); }}><Download size={16} /> Inspect &amp; export</button>
+            {score && <>
+              <button className="button button--save" disabled={busy !== "" || saved || !draftReady} aria-label={saved ? "Backbone saved" : "Save this backbone"} onClick={() => void onMaterialize(true)}>
+                {busy === "filter" ? <LoaderCircle className="spin" size={17} aria-hidden="true" /> : saved ? <Check size={17} aria-hidden="true" /> : <Plus size={17} aria-hidden="true" />}
+                <span className="dock-label">{saved ? "Backbone saved" : "Save this backbone"}</span>
+                <span className="dock-label-short" aria-hidden="true">{saved ? "Saved" : "Save"}</span>
+              </button>
+              <button className="button" disabled={busy !== "" || !draftReady} aria-label="Inspect & export" title="Inspect & export" onClick={() => { resultDialog.current?.showModal(); void onMaterialize(false); }}>
+                <Download size={16} aria-hidden="true" /> <span className="dock-label">Inspect &amp; export</span>
+              </button>
             </>}
-            {!demoMode && networkReady && method && !selectedBlocked && (!score || filterChosen) && <button className="button button--explore" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values"><BarChart3 size={16} /> Sweep</button>}
-            {savedCount >= 2 && <button className="button button--compare" disabled={busy !== ""} onClick={onCompare}><GitCompareArrows size={16} /> Compare</button>}
+            {!demoMode && networkReady && method && !selectedBlocked && <button className="button" disabled={busy !== "" || Boolean(score && !draftReady)} onClick={onSweep} aria-label="Sweep: test a range of values" title="Sweep: test a range of values">
+              <BarChart3 size={16} aria-hidden="true" /> <span className="dock-label">Sweep</span>
+            </button>}
+            {savedCount >= 2 && <button className="button" disabled={busy !== ""} onClick={onCompare} aria-label={`Compare ${savedCount} saved backbones`} title={`Compare ${savedCount} saved backbones`}>
+              <GitCompareArrows size={16} aria-hidden="true" /> <span className="dock-label">Compare</span> <span className="nav-count" aria-hidden="true">{savedCount}</span>
+            </button>}
           </div>
         </div>
       </footer>}
       <dialog className="workbench-dialog result-details-dialog" ref={resultDialog} aria-labelledby="result-title">
-        <header><h2 id="result-title">Inspect &amp; export</h2><button className="button button--quiet" onClick={() => resultDialog.current?.close()}>Close</button></header>
-        {result && method ? <ResultDetails key={result.result_id} result={result} method={method} tab={resultTab} onTab={setResultTab} /> : <p role={error ? "alert" : "status"}>{error || "Preparing the backbone…"}</p>}
+        <header><h2 id="result-title">Inspect &amp; export</h2><button className="icon-button dialog-close" aria-label="Close" title="Close" onClick={() => resultDialog.current?.close()}><X size={18} aria-hidden="true" /></button></header>
+        {result ? <BackboneDetails key={result.result_id} result={result} schema={schema} /> : <p role={error ? "alert" : "status"}>{error || "Preparing the backbone…"}</p>}
       </dialog>
       <span className="visually-hidden" role="status" aria-atomic="true">{message}</span>
     </main>
-  );
-}
-
-function openFilterPicker(dialog: HTMLDialogElement | null) {
-  dialog?.showModal();
-  dialog?.querySelector<HTMLButtonElement>("[data-initial-focus]")?.focus();
-}
-
-const resultTabs = ["inspect", "export"] as const;
-type ResultTab = (typeof resultTabs)[number];
-
-function ResultDetails({ result, method, tab, onTab }: {
-  result: ExtractionResponse;
-  method: MethodSpec;
-  tab: ResultTab;
-  onTab: (tab: ResultTab) => void;
-}) {
-  const [format, setFormat] = useState<"graphml" | "gexf">("graphml");
-  const [scope, setScope] = useState<"annotated" | "backbone">("backbone");
-  const [exportError, setExportError] = useState("");
-  const [preparingBundle, setPreparingBundle] = useState(false);
-  const [bundleError, setBundleError] = useState("");
-
-  async function exportExperiment() {
-    setBundleError("");
-    setPreparingBundle(true);
-    try {
-      await downloadExperiment(result.result_id);
-    } catch (reason) {
-      setBundleError(errorMessage(reason));
-    } finally {
-      setPreparingBundle(false);
-    }
-  }
-  return (
-    <div className="result-details">
-      <div className="result-tab-bar">
-        <div className="result-mode-tabs" role="tablist" aria-label="Backbone result" onKeyDown={(event) => {
-          let next: ResultTab;
-          if (event.key === "Home") next = "inspect";
-          else if (event.key === "End") next = "export";
-          else if (event.key === "ArrowLeft" || event.key === "ArrowRight") next = tab === "inspect" ? "export" : "inspect";
-          else return;
-          event.preventDefault();
-          onTab(next);
-          event.currentTarget.querySelector<HTMLButtonElement>(`#result-tab-${next}`)?.focus();
-        }}>
-          {resultTabs.map((item) => (
-            <button key={item} type="button" role="tab" id={`result-tab-${item}`} aria-controls={`result-panel-${item}`} aria-selected={tab === item} tabIndex={tab === item ? 0 : -1} onClick={() => onTab(item)}>
-              {item === "inspect" ? <Table2 size={17} aria-hidden="true" /> : <Download size={17} aria-hidden="true" />}
-              {item === "inspect" ? "Inspect" : "Export"}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div id="result-panel-inspect" role="tabpanel" aria-labelledby="result-tab-inspect" hidden={tab !== "inspect"}>
-        <section className="result-statistics">
-          <StatisticsTable heading="Method statistics" records={result.statistics} primaryStatistic={method.primary_statistic} filename={`${method.name}-statistics.csv`} />
-        </section>
-        <details className="advanced-options resolved-config result-run-settings">
-          <summary>View run settings</summary>
-          <div className="result-settings-actions">
-            <button type="button" className="button button--export" onClick={() => downloadJson(result.resolved_config, "netbone-pipeline.json")}><Download size={16} aria-hidden="true" /> Download settings (JSON)</button>
-          </div>
-          <pre tabIndex={0}>{JSON.stringify(result.resolved_config, null, 2)}</pre>
-        </details>
-      </div>
-      <div id="result-panel-export" role="tabpanel" aria-labelledby="result-tab-export" hidden={tab !== "export"}>
-        <div className="result-export-options" aria-label="Export options" role="group">
-          <section className="result-export-card">
-            <div className="result-export-heading">
-              <Network size={20} aria-hidden="true" />
-              <h3>Graph</h3>
-            </div>
-            <div className="field-grid">
-              <label className="field"><span>Graph</span><select value={scope} onChange={(event) => setScope(event.target.value as typeof scope)}><option value="backbone">Backbone only</option><option value="annotated">Annotated original</option></select></label>
-              <label className="field"><span>Format</span><select value={format} onChange={(event) => setFormat(event.target.value as typeof format)}><option value="graphml">GraphML</option><option value="gexf">GEXF for Gephi</option></select></label>
-            </div>
-            <button className="button button--export export-card-download" onClick={() => {
-              setExportError("");
-              void downloadGraph(result.result_id, format, scope).catch((reason: unknown) => setExportError(errorMessage(reason)));
-            }}><Download size={16} aria-hidden="true" /> Download {format === "graphml" ? "GraphML" : "GEXF"}</button>
-            {exportError && <p className="error-text" role="alert">{exportError}</p>}
-          </section>
-          <section className="result-export-card result-export-card--experiment">
-            <div className="result-export-heading">
-              <Archive size={20} aria-hidden="true" />
-              <h3>Full experiment</h3>
-            </div>
-            <p>Both graphs, statistics, run settings, and a report in one ZIP.</p>
-            <button type="button" className="button button--export export-card-download" disabled={preparingBundle} onClick={() => void exportExperiment()}>
-              {preparingBundle ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
-              {preparingBundle ? "Preparing ZIP…" : "Download ZIP"}
-            </button>
-            <span className="visually-hidden" role="status">{preparingBundle ? "Preparing the experiment ZIP." : ""}</span>
-            {bundleError && <p className="error-text" role="alert">{bundleError}</p>}
-          </section>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1314,6 +1267,9 @@ function RetentionPreview({ preview, directed }: { preview: FilterPreview; direc
   const edgeFraction = preview.original_edge_count
     ? preview.backbone_edge_count / preview.original_edge_count
     : 0;
+  // Isolated nodes are not groups of the backbone, so they are counted on their own line.
+  const isolated = preview.backbone_isolated_node_count ?? 0;
+  const components = Math.max(0, preview.backbone_component_count - isolated);
   return <div className="preview-counts" aria-label="Retention preview">
     <RetentionCount
       label="Backbone nodes"
@@ -1323,7 +1279,11 @@ function RetentionPreview({ preview, directed }: { preview: FilterPreview; direc
       explanation={edgeTarget ? "Counts nodes that touch at least one backbone edge." : undefined}
     />
     <RetentionCount label="Backbone edges" count={preview.backbone_edge_count} total={preview.original_edge_count} fraction={edgeFraction} />
-    <div><span className="metric-label">{directed ? "Weakly connected components" : "Connected components"}</span><strong>{formatValue(preview.backbone_component_count)}</strong></div>
+    <div className="component-count">
+      <div className="label-with-hint"><span className="metric-label">{directed ? "Weakly connected components" : "Connected components"}</span><Hint label="How components are counted">Groups of nodes linked by backbone edges. Nodes left without a backbone edge are counted separately as isolated nodes.</Hint></div>
+      <strong>{formatValue(components)}</strong>
+      {isolated > 0 && <span className="component-count-note">+ {formatValue(isolated)} isolated {isolated === 1 ? "node" : "nodes"}</span>}
+    </div>
   </div>;
 }
 
@@ -1376,13 +1336,17 @@ function adjustedFilterControls(controls: ControlSpec[], score: ScoreResponse | 
       : control);
 }
 
-function filterDefaults(schema: UiSchema, name: FilterName, method: MethodSpec, score?: ScoreResponse | null): Record<string, ControlValue> {
+/** Filter values for a method: registered defaults, then any values to keep, fitted to the score range. */
+function filterDefaults(schema: UiSchema, name: FilterName, method: MethodSpec, score?: ScoreResponse | null, keep?: Record<string, ControlValue>): Record<string, ControlValue> {
   const controls = adjustedFilterControls(schema.controls.filters[name] || [], score || null, method);
   const values = initialControlValues(controls);
   const registered = method.default_filter_parameters || {};
   for (const [key, value] of Object.entries(registered)) {
     if (key === "value" && name === "threshold") values.threshold_value = value;
     else if (key in values) values[key] = value;
+  }
+  for (const [key, value] of Object.entries(keep || {})) {
+    if (key in values && value !== "") values[key] = value;
   }
   const range = score?.score_ranges[method.primary_statistic];
   if (name === "threshold" && range && method.name !== "noise_corrected") {
@@ -1413,10 +1377,6 @@ function filterDirection(name: FilterName, controls: Record<string, ControlValue
   if (name === "fraction") return method.preferred_direction;
   if (name === "threshold") return String(controls.operator).startsWith("less") ? "lower" : "higher";
   return method.preferred_direction;
-}
-
-function filterLabel(name: FilterName): string {
-  return { default: "Recommended selection", fraction: "Keep a fraction", significance: "Significance", threshold: "Score cutoff" }[name];
 }
 
 function filterDescription(name: FilterName, context: NetworkContext, method: MethodSpec): string {
@@ -1450,4 +1410,24 @@ function jumpToHeading(event: MouseEvent<HTMLAnchorElement>) {
   event.preventDefault();
   heading.focus({ preventScroll: true });
   heading.scrollIntoView({ block: "start" });
+}
+
+/** The Netbone N: four nodes, and the diagonal is the strong link. index.html uses the same drawing as the tab icon. */
+function BrandMark() {
+  return (
+    <svg className="brand-mark" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true">
+      <defs>
+        <linearGradient id="brand-tile" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#14897d" />
+          <stop offset="1" stopColor="#0b5c55" />
+        </linearGradient>
+      </defs>
+      <rect width="48" height="48" rx="12" fill="url(#brand-tile)" />
+      <path d="M14 35V13M34 35V13" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M14 13 34 35" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" />
+      <g fill="#ffffff">
+        <circle cx="14" cy="35" r="4" /><circle cx="14" cy="13" r="5" /><circle cx="34" cy="35" r="5" /><circle cx="34" cy="13" r="4" />
+      </g>
+    </svg>
+  );
 }

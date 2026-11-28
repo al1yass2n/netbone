@@ -480,33 +480,41 @@ def test_webapp_source_keeps_extraction_in_one_workspace() -> None:
 def test_webapp_source_exposes_package_backed_sweep_workspace() -> None:
     app = _frontend_text("App.tsx")
     sweep = _frontend_text("components", "ConfigurationSweepWorkspace.tsx")
+    setup = _frontend_text("sweepSetup.ts")
     api = _frontend_text("api.ts")
 
     assert "SweepWorkspace" in app
     assert 'aria-label="Sweep: test a range of values"' in app
     assert "initialConfiguration=" in app
     assert "filterPreview?.resolved_config" in app
+    assert "onBack={backToAnalysis}" in app
+    assert "<BackLink onClick={onBack} />" in sweep
     assert "Test a range of settings" in sweep
     assert "What to vary?" in sweep
     assert "Add another setup" in sweep
     assert "Duplicate setup" in sweep
-    assert "Base setup and fixed settings" in sweep
+    assert "Method, filter and fixed settings" in sweep
     assert "Add another setting" in sweep
-    assert "Review runs" in sweep
-    assert "Runs to execute" in sweep
-    assert "Edit settings" in sweep
-    assert "onClick={() => void execute(!preview)}" in sweep
+    # Numbers start as a From/To/Step range, and the sweep runs without a review step.
+    assert 'RANGE_PARTS = [["from", "From"], ["to", "To"], ["step", "Step"]]' in sweep
+    assert "Range</button>" in sweep
+    assert "List</button>" in sweep
+    assert '"Run sweep"' in sweep
+    assert "preview_only" not in sweep
+    assert "Review runs" not in sweep
+    assert "SWEEP_RUN_LIMIT = 100" in setup
     assert "parameter-choices" in sweep
-    assert "Choose two or more values to compare" in sweep
+    assert "Choose two or more." in sweep
     assert 'aria-label="Backbone measurements"' in sweep
-    assert "SweepResultsView" in sweep
+    assert "SweepResults" in sweep
     assert "Run settings" in sweep
     assert "Edit sweep" in sweep
+    assert "<DownloadMenu items={downloads} />" in sweep
     assert "configuration-drawer" in sweep
+    assert "mergeDescriptions" in sweep
     assert "overflow-y: auto" in _frontend_text("styles.css")
-    assert "comma-separated values" in sweep
-    assert "score_cache_hits" in sweep
-    assert "explanations for unavailable or failed results" in sweep
+    assert "separated by commas" in sweep
+    assert "One row for each run." in sweep
     assert 'requestJson<SweepResponse>("/api/sweep"' in api
 
 
@@ -527,18 +535,22 @@ def test_webapp_source_exposes_saved_result_comparison_workspace() -> None:
 
     assert "Save this backbone" in app
     assert "savedCount >= 2" in app
+    assert "aria-label={`Compare ${savedCount} saved backbones`}" in app
+    assert "<BackLink onClick={onBack} />" in comparison
     assert "Compare backbones" in comparison
     assert 'aria-label="Saved backbones"' in comparison
     assert 'role="group" aria-label="Comparison scope"' in comparison
     assert "Properties" in comparison
-    assert "Overlap & agreement" in comparison
+    assert "Overlap &amp; agreement" in comparison
     assert "Score alignment" in comparison
     assert "Backbone pair" in comparison
-    assert "Select at least two backbones." in comparison
-    assert 'title="Inspect saved result"' in comparison
+    assert "Select two or more backbones" in comparison
+    # Each saved backbone has one menu for its actions.
+    assert "aria-label={`Options for ${item.label}`}" in comparison
+    assert ">Details</button>" in comparison
     assert 'role="dialog" aria-modal="true"' in comparison
-    assert '["result", "value", "status", "explanation"]' in comparison
-    assert '["result_a", "result_b", "value", "status", "explanation"]' in comparison
+    # Status and explanation columns appear only when a value is missing.
+    assert '"value", ...(problems ? ["status", "explanation"] : [])' in comparison
     assert 'requestJson<ComparisonResponse>("/api/compare"' in api
 
 
@@ -566,7 +578,7 @@ def test_webapp_source_exports_accessible_comparison_figures() -> None:
     assert 'title="Zoom out"' in alignment
     assert 'title="Reset view"' in alignment
     assert "onPointerMove" in alignment
-    assert "Backbone Jaccard" in alignment
+    assert 'metricLabel("score_spearman")' in alignment
     assert "alignmentOverlap" in comparison
     assert "XMLSerializer" in export
     assert 'type: "image/svg+xml;charset=utf-8"' in export
@@ -577,32 +589,41 @@ def test_webapp_source_exports_accessible_comparison_figures() -> None:
 def test_webapp_source_uses_accessible_single_select_filters() -> None:
     source = _frontend_text("App.tsx")
 
-    assert 'aria-labelledby="filter-choice-title"' in source
-    assert "aria-pressed={filterChosen && name === filterName}" in source
-    assert "name === method.recommended_filter && <span>Recommended</span>" in source
-    assert "!score?.score_id || !method || !filterChosen" in source
-    assert "filterOptions(method).map" in source
+    # The filter is a switch on the page, preset to the method's recommendation.
+    assert (
+        '<div className="filter-switch" role="radiogroup" '
+        'aria-labelledby="retention-title">'
+    ) in source
+    assert '<input type="radio" name="analysis-filter"' in source
+    assert "checked={name === filterName}" in source
+    assert "filterName === method.recommended_filter" in source
+    assert "if (!score?.score_id || !method) {" in source
+    assert "filterOptions(method)" in source
+    assert "filterChosen" not in source
 
 
 def test_webapp_source_keeps_primary_result_actions_reachable() -> None:
     app = _frontend_text("App.tsx")
+    details = _frontend_text("components", "BackboneDetails.tsx")
 
-    for label in (
-        "Save this backbone",
-        "Inspect &amp; export",
-        "Method statistics",
-        "View run settings",
-        "Download settings (JSON)",
-        "Download ZIP",
-    ):
+    for label in ("Save this backbone", "Inspect &amp; export"):
         assert label in app
-    assert "Download CSV" in _frontend_text("components", "StatisticsTable.tsx")
-    assert "downloadGraph(result.result_id, format, scope)" in app
+    for label in (
+        "Method statistics",
+        "Run settings",
+        "Statistics (CSV)",
+        "Backbone (GraphML)",
+        "Full network with scores (GEXF)",
+        "Settings (JSON)",
+        "Full experiment (ZIP)",
+    ):
+        assert label in details
+    assert "downloadStatistics" in _frontend_text("components", "StatisticsTable.tsx")
+    assert 'downloadGraph(result.result_id, "graphml", "backbone")' in details
     assert "resultDialog.current?.showModal()" in app
+    assert "<BackboneDetails" in app
     assert "Comparison label" not in app
-    assert "Rename saved result" in _frontend_text(
-        "components", "ComparisonWorkspace.tsx"
-    )
+    assert "Rename backbone" in _frontend_text("components", "ComparisonWorkspace.tsx")
 
 
 def test_webapp_source_emphasizes_the_next_extraction_action() -> None:
@@ -615,9 +636,7 @@ def test_webapp_source_emphasizes_the_next_extraction_action() -> None:
     assert "onMaterialize(true)" in app
     assert "onMaterialize(false)" in app
     assert "min-height: var(--button-height)" in styles
-    assert (
-        ".button--primary, .button--export, .button--save, .button--success" in styles
-    )
+    assert ".button--primary, .button--save, .button--success" in styles
     assert "--action-tone: var(--button-green)" in styles
 
 
@@ -678,19 +697,19 @@ def test_webapp_source_filters_methods_by_discovery_facets() -> None:
 def test_webapp_source_keeps_method_details_in_selected_pane() -> None:
     app = _frontend_text("App.tsx")
 
-    assert '<span aria-hidden="true">1</span> Scoring method</h2>' in app
+    assert '<span aria-hidden="true">1</span> Method</h2>' in app
     assert '<span aria-hidden="true">2</span> Filter</h2>' in app
     assert "<strong>{method.label}</strong>" in app
-    assert "<strong>{filterLabel(filterName)}</strong>" in app
+    assert "<span>{filterLabel(name)}</span>" in app
     assert "Start with a goal" not in app
     assert "Clear search and filters" in app
-    assert '"Change method" : "Choose method"' in app
+    assert 'aria-label="Change method"' in app
     assert "methodDialog.current?.showModal()" in app
     assert "Advanced method settings" in app
     assert "compactChoices" in app
     assert "Browse methods to choose one for this network." in app
-    assert "Recommended selection" in app
-    assert '"Change filter" : "Choose filter"' in app
+    assert "Recommended" in app
+    assert 'aria-label="Change filter"' not in app
     assert "</button> : methodChoiceButton}" in app
     assert '{score && method && <section className="analysis-step">' in app
     assert "Advanced filter options" in app
@@ -702,8 +721,10 @@ def test_webapp_source_uses_live_graph_and_resolves_full_results_on_demand() -> 
     assert "filterPreview?.graph" in source
     assert "api.filterPreview" in source
     assert "api.filter(" in source
-    assert "StatisticsTable" in source
-    assert "result.resolved_config" in source
+    assert "<BackboneDetails" in source
+    assert "result.resolved_config" in _frontend_text(
+        "components", "BackboneDetails.tsx"
+    )
 
 
 def test_webapp_source_includes_examples_and_export_bridges() -> None:
@@ -718,10 +739,12 @@ def test_webapp_source_includes_examples_and_export_bridges() -> None:
     assert 'format: "gexf" | "graphml"' in api
     assert 'downloadAttachment("/api/export",' in api
     assert 'downloadAttachment("/api/export-result",' in api
-    assert "downloadGraph" in app
-    assert "StatisticsTable" in app
+    details = _frontend_text("components", "BackboneDetails.tsx")
+    assert "<BackboneDetails" in app
+    assert "downloadGraph" in details
+    assert "StatisticsTable" in details
     assert "downloadCsv" in _frontend_text("components", "StatisticsTable.tsx")
-    assert "downloadJson" in app
+    assert "downloadJson" in details
 
 
 def test_webapp_source_includes_graphml_import_controls() -> None:
@@ -782,9 +805,9 @@ def test_webapp_source_includes_accessibility_hooks() -> None:
     assert 'aria-labelledby="result-title"' in app
     assert 'aria-labelledby="compare-title"' in comparison
     assert 'role="img" aria-label="Backbone graph preview"' in graph
-    assert "if (graph.truncated || graph.nodes.length > 80)" in graph
+    assert "const large = graph.truncated || graph.nodes.length > 80;" in graph
     assert "Preview unavailable for large networks" in graph
-    assert 'title="Remove saved result"' in comparison
+    assert 'className="is-danger"' in comparison
 
 
 def test_webapp_static_assets_do_not_contain_mojibake() -> None:
@@ -929,6 +952,7 @@ def test_webapp_filter_preview_reports_exact_edge_node_coverage(
     assert sum(node["isolated"] for node in result["graph"]["nodes"]) == (
         expected_backbone_nodes - 2
     )
+    assert result["backbone_isolated_node_count"] == expected_backbone_nodes - 2
     assert result["backbone_node_fraction"] == pytest.approx(
         expected_backbone_nodes / 3
     )
@@ -954,6 +978,7 @@ def test_webapp_filter_preview_reports_node_target_retention() -> None:
     assert result["backbone_node_count"] == 1
     assert result["backbone_edge_count"] == 0
     assert result["backbone_component_count"] == 1
+    assert result["backbone_isolated_node_count"] == 1
     assert result["backbone_node_fraction"] == pytest.approx(1 / 3)
 
 

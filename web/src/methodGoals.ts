@@ -31,3 +31,45 @@ export function methodGoalDetails(method: MethodSpec) {
     ? { goal, nodes: retained, edges: "All original edges between retained nodes, with their original weights." }
     : { goal, edges: retained, nodes: "Endpoints of retained edges. Other original nodes remain as isolates unless the filter drops isolated nodes." };
 }
+
+export const METHOD_FAMILIES = ["Statistical methods", "Structural selections", "Paths and neighborhoods", "Node measures", "Baselines"] as const;
+
+// Family and short source label for each method, matching the docs catalog.
+const methodCatalog: Record<string, [family: (typeof METHOD_FAMILIES)[number], source: string]> = {
+  disparity: ["Statistical methods", "Serrano et al. 2009"],
+  glanb: ["Statistical methods", "Zhang et al. 2014"],
+  lans: ["Statistical methods", "Foti et al. 2011"],
+  marginal_likelihood: ["Statistical methods", "Dianati 2016"],
+  noise_corrected: ["Statistical methods", "Coscia & Neffke 2017"],
+  doubly_stochastic: ["Structural selections", "Slater 2009"],
+  h_backbone: ["Structural selections", "Zhang et al. 2018"],
+  maximum_spanning_forest: ["Structural selections", "Kruskal 1956"],
+  multiple_linkage: ["Structural selections", "Van Nuffel 2007"],
+  planar_maximally_filtered_graph: ["Structural selections", "Tumminello et al. 2005"],
+  primary_linkage: ["Structural selections", "Nystuen & Dacey 1961"],
+  edge_betweenness: ["Paths and neighborhoods", "Girvan & Newman 2002"],
+  gspar: ["Paths and neighborhoods", "Satuluri et al. 2011"],
+  link_prediction: ["Paths and neighborhoods", "Yassin et al. 2025"],
+  link_prediction_iforest: ["Paths and neighborhoods", "Yassin et al. 2025"],
+  link_salience: ["Paths and neighborhoods", "Grady et al. 2012"],
+  node_betweenness: ["Node measures", "Freeman 1977"],
+  node_degree: ["Node measures", "Freeman 1978"],
+  node_strength: ["Node measures", "Barrat et al. 2004"],
+  edge_weight: ["Baselines", ""],
+};
+
+export function methodFamily(method: MethodSpec): string {
+  return methodCatalog[method.name]?.[0] ?? (method.target === "node" ? "Node measures" : "Other methods");
+}
+
+export function methodSource(method: MethodSpec): string {
+  return methodCatalog[method.name]?.[1] ?? "";
+}
+
+export function methodTags(method: MethodSpec): string[] {
+  const tags = [method.output_type === "pvalue" ? "p-value" : "Score"];
+  tags.push(method.requires_weights ? "Needs weights" : method.supports_weighted ? "Optional weights" : "Ignores weights");
+  if (method.supports_directed) tags.push("Directed");
+  if (method.target === "node") tags.push("Node method");
+  return tags;
+}

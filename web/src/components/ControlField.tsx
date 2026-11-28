@@ -75,6 +75,9 @@ export function ControlField({ control, value, onChange, compactChoices = false 
     const step = control.step ?? Math.max((maximum - minimum) / 100, 0.0001);
     const numberValue = Number(value ?? control.default ?? minimum);
     const clampedValue = Math.min(maximum, Math.max(minimum, numberValue));
+    // A retained fraction reads as a percentage everywhere, so its box takes 0–100.
+    const percent = control.name === "fraction";
+    const scale = percent ? 100 : 1;
     return (
       <div className="range-control">
         <div className="control-heading">
@@ -82,7 +85,6 @@ export function ControlField({ control, value, onChange, compactChoices = false 
             <label htmlFor={`control-${control.name}`}>{control.label}</label>
             {control.description && <Hint label={`About ${control.label}`}>{control.description}</Hint>}
           </div>
-          <output>{control.name === "fraction" ? `${(numberValue * 100).toFixed(1)}%` : formatValue(numberValue)}</output>
         </div>
         <div className="range-inputs">
           <input
@@ -93,23 +95,27 @@ export function ControlField({ control, value, onChange, compactChoices = false 
             step={step}
             value={clampedValue}
             disabled={control.disabled}
+            aria-valuetext={percent ? `${Number((clampedValue * 100).toFixed(2))}%` : undefined}
             onChange={(event) => onChange(control.name, Number(event.target.value))}
           />
-          <input
-            type="number"
-            aria-label={`${control.label} exact value`}
-            min={minimum}
-            max={maximum}
-            step={step}
-            value={numberValue}
-            disabled={control.disabled}
-            onChange={(event) => onChange(control.name, event.target.value === "" ? "" : Number(event.target.value))}
-          />
+          <span className="number-with-unit">
+            <input
+              type="number"
+              aria-label={percent ? `${control.label} in percent` : `${control.label} exact value`}
+              min={minimum * scale}
+              max={maximum * scale}
+              step={percent ? 1 : step}
+              value={value === "" ? "" : Number((numberValue * scale).toFixed(percent ? 2 : 12))}
+              disabled={control.disabled}
+              onChange={(event) => onChange(control.name, event.target.value === "" ? "" : Number(event.target.value) / scale)}
+            />
+            {percent && <span aria-hidden="true">%</span>}
+          </span>
         </div>
-        <div className="range-scale" aria-hidden="true">
+        {!percent && <div className="range-scale" aria-hidden="true">
           <span>{formatValue(minimum)}</span>
           <span>{formatValue(maximum)}</span>
-        </div>
+        </div>}
       </div>
     );
   }

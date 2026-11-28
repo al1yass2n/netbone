@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { moveSavedBackbone, shortBackboneLabel, uniqueResultLabel } from "../src/savedBackbones.ts";
+import { loadSource } from "./sourceModule.mjs";
 
-test("saved labels summarize the method and filter in a few characters", () => {
-  assert.equal(shortBackboneLabel({ extraction: { method: "doubly_stochastic", filter: "fraction", filter_parameters: { fraction: 0.25 } } }), "DS 25%");
-  assert.equal(shortBackboneLabel({ extraction: { method: "disparity", filter: "significance", filter_parameters: { alpha: 0.05 } } }), "DF α0.05");
+const { backboneLabel, moveSavedBackbone, uniqueResultLabel } = await loadSource("/src/savedBackbones.ts");
+
+test("saved labels name the method and the filter value in plain words", () => {
+  const extraction = (filter, filter_parameters) => ({ extraction: { method: "doubly_stochastic", filter, filter_parameters } });
+  assert.equal(backboneLabel(extraction("fraction", { fraction: 0.25 }), "Doubly Stochastic"), "Doubly Stochastic · 25%");
+  assert.equal(backboneLabel(extraction("significance", { alpha: 0.05 }), "Doubly Stochastic"), "Doubly Stochastic · p < 0.05");
+  assert.equal(backboneLabel(extraction("threshold", { value: 0.125 }), "Doubly Stochastic"), "Doubly Stochastic · cutoff 0.125");
+  assert.equal(backboneLabel(extraction("default", {})), "Doubly stochastic");
 });
 
 test("label suggestions skip case-insensitive collisions and preserve the server limit", () => {

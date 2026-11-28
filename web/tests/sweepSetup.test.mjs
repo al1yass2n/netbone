@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { compileSweep, newSweepDraft, sweepSettings } from "../src/sweepSetup.ts";
+import { loadSource } from "./sourceModule.mjs";
+
+const { compileSweep, defaultRange, newSweepDraft, plannedRuns, settingRange, sweepSettings, withDirectedOnlyOptions } = await loadSource("/src/sweepSetup.ts");
 
 const environment = { directed: false, weighted: true };
 const method = "link_prediction_iforest";
@@ -27,14 +29,36 @@ const resolved = {
   },
 };
 
-test("the current setting is visible but does not create an unconfirmed sweep", () => {
+test("a new sweep starts with a range of retained fractions it can run at once", () => {
   const draft = newSweepDraft(1, method, "fraction", schema, environment, resolved);
-  assert.equal(draft.name, "Current extraction");
-  assert.deepEqual(draft.variations, [{ id: 1, key: "filter.fraction", text: "0.5" }]);
-  const incomplete = compileSweep([draft], schema, environment);
-  assert.match(incomplete.error, /two or more different values for retained fraction/);
-  assert.equal(incomplete.count, 0);
-  assert.deepEqual(incomplete.configurations, []);
+  assert.equal(draft.name, "Current settings");
+  assert.deepEqual(draft.variations, [{
+    id: 1, key: "filter.fraction", mode: "range", range: { from: "10", to: "90", step: "20" }, text: "10%, 30%, 50%, 70%, 90%",
+  }]);
+  const plan = compileSweep([draft], schema, environment);
+  assert.equal(plan.error, "");
+  assert.equal(plan.count, 5);
+  assert.deepEqual(plan.configurations[0].filter.parameters.fraction, [0.1, 0.3, 0.5, 0.7, 0.9]);
+  assert.deepEqual(plannedRuns([draft], schema, environment), ["Retained fraction: 10%", "Retained fraction: 30%", "Retained fraction: 50%", "Retained fraction: 70%", "Retained fraction: 90%"]);
+});
+
+test("a range is checked against the setting's limits in the units it is typed in", () => {
+  const settings = sweepSettings(newSweepDraft(1, method, "fraction", schema, environment), schema, environment);
+  const fraction = settings.find((setting) => setting.key === "filter.fraction");
+  const trees = settings.find((setting) => setting.key === "method.n_estimators");
+  assert.equal(settingRange({ from: "20", to: "120", step: "50" }, fraction).error, "Use values from 0% to 100%.");
+  assert.equal(settingRange({ from: "50", to: "40", step: "5" }, fraction).error, "To must be at least From.");
+  assert.equal(settingRange({ from: "50", to: "50", step: "5" }, fraction).error, "This range makes only one value.");
+  assert.equal(settingRange({ from: "1", to: "", step: "1" }, fraction).error, "Enter a number for From, To and Step.");
+  assert.equal(settingRange({ from: "10", to: "20", step: "2.5" }, trees).error, "Use whole numbers.");
+  assert.equal(settingRange({ from: "0", to: "60", step: "30" }, trees).error, "Use values of 1 or more.");
+  assert.deepEqual(settingRange({ from: "50", to: "150", step: "50" }, trees), { values: [50, 100, 150], text: "50, 100, 150", error: "" });
+  assert.deepEqual(defaultRange(trees, "100"), { from: "100", to: "200", step: "25" });
+  const draft = newSweepDraft(1, method, "fraction", schema, environment);
+  draft.variations[0] = { ...draft.variations[0], range: { from: "20", to: "120", step: "50" } };
+  assert.equal(compileSweep([draft], schema, environment).error, "Retained fraction: Use values from 0% to 100%.");
+  const other = { ...draft, id: 2, name: "Wide range" };
+  assert.equal(compileSweep([draft, other], schema, environment).error, "Setup 1: Retained fraction: Use values from 0% to 100%.");
 });
 
 test("varying settings cross within a setup and separate fixed setups add one run", () => {
@@ -49,7 +73,7 @@ test("varying settings cross within a setup and separate fixed setups add one ru
   assert.equal(plan.error, "");
   assert.deepEqual(plan.configurations, [
     {
-      name: "Current extraction",
+      name: "Current settings",
       method: { name: method, parameters: { weight: null, similarities: [["preferential_attachment", "shortest_path"]], n_estimators: [30, 60] } },
       filter: { name: "fraction", parameters: { fraction: [0.25, 0.5, 0.75], direction: "lower" } },
     },
@@ -63,6 +87,7 @@ test("varying settings cross within a setup and separate fixed setups add one ru
 
 test("invalid fractions, integer settings, and identical fractions are rejected", () => {
   const draft = newSweepDraft(1, method, "fraction", schema, environment, resolved);
+  draft.variations[0].mode = "list";
   for (const text of ["50%, 110%", "0.25, 50", "0.25, NaN", "0.25, %"]) {
     draft.variations[0].text = text;
     assert.match(compileSweep([draft], schema, environment).error, /valid values for retained fraction/);
@@ -78,14 +103,15 @@ test("cutoffs follow score units and weight-only settings are omitted for unweig
   const unweighted = { ...environment, weighted: false };
   const draft = newSweepDraft(1, method, "threshold", schema, unweighted);
   assert.deepEqual(sweepSettings(draft, schema, unweighted).map((setting) => setting.key), ["filter.value", "method.n_estimators"]);
-  draft.variations[0].text = "-2, 3000";
+  // A cutoff has no fixed bounds, so it starts at 0 and steps by a quarter.
+  assert.equal(draft.variations[0].text, "0, 0.25, 0.5, 0.75, 1");
+  draft.variations[0] = { ...draft.variations[0], mode: "list", text: "-2, 3000" };
   const plan = compileSweep([draft], schema, unweighted);
   assert.equal(plan.count, 2);
   assert.deepEqual(plan.configurations[0].filter.parameters, { value: [-2, 3000] });
 });
 
-test("outgoing and incoming aggregation are offered only on directed networks", async () => {
-  const { withDirectedOnlyOptions } = await import("../src/sweepSetup.ts");
+test("outgoing and incoming aggregation are offered only on directed networks", () => {
   const control = {
     name: "pvalue_aggregation",
     label: "Endpoint p-value",

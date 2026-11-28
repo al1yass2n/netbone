@@ -1,4 +1,5 @@
 import type { ControlSpec, ControlValue, FilterName, JsonRecord, JsonValue, UiSchema, WeightSign } from "./types";
+import { formatPercent } from "./utils";
 
 export type SettingKind = "method" | "filter";
 
@@ -10,8 +11,21 @@ export interface SweepSetting extends ControlSpec {
 export interface SweepVariation {
   id: number;
   key: string;
+  /** Comma-separated values. In range mode it is written from the range. */
   text: string;
+  /** Numeric settings start as a From/To/Step range; "list" takes typed values. */
+  mode?: "range" | "list";
+  range?: SweepRange;
 }
+
+/** A range as typed. A retained fraction is typed in percent. */
+export interface SweepRange {
+  from: string;
+  to: string;
+  step: string;
+}
+
+export const SWEEP_RUN_LIMIT = 100;
 
 export interface SweepDraft {
   id: number;
@@ -107,6 +121,110 @@ export function splitSweepValues(text: string): string[] {
   return text.split(",").map((value) => value.trim()).filter(Boolean);
 }
 
+/** A retained fraction is entered and shown in percent. */
+export function isPercentSetting(setting: Pick<SweepSetting, "kind" | "name">): boolean {
+  return setting.kind === "filter" && setting.name === "fraction";
+}
+
+export function isNumericSetting(setting: SweepSetting): boolean {
+  return settingChoices(setting).length === 0;
+}
+
+/** The values a range makes, or why it makes none. */
+export function rangeValues(range: SweepRange): { values: number[]; error: string } {
+  const texts = [range.from, range.to, range.step];
+  const [from, to, step] = texts.map(Number) as [number, number, number];
+  if (texts.some((text) => !text.trim()) || ![from, to, step].every(Number.isFinite)) {
+    return { values: [], error: "Enter a number for From, To and Step." };
+  }
+  if (step <= 0) return { values: [], error: "Step must be more than 0." };
+  if (to < from) return { values: [], error: "To must be at least From." };
+  const count = Math.floor((to - from) / step + 1e-9) + 1;
+  if (count > SWEEP_RUN_LIMIT) return { values: [], error: `This range makes more than ${SWEEP_RUN_LIMIT} values.` };
+  return { values: Array.from({ length: count }, (_, index) => Number((from + index * step).toPrecision(12))), error: "" };
+}
+
+export function rangeText(range: SweepRange, setting: Pick<SweepSetting, "kind" | "name">): string {
+  return rangeValues(range).values.map((value) => isPercentSetting(setting) ? `${value}%` : String(value)).join(", ");
+}
+
+/** A range checked against the setting's limits, in the units it is typed in. */
+export function settingRange(range: SweepRange, setting: SweepSetting): { values: number[]; text: string; error: string } {
+  const { values, error } = rangeValues(range);
+  if (error) return { values: [], text: "", error };
+  const percent = isPercentSetting(setting);
+  const unit = percent ? "%" : "";
+  const scale = (value: number | undefined) => value === undefined ? undefined : Number((value * (percent ? 100 : 1)).toPrecision(12));
+  const min = scale(setting.min);
+  const max = scale(setting.max);
+  const first = values[0] ?? 0;
+  const last = values.at(-1) ?? 0;
+  if ((min !== undefined && first < min) || (max !== undefined && last > max)) {
+    const limits = min !== undefined && max !== undefined ? `from ${min}${unit} to ${max}${unit}`
+      : min !== undefined ? `of ${min}${unit} or more` : `of ${max}${unit} or less`;
+    return { values: [], text: "", error: `Use values ${limits}.` };
+  }
+  if (setting.step === 1 && values.some((value) => !Number.isInteger(value))) return { values: [], text: "", error: "Use whole numbers." };
+  if (values.length < 2) return { values, text: "", error: "This range makes only one value." };
+  return { values, text: rangeText(range, setting), error: "" };
+}
+
+/** A starting range: the whole scale for shares, common levels for alpha, five steps from the current value otherwise. */
+export function defaultRange(setting: SweepSetting, current: string): SweepRange {
+  if (isPercentSetting(setting)) return { from: "10", to: "90", step: "20" };
+  if (setting.kind === "filter" && setting.name === "alpha") return { from: "0.01", to: "0.05", step: "0.01" };
+  const integer = setting.step === 1;
+  const { min, max } = setting;
+  if (min !== undefined && max !== undefined && max > min) {
+    const step = integer ? Math.max(1, Math.round((max - min) / 5)) : niceNumber((max - min) / 5);
+    const from = integer ? Math.min(max, min + Math.floor(step / 2)) : Number((min + step / 2).toPrecision(12));
+    return { from: String(from), to: String(Number((from + Math.floor((max - from) / step) * step).toPrecision(12))), step: String(step) };
+  }
+  const value = Number(current);
+  const start = Number.isFinite(value) && current.trim() ? value : min ?? 0;
+  // Most scores fall between 0 and 1, so a setting that starts at 0 steps by a quarter.
+  const step = integer ? Math.max(1, Math.round(niceNumber(Math.abs(start) / 4))) : start ? niceNumber(Math.abs(start) / 4) : 0.25;
+  const end = Number((start + 4 * step).toPrecision(12));
+  return { from: String(start), to: String(max === undefined ? end : Math.min(max, end)), step: String(step) };
+}
+
+function niceNumber(value: number): number {
+  if (!(value > 0)) return 1;
+  const power = 10 ** Math.floor(Math.log10(value));
+  return Number((([1, 2, 2.5, 5, 10].find((factor) => factor * power >= value) ?? 10) * power).toPrecision(6));
+}
+
+/** The variation a setting starts with: a range for numbers, the current choice for options. */
+export function variationFor(draft: SweepDraft, setting: SweepSetting, id: number): SweepVariation {
+  const current = fixedText(draft, setting);
+  if (!isNumericSetting(setting)) return { id, key: setting.key, text: current };
+  const range = defaultRange(setting, current);
+  return { id, key: setting.key, text: rangeText(range, setting), mode: "range", range };
+}
+
+/** A value as the person reads it: option labels and percentages. */
+export function formatSweepValue(setting: SweepSetting, value: ControlValue): string {
+  const choice = settingChoices(setting).find((item) => item.value === String(value));
+  if (choice) return choice.label;
+  if (isPercentSetting(setting) && typeof value === "number") return formatPercent(value);
+  return String(value);
+}
+
+/** One line for each run a sweep will make, in the order the server runs them. */
+export function plannedRuns(drafts: SweepDraft[], schema: UiSchema, environment: SweepEnvironment): string[] {
+  return drafts.flatMap((draft) => {
+    const settings = sweepSettings(draft, schema, environment);
+    let runs: string[][] = [[]];
+    for (const variation of draft.variations) {
+      const setting = settings.find((item) => item.key === variation.key);
+      if (!setting) continue;
+      const values = splitSweepValues(variation.text).map((text) => parseSetting(text, setting)).filter((value) => value !== undefined);
+      runs = runs.flatMap((run) => values.map((value) => [...run, `${setting.label}: ${formatSweepValue(setting, value)}`]));
+    }
+    return runs.map((run) => [...(drafts.length > 1 ? [draft.name.trim()] : []), ...run].join(" · ") || draft.name.trim());
+  });
+}
+
 export function fixedText(draft: SweepDraft, setting: SweepSetting): string {
   const initial = setting.kind === "method" ? draft.initialMethodParameters : draft.initialFilterParameters;
   return draft.fixed[setting.key] ?? String(initial?.[setting.name] ?? setting.default ?? "");
@@ -117,7 +235,7 @@ export function initialVariation(draft: SweepDraft, settings: SweepSetting[]): S
   const setting = settings.find((item) => item.kind === "filter" && item.name === preferred)
     ?? settings.find((item) => item.kind === "method" && !item.advanced)
     ?? settings[0];
-  return setting ? [{ id: 1, key: setting.key, text: fixedText(draft, setting) }] : [];
+  return setting ? [variationFor(draft, setting, 1)] : [];
 }
 
 export function newSweepDraft(
@@ -135,7 +253,7 @@ export function newSweepDraft(
   const initialFilterParameters = methodConfig?.name === method && filterConfig?.name === filter ? record(filterConfig.parameters) : undefined;
   const draft = {
     id,
-    name: initialFilterParameters ? "Current extraction" : "Setup " + id,
+    name: initialFilterParameters ? "Current settings" : "Setup " + id,
     method,
     filter,
     fixed: {},
@@ -180,6 +298,8 @@ export function compileSweepDraft(draft: SweepDraft, settings: SweepSetting[]) {
     if (!setting) return { count: 0, error: "Choose which setting to vary." } as const;
     if (seen.has(setting.key)) return { count: 0, error: "Choose each varying setting only once." } as const;
     seen.add(setting.key);
+    const rangeError = variation.mode === "range" && variation.range ? settingRange(variation.range, setting).error : "";
+    if (rangeError) return { count: 0, error: setting.label + ": " + rangeError } as const;
     const parsed = splitSweepValues(variation.text).map((text) => parseSetting(text, setting));
     if (parsed.some((value) => value === undefined)) {
       return { count: 0, error: "Enter valid values for " + setting.label.toLowerCase() + "." } as const;
@@ -224,7 +344,8 @@ export function compileSweep(drafts: SweepDraft[], schema: UiSchema, environment
     if (names.has(name)) return { configurations: [], count: 0, error: "Give each setup a different name." };
     names.add(name);
     const compiled = compileSweepDraft(draft, sweepSettings(draft, schema, environment));
-    if (!compiled.configuration) return { configurations: [], count: 0, error: name + ": " + compiled.error };
+    // With one setup its name adds nothing to the message.
+    if (!compiled.configuration) return { configurations: [], count: 0, error: (drafts.length > 1 ? name + ": " : "") + compiled.error };
     configurations.push(compiled.configuration);
     count += compiled.count;
   }

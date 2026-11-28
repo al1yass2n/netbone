@@ -222,6 +222,8 @@ export interface FilterPreview {
   backbone_edge_count: number;
   original_edge_count: number;
   backbone_component_count: number;
+  /** Nodes in the backbone graph with no backbone edge. Each one is also a component. */
+  backbone_isolated_node_count?: number;
   backbone_node_fraction: number;
   node_coverage_count: number;
   node_coverage_fraction: number;

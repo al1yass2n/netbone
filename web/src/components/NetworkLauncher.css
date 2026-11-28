@@ -16,8 +16,8 @@
 .app-shell--launcher[data-theme="light"] {
   --launcher-ink: #20343c;
   --launcher-muted: #495f68;
-  --launcher-accent: #11685d;
-  --launcher-accent-hover: #0c574e;
+  --launcher-accent: #0f766e;
+  --launcher-accent-hover: #0b5f58;
   --launcher-accent-ink: #fff;
   --launcher-network: #4d707d;
   --launcher-route: #536e7e;

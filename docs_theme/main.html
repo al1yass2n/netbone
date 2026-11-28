@@ -62,6 +62,15 @@
   {% endif %}
 {% endmacro %}
 
+{% block site_meta %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if page and page.is_homepage %}<meta name="description" content="{{ config.site_description }}">{% endif %}
+  {% if config.site_author %}<meta name="author" content="{{ config.site_author }}">{% endif %}
+  {% if page and page.canonical_url %}<link rel="canonical" href="{{ page.canonical_url }}">{% endif %}
+  <link rel="icon" type="image/svg+xml" href="{{ 'assets/netbone-logo.svg' | url }}">
+{% endblock %}
+
 {% block extrahead %}
   <script src="{{ 'assets/docs-theme.js' | url }}"></script>
 {% endblock %}
@@ -69,7 +78,7 @@
 {% block site_name %}
   <a class="docs-skip" href="#docs-content">Skip to content</a>
   <a class="navbar-brand docs-brand" href="{{ nav.homepage.url | url }}">
-    <span class="docs-brand-icon">{{ icon("diagram-project") }}</span>
+    <img class="docs-brand-icon" src="{{ 'assets/netbone-logo.svg' | url }}" alt="" width="36" height="36">
     {{ config.site_name }}
   </a>
 {% endblock %}

@@ -57,6 +57,23 @@ ported. It adds:
 - Edge lists and event lists can be separated by spaces. Pass
   `delimiter=" "` in Python, or pick **Space** in the web app, which also
   detects such files. Any run of spaces or tabs counts as one separator.
+- The web app has a new look and fewer steps. The filter is a switch on the
+  analysis page, with the method's recommended filter selected. Compare and
+  Sweep open from the bar at the bottom of the analysis, and **Back to
+  analysis** returns. A comparison runs as soon as two backbones are ticked,
+  and a sweep starts with a ready range of values and runs in one step. The
+  method picker groups methods by family and shows each one's goal, tags and
+  source. The network preview uses a force layout. Tables hide id columns,
+  page through long results and mark rows as Kept or Dropped. Retained
+  fractions read as percentages, run settings are listed in plain words,
+  charts use round axis ticks, and each screen has one **Download** menu.
+- The web app follows the system's light or dark setting. The theme button
+  switches to the other theme and remembers the choice; switching back to the
+  system's theme follows the system again. Colors are calmer gray with one
+  teal accent, and small text is one step larger. Charts follow the dark
+  theme on screen, while downloaded figures keep light colors. The app has a
+  new logo, an N drawn from four nodes, which is also the browser tab icon.
+  The documentation site uses the same colors and logo.
 
 **Stricter input checks**
 

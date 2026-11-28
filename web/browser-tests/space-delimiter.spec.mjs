@@ -17,6 +17,6 @@ test("a space-separated edge list is detected and loaded", async ({ page }) => {
   await mapping.getByRole("button", { name: "Use this mapping" }).click();
   await expect(mapping).toBeHidden();
   const summary = page.getByLabel("Network summary");
-  await expect(summary).toContainText(/Nodes\s*4/);
-  await expect(summary).toContainText(/Edges\s*3/);
+  await expect(summary).toContainText(/4\s*nodes/);
+  await expect(summary).toContainText(/3\s*edges/);
 });

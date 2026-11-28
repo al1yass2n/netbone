@@ -1,5 +1,7 @@
 import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { rankTicks } from "../chart";
+import { formatMetric, metricLabel } from "../labels";
 import type { AlignmentRecord, MetricRecord } from "../types";
 import { formatValue } from "../utils";
 
@@ -23,14 +25,16 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
     const [view, setView] = useState({ xMin: 1, xMax: maximum, yMin: 1, yMax: maximum });
     const drag = useRef<{ x: number; y: number; view: typeof view } | null>(null);
     useEffect(() => setView({ xMin: 1, xMax: maximum, yMin: 1, yMax: maximum }), [alignment, maximum]);
-    const xTicks = ticks(view.xMin, view.xMax);
-    const yTicks = ticks(view.yMin, view.yMax);
+    const xTicks = rankTicks(view.xMin, view.xMax);
+    const yTicks = rankTicks(view.yMin, view.yMax);
     const titleId = "score-alignment-title";
     const descriptionId = "score-alignment-description";
     const title = `${alignment.result_a} and ${alignment.result_b}`;
     const description = "Each mark is one aligned item. Points near the diagonal have similar importance ranks in both methods.";
-    const scaleX = (rank: number) => margin.left + ((rank - view.xMin) / Math.max(1, view.xMax - view.xMin)) * plotWidth;
-    const scaleY = (rank: number) => margin.top + plotHeight - ((rank - view.yMin) / Math.max(1, view.yMax - view.yMin)) * plotHeight;
+    // Dots at the first and last rank stay whole inside the plot.
+    const inset = 8;
+    const scaleX = (rank: number) => margin.left + inset + ((rank - view.xMin) / Math.max(1, view.xMax - view.xMin)) * (plotWidth - 2 * inset);
+    const scaleY = (rank: number) => margin.top + plotHeight - inset - ((rank - view.yMin) / Math.max(1, view.yMax - view.yMin)) * (plotHeight - 2 * inset);
 
     function zoom(factor: number, centerX = (view.xMin + view.xMax) / 2, centerY = (view.yMin + view.yMax) / 2) {
       if (maximum <= 1) return;
@@ -94,20 +98,20 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
         >
         <title id={titleId}>{title}</title>
         <desc id={descriptionId}>{description}</desc>
-        <rect width={width} height={height} fill="#ffffff" />
-        <text x={24} y={34} fill="#172033" fontSize={22} fontWeight={750}>Importance-rank alignment</text>
-        <text x={24} y={59} fill="#64748b" fontSize={13}>{title}</text>
-        <text x={24} y={82} fill="#475569" fontSize={12}>
+        <rect className="figure-paper" width={width} height={height} fill="#ffffff" />
+        <text className="figure-ink" x={24} y={34} fill="#1a1f25" fontSize={22} fontWeight={750}>Importance-rank alignment</text>
+        <text className="figure-muted" x={24} y={59} fill="#5d6670" fontSize={13}>{title}</text>
+        <text className="figure-soft" x={24} y={82} fill="#3f4750" fontSize={12}>
           {alignment.points.length} aligned {alignment.target === "node" ? "nodes" : "edges"}
-          {spearman?.status === "ok" && Number.isFinite(spearman.value) ? ` · Spearman ${formatValue(spearman.value)}` : ""}
-          {overlap?.status === "ok" && Number.isFinite(overlap.value) ? ` · Backbone Jaccard ${formatValue(overlap.value)}` : ""}
+          {spearman?.status === "ok" && Number.isFinite(spearman.value) ? ` · ${metricLabel("score_spearman")} ${formatMetric("score_spearman", spearman.value)}` : ""}
+          {overlap?.status === "ok" && Number.isFinite(overlap.value) ? ` · ${metricLabel(overlap.metric)} ${formatMetric(overlap.metric, overlap.value)}` : ""}
         </text>
         {xTicks.map((tick) => {
           const x = scaleX(tick);
           return (
             <g key={`x-${tick}`}>
-              <line x1={x} y1={margin.top} x2={x} y2={margin.top + plotHeight} stroke="#e2e8f0" />
-              <text x={x} y={margin.top + plotHeight + 24} fill="#64748b" fontSize={11} textAnchor="middle">{formatValue(tick)}</text>
+              <line className="figure-grid" x1={x} y1={margin.top} x2={x} y2={margin.top + plotHeight} stroke="#eceef1" />
+              <text className="figure-muted" x={x} y={margin.top + plotHeight + 24} fill="#5d6670" fontSize={11} textAnchor="middle">{formatValue(tick)}</text>
             </g>
           );
         })}
@@ -115,33 +119,28 @@ export const ScoreAlignmentFigure = forwardRef<SVGSVGElement, ScoreAlignmentFigu
           const y = scaleY(tick);
           return (
             <g key={`y-${tick}`}>
-              <line x1={margin.left} y1={y} x2={margin.left + plotWidth} y2={y} stroke="#e2e8f0" />
-              <text x={margin.left - 14} y={y + 4} fill="#64748b" fontSize={11} textAnchor="end">{formatValue(tick)}</text>
+              <line className="figure-grid" x1={margin.left} y1={y} x2={margin.left + plotWidth} y2={y} stroke="#eceef1" />
+              <text className="figure-muted" x={margin.left - 14} y={y + 4} fill="#5d6670" fontSize={11} textAnchor="end">{formatValue(tick)}</text>
             </g>
           );
         })}
         <defs><clipPath id="alignment-plot-clip"><rect x={margin.left} y={margin.top} width={plotWidth} height={plotHeight} /></clipPath></defs>
         <g clipPath="url(#alignment-plot-clip)">
-          <line x1={scaleX(Math.max(view.xMin, view.yMin))} y1={scaleY(Math.max(view.xMin, view.yMin))} x2={scaleX(Math.min(view.xMax, view.yMax))} y2={scaleY(Math.min(view.xMax, view.yMax))} stroke="#94a3b8" strokeDasharray="6 6" />
+          <line className="figure-axis" x1={scaleX(Math.max(view.xMin, view.yMin))} y1={scaleY(Math.max(view.xMin, view.yMin))} x2={scaleX(Math.min(view.xMax, view.yMax))} y2={scaleY(Math.min(view.xMax, view.yMax))} stroke="#c6ccd3" strokeDasharray="6 6" />
           {alignment.points.map((point, index) => (
-            <circle key={index} cx={scaleX(point.importance_rank_a)} cy={scaleY(point.importance_rank_b)} r={5.5} fill="#0072b2" fillOpacity={0.66} stroke="#ffffff" strokeWidth={1}>
+            <circle className="figure-series-0 figure-ring" key={index} cx={scaleX(point.importance_rank_a)} cy={scaleY(point.importance_rank_b)} r={5.5} fill="#0f766e" fillOpacity={0.66} stroke="#ffffff" strokeWidth={1}>
               <title>{pointLabel(point)}; {alignment.result_a}: value {formatValue(point.value_a)}, rank {formatValue(point.importance_rank_a)}; {alignment.result_b}: value {formatValue(point.value_b)}, rank {formatValue(point.importance_rank_b)}</title>
             </circle>
           ))}
         </g>
-        <text x={margin.left + plotWidth / 2} y={height - 28} fill="#334155" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_a} importance rank</text>
-        <text transform={`translate(27 ${margin.top + plotHeight / 2}) rotate(-90)`} fill="#334155" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_b} importance rank</text>
-        <text x={margin.left + plotWidth} y={height - 8} fill="#64748b" fontSize={11} textAnchor="end">Higher rank means greater importance</text>
+        <text className="figure-soft" x={margin.left + plotWidth / 2} y={height - 28} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_a} importance rank</text>
+        <text className="figure-soft" transform={`translate(27 ${margin.top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{alignment.result_b} importance rank</text>
+        <text className="figure-muted" x={margin.left + plotWidth} y={height - 8} fill="#5d6670" fontSize={11} textAnchor="end">Higher rank means greater importance</text>
         </svg>
       </div>
     );
   },
 );
-
-function ticks(minimum: number, maximum: number): number[] {
-  if (minimum === maximum) return [minimum];
-  return Array.from({ length: 6 }, (_, index) => minimum + ((maximum - minimum) * index) / 5);
-}
 
 function zoomAxis(minimum: number, maximum: number, center: number, factor: number, limit: number): [number, number] {
   const minimumRange = Math.max(1, (limit - 1) / 100);

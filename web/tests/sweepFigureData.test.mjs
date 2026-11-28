@@ -56,9 +56,21 @@ test("run names include both changing settings and omit settings fixed within ea
     run.varied_parameters.method_parameters = { endpoint_rule: index === 1 ? "maximum" : "minimum", weight: "weight" };
   }
   const labels = sweepRunLabels(changed);
-  assert.equal(labels.get(1), "First setup · endpoint rule = minimum · retained fraction = 20%");
-  assert.equal(labels.get(2), "First setup · endpoint rule = maximum · retained fraction = 40%");
-  assert.equal(labels.get(3), "Second setup · retained fraction = 20%");
+  assert.equal(labels.get(1), "First setup · Endpoint rule: minimum · Retained fraction: 20%");
+  assert.equal(labels.get(2), "First setup · Endpoint rule: maximum · Retained fraction: 40%");
+  assert.equal(labels.get(3), "Second setup · Retained fraction: 20%");
+  // The schema's own names replace the fallbacks.
+  assert.equal(sweepRunLabels(changed, (scope, name) => name === "endpoint_rule" ? "Rule at each end" : undefined).get(2),
+    "First setup · Rule at each end: maximum · Retained fraction: 40%");
   assert.equal(trajectoryRows(changed, "filter.fraction", "edge_retention")[0].runLabel, labels.get(1));
   assert.equal(tradeoffRows(changed, "edge_retention", "connected_component_count")[1].runLabel, labels.get(2));
+});
+
+test("a sweep with one setup names its runs by the values alone", () => {
+  const single = structuredClone(sweep);
+  single.runs = single.runs.slice(0, 2);
+  single.setup_names = { first_a: "Current settings", first_b: "Current settings" };
+  const labels = sweepRunLabels(single);
+  assert.equal(labels.get(1), "Retained fraction: 20%");
+  assert.equal(labels.get(2), "Retained fraction: 40%");
 });

@@ -11,6 +11,31 @@ test("the citation footer links to the published paper in both themes", async ({
   await expect(footer).toContainText("Yassin et al.");
 });
 
+test("the theme follows the system until someone picks the other one", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/");
+  const shell = page.locator(".app-shell");
+  await expect(shell).toHaveAttribute("data-theme", "dark");
+  // The page behind the app matches, so no light edge shows when scrolling past the end.
+  await expect(page.locator("html")).toHaveCSS("background-color", "rgb(19, 21, 24)");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(shell).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("html")).toHaveCSS("background-color", "rgb(244, 245, 247)");
+
+  // A pick that differs from the system is remembered and wins over the system.
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(shell).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(shell).toHaveAttribute("data-theme", "dark");
+
+  // Picking the system's own theme again goes back to following the system.
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect(shell).toHaveAttribute("data-theme", "light");
+  expect(await page.evaluate(() => localStorage.getItem("netbone-theme"))).toBeNull();
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(shell).toHaveAttribute("data-theme", "dark");
+});
+
 test("the launcher keeps the full word visible and highlights it under reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");

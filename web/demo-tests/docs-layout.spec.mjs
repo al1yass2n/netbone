@@ -84,7 +84,7 @@ test("choose light or dark and reset the docs theme to the system setting", asyn
   const html = page.locator("html");
   await expect(theme).toHaveValue("system");
   await expect(html).toHaveAttribute("data-bs-theme", "dark");
-  await expect(page.locator(".navbar")).toHaveCSS("background-color", "rgb(21, 25, 29)");
+  await expect(page.locator(".navbar")).toHaveCSS("background-color", "rgb(19, 21, 24)");
 
   await theme.selectOption("light");
   await expect(html).toHaveAttribute("data-bs-theme", "light");
@@ -98,7 +98,7 @@ test("choose light or dark and reset the docs theme to the system setting", asyn
   await page.reload();
   await expect(theme).toHaveValue("dark");
   await expect(html).toHaveAttribute("data-bs-theme", "dark");
-  await expect(page.locator(".codehilite").first()).toHaveCSS("background-color", "rgb(28, 34, 39)");
+  await expect(page.locator(".codehilite").first()).toHaveCSS("background-color", "rgb(27, 30, 34)");
   await expect(page.locator(".codehilite .s2").first()).toHaveCSS("color", "rgb(230, 219, 116)");
 
   await theme.selectOption("system");

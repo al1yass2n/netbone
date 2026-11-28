@@ -1,14 +1,18 @@
 import { expect, test } from "@playwright/test";
-import { expectZip } from "./downloads.mjs";
+import { downloadedSettings, expectZip } from "./downloads.mjs";
 
 async function openMethods(page) {
   await page.getByRole("button", { name: "Choose method", exact: true }).click();
   return page.getByRole("dialog", { name: "Choose a scoring method" });
 }
 
+function chooseFilter(page, name) {
+  return page.getByRole("radiogroup", { name: "Filter" }).getByRole("radio", { name }).check();
+}
+
 async function selectAndInspect(page, method, filter) {
   await method.click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: filter }).click();
+  await chooseFilter(page, filter);
   await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Inspect & export" }).click();
   return page.getByRole("dialog", { name: "Inspect & export" });
@@ -17,30 +21,31 @@ async function selectAndInspect(page, method, filter) {
 async function compareAndSweep(page) {
   const save = page.getByRole("button", { name: "Save this backbone" });
   const fraction = page.getByRole("spinbutton", { name: /Retained fraction/ });
-  for (const value of ["0.25", "0.75"]) {
+  for (const value of ["25", "75"]) {
     await fraction.fill(value);
     await fraction.press("Tab");
     await save.click();
     await expect(page.getByRole("button", { name: "Backbone saved" })).toBeVisible();
   }
-  await page.getByRole("button", { name: "Compare", exact: true }).click();
-  await page.getByRole("button", { name: "Compare 2 backbones" }).click();
-  const exportButton = page.getByRole("button", { name: "Export full experiment" });
-  await expectZip(page, exportButton, "netbone-comparison-experiment.zip");
+  // The comparison runs as soon as the page opens with two saved backbones.
+  await page.getByRole("button", { name: "Compare 2 saved backbones" }).click();
+  await expect(page.getByRole("button", { name: "Overlap & agreement" })).toBeVisible();
+  await expectZip(page, page.getByRole("main"), "netbone-comparison-experiment.zip");
   await page.getByRole("button", { name: "Back to analysis" }).click();
 
   await page.getByRole("button", { name: /^Sweep:/ }).click();
-  await page.getByRole("combobox", { name: "Setting 1" }).selectOption("filter.fraction");
-  await page.getByRole("textbox", { name: /Values for retained fraction/ }).fill("25%, 75%");
-  await page.getByRole("button", { name: "Review runs" }).click();
-  const response = page.waitForResponse((result) =>
-    new URL(result.url()).pathname === "/api/sweep" && result.request().postDataJSON().preview_only === false,
-  );
-  await page.getByRole("button", { name: "Run 2 configurations" }).click();
+  // A sweep starts by varying the retained fraction, so only the range needs typing.
+  await expect(page.getByRole("combobox", { name: "Setting", exact: true })).toHaveValue("filter.fraction");
+  await page.getByRole("spinbutton", { name: /^From/ }).fill("25");
+  await page.getByRole("spinbutton", { name: /^To/ }).fill("75");
+  await page.getByRole("spinbutton", { name: /^Step/ }).fill("50");
+  await expect(page.getByText("2 values: 25%, 75%")).toBeVisible();
+  const response = page.waitForResponse((result) => new URL(result.url()).pathname === "/api/sweep");
+  await page.getByRole("button", { name: "Run sweep" }).click();
   const sweep = await (await response).json();
   expect(sweep.runs.map((run) => run.status)).toEqual(["ok", "ok"]);
   await expect(page.getByRole("heading", { name: "Sweep results" })).toBeVisible();
-  await expectZip(page, exportButton, "netbone-sweep-experiment.zip");
+  await expectZip(page, page.getByRole("main"), "netbone-sweep-experiment.zip");
 }
 
 test("an unweighted CSV blocks weight-only methods and extracts with Node Degree", async ({ page }) => {
@@ -65,8 +70,7 @@ test("an unweighted CSV blocks weight-only methods and extracts with Node Degree
   const table = inspect.getByRole("table", { name: "Method statistics" });
   await expect(table.getByRole("columnheader", { name: "Node", exact: true })).toBeVisible();
   await expect(table.getByRole("columnheader", { name: "Weight", exact: true })).toHaveCount(0);
-  await inspect.getByRole("tab", { name: "Export" }).click();
-  await expectZip(page, inspect.getByRole("button", { name: "Download ZIP" }), "netbone-node-degree-experiment.zip");
+  await expectZip(page, inspect, "netbone-node-degree-experiment.zip");
   await inspect.getByRole("button", { name: "Close" }).click();
   await compareAndSweep(page);
 });
@@ -91,13 +95,10 @@ test("a directed temporal example aggregates events and enables Disparity", asyn
   await expect(undirectedOnly).toContainText("Not available for directed networks");
   const inspect = await selectAndInspect(page, methods.getByRole("button", { name: /^Disparity / }), /^Significance/);
   await expect(inspect.getByRole("columnheader", { name: "Weight", exact: true })).toBeVisible();
-  await inspect.getByText("View run settings", { exact: true }).click();
-  await expect(inspect.locator("pre")).toContainText('"temporal_aggregation"');
-  await inspect.getByRole("tab", { name: "Export" }).click();
-  await expectZip(page, inspect.getByRole("button", { name: "Download ZIP" }), "netbone-disparity-experiment.zip");
+  expect(JSON.stringify(await downloadedSettings(page, inspect))).toContain('"temporal_aggregation"');
+  await expectZip(page, inspect, "netbone-disparity-experiment.zip");
   await inspect.getByRole("button", { name: "Close" }).click();
-  await page.getByRole("button", { name: "Change filter" }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  await chooseFilter(page, "Keep a fraction");
   await compareAndSweep(page);
 });
 
@@ -107,15 +108,14 @@ test("Noise Corrected applies the published cutoff and allows it to be changed",
   await page.getByRole("button", { name: /^Weighted relationships / }).click();
   const methods = await openMethods(page);
   await methods.getByRole("button", { name: /^Noise Corrected / }).click();
-  const filters = page.getByRole("dialog", { name: "Choose a filter" });
-  await filters.getByRole("button", { name: /^Score cutoff Recommended/ }).click();
+  await expect(page.getByRole("radio", { name: "Score cutoff" })).toBeChecked();
+  await expect(page.locator(".filter-description")).toContainText("Recommended");
   const cutoff = page.getByRole("spinbutton", { name: "Standard deviation cutoff" });
   await expect(cutoff).toHaveValue("1.64");
   await cutoff.fill("2.32");
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
-  await inspect.getByText("View run settings", { exact: true }).click();
-  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  const configuration = await downloadedSettings(page, inspect);
   expect(configuration.filter.parameters).toMatchObject({ value: 2.32, operator: "greater" });
 });
 
@@ -154,7 +154,7 @@ test("Node Strength offers in, out and total strength on directed networks", asy
   await page.getByRole("button", { name: /^Weighted relationships / }).click();
   const methods = await openMethods(page);
   await methods.getByRole("button", { name: /^Node Strength / }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  await chooseFilter(page, "Keep a fraction");
   const status = page.locator("span.visually-hidden[role=status][aria-atomic=true]");
   const openScoringSettings = async () => {
     const details = page.locator("details.analysis-score-settings");
@@ -179,12 +179,12 @@ test("Node Strength offers in, out and total strength on directed networks", asy
   await expect(inStrength).toBeEnabled();
   await inStrength.check();
   await page.getByRole("button", { name: "Compute scores" }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  // New scores keep the filter that was chosen before.
+  await expect(page.getByRole("radio", { name: "Keep a fraction" })).toBeChecked();
   await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
-  await inspect.getByText("View run settings", { exact: true }).click();
-  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  const configuration = await downloadedSettings(page, inspect);
   expect(configuration.method.parameters).toMatchObject({ direction: "in" });
 });
 
@@ -194,7 +194,7 @@ test("outgoing-only and incoming-only aggregation unlock on directed networks", 
   await page.getByRole("button", { name: /^Weighted relationships / }).click();
   const methods = await openMethods(page);
   await methods.getByRole("button", { name: /^Disparity / }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await chooseFilter(page, "Significance");
   const status = page.locator("span.visually-hidden[role=status][aria-atomic=true]");
   const openScoringSettings = async () => {
     const details = page.locator("details.analysis-score-settings");
@@ -221,12 +221,11 @@ test("outgoing-only and incoming-only aggregation unlock on directed networks", 
   await expect(incoming).toBeEnabled();
   await incoming.check();
   await page.getByRole("button", { name: "Compute scores" }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await expect(page.getByRole("radio", { name: "Significance" })).toBeChecked();
   await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
-  await inspect.getByText("View run settings", { exact: true }).click();
-  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  const configuration = await downloadedSettings(page, inspect);
   expect(configuration.method.parameters).toMatchObject({ pvalue_aggregation: "in" });
 });
 
@@ -236,7 +235,7 @@ test("seeded random ties show a seed box and Holm correction is offered", async 
   await page.getByRole("button", { name: /^Weighted relationships / }).click();
   const methods = await openMethods(page);
   await methods.getByRole("button", { name: /^Edge Weight / }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Keep a fraction/ }).click();
+  await chooseFilter(page, "Keep a fraction");
   const openAdvancedFilters = async () => {
     const advanced = page.locator("details.advanced-options").filter({ hasText: "Advanced filter options" });
     if (!(await advanced.evaluate((element) => element.open))) await advanced.locator("summary").click();
@@ -250,8 +249,7 @@ test("seeded random ties show a seed box and Holm correction is offered", async 
   await expect(page.getByLabel("Retention preview").getByText("Backbone edges", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Inspect & export" }).click();
   const inspect = page.getByRole("dialog", { name: "Inspect & export" });
-  await inspect.getByText("View run settings", { exact: true }).click();
-  const configuration = JSON.parse(await inspect.locator("pre").textContent());
+  const configuration = await downloadedSettings(page, inspect);
   expect(configuration.filter.parameters).toMatchObject({ tie_policy: "random_seeded", random_seed: 7 });
   await inspect.getByRole("button", { name: "Close" }).click();
 
@@ -259,7 +257,7 @@ test("seeded random ties show a seed box and Holm correction is offered", async 
   await expect(seed).toHaveCount(0);
   await page.getByRole("button", { name: "Change method" }).click();
   await page.getByRole("dialog", { name: "Choose a scoring method" }).getByRole("button", { name: /^Disparity / }).click();
-  await page.getByRole("dialog", { name: "Choose a filter" }).getByRole("button", { name: /^Significance/ }).click();
+  await chooseFilter(page, "Significance");
   await openAdvancedFilters();
   const correction = page.getByRole("combobox", { name: "Correction" });
   await correction.selectOption("holm");

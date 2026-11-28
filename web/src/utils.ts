@@ -187,9 +187,10 @@ export function buildPayload(
   return payload;
 }
 
+/** 0.25 → "25%", 0.11538 → "11.5%". */
 export function formatPercent(value: unknown): string {
   const number = Number(value);
-  return Number.isFinite(number) ? `${(number * 100).toFixed(1)}%` : "Not available";
+  return Number.isFinite(number) ? `${Number((number * 100).toFixed(1))}%` : "Not available";
 }
 
 export function formatValue(value: unknown): string {
