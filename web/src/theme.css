@@ -9,44 +9,54 @@
 
 .app-shell[data-theme] {
   /* Colours */
-  --canvas: #f3f6f5;
+  --canvas: #f4f5f7;
   --panel: #ffffff;
-  --subtle: #f7f9f8;
-  --track: #e6edea;
-  --line: #dde5e2;
-  --line-strong: #c3cfcb;
-  --ink: #16302b;
-  --ink-soft: #41534e;
-  --muted: #586863;
-  --accent: #136b56;
-  --accent-hover: #0e5745;
-  --accent-soft: #e4f2ec;
-  --accent-soft-ink: #0e5745;
+  --subtle: #f8f9fa;
+  --track: #eceef1;
+  --line: #e1e4e8;
+  --line-strong: #c6ccd3;
+  --ink: #1a1f25;
+  --ink-soft: #3f4750;
+  --muted: #5d6670;
+  /* The accent marks the main action, the current choice and backbone data, and nothing else. */
+  --accent: #0f766e;
+  --accent-hover: #0b5f58;
+  --accent-soft: #e6f3f1;
+  --accent-soft-ink: #0b5f58;
   --on-accent: #ffffff;
+  /* Filled buttons and switches. Dark mode keeps them deep so they do not glow. */
+  --primary: var(--accent);
+  --primary-hover: var(--accent-hover);
+  --on-primary: var(--on-accent);
+  --hint-surface: #1f2328;
+  --hint-ink: #ffffff;
+  --hint-line: transparent;
   --second: #c2410c;
   --graph-3: #6d4fc2;
   --graph-4: #a16207;
   --graph-5: #1d6fa5;
   --graph-6: #be185d;
-  --edge-dropped: #c4cfcb;
-  --node-isolated: #9aa8a5;
+  --edge-dropped: #c8cdd3;
+  --node-isolated: #9aa1a9;
   --danger: #b42318;
   --danger-soft: #fdecea;
   --warning-ink: #6b4500;
   --warning-soft: #fff6e0;
   --warning-line: #f1dca4;
-  --focus: #136b56;
-  --shadow: 0 1px 2px rgb(22 48 43 / 6%);
-  --shadow-dialog: 0 24px 60px rgb(10 30 26 / 28%);
-  --scrim: rgb(22 48 43 / 42%);
+  --focus: #0f766e;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%);
+  --shadow-raised: 0 1px 2px rgb(16 24 40 / 12%);
+  --shadow-menu: 0 10px 30px rgb(16 24 40 / 14%);
+  --shadow-dialog: 0 24px 60px rgb(16 24 40 / 24%);
+  --scrim: rgb(16 22 30 / 45%);
 
   /* Shape and type */
   --radius-control: 8px;
   --radius-card: 12px;
   --radius-pill: 999px;
   --control-height: 44px;
-  --text-small: 0.8125rem;
-  --text-control: 0.875rem;
+  --text-small: 0.875rem;
+  --text-control: 0.9375rem;
   --button-radius: var(--radius-control);
   --button-height: var(--control-height);
 
@@ -80,9 +90,9 @@
   --analysis-error-border: #e7a5ad;
   --dialog-header: var(--panel);
   --dialog-disabled: var(--track);
-  --dialog-action: var(--accent);
-  --dialog-action-hover: var(--accent-hover);
-  --dialog-action-ink: var(--on-accent);
+  --dialog-action: var(--primary);
+  --dialog-action-hover: var(--primary-hover);
+  --dialog-action-ink: var(--on-primary);
   --dialog-selected-line: var(--accent);
   --dialog-warning-surface: var(--warning-soft);
   --dialog-warning-ink: var(--warning-ink);
@@ -92,7 +102,7 @@
   --button-green-ink: var(--accent-soft-ink);
   --button-green-fill: var(--accent-soft);
   --button-green-border: var(--accent);
-  --button-green-hover: #d3eadf;
+  --button-green-hover: #d8ecea;
   color-scheme: light;
   color: var(--ink);
   background: var(--canvas);
@@ -100,41 +110,57 @@
 }
 
 .app-shell[data-theme="dark"] {
-  --canvas: #14191b;
-  --panel: #1c2326;
-  --subtle: #20282b;
-  --track: #283236;
-  --line: #323d41;
-  --line-strong: #56656a;
-  --ink: #eef3f1;
-  --ink-soft: #c9d4d0;
-  --muted: #a9b7b3;
-  --accent: #6fd4bb;
-  --accent-hover: #93e2cf;
-  --accent-soft: #1d3a33;
-  --accent-soft-ink: #a9eedb;
+  --canvas: #131518;
+  --panel: #1b1e22;
+  --subtle: #1f2226;
+  --track: #292d32;
+  --line: #30353b;
+  --line-strong: #545b63;
+  --ink: #eceef1;
+  --ink-soft: #c4c9cf;
+  --muted: #9fa6ae;
+  --accent: #5cc2b5;
+  --accent-hover: #7fd0c5;
+  --accent-soft: #17302d;
+  --accent-soft-ink: #9edfd5;
   --on-accent: #0b2420;
+  --primary: #137d76;
+  --primary-hover: #106c66;
+  --on-primary: #ffffff;
+  --hint-surface: #2a2f35;
+  --hint-ink: var(--ink);
+  --hint-line: var(--line-strong);
   --second: #f28c5a;
   --graph-3: #b5a2f0;
   --graph-4: #e3b341;
   --graph-5: #79b8e8;
   --graph-6: #f08bb8;
-  --edge-dropped: #4b585c;
-  --node-isolated: #7d8b88;
+  --edge-dropped: #4a5057;
+  --node-isolated: #7c838b;
   --danger: #ffb4ab;
   --danger-soft: #3b2422;
   --warning-ink: #f5d9a8;
   --warning-soft: #352b1d;
   --warning-line: #6b5530;
-  --focus: #6fd4bb;
+  --focus: #5cc2b5;
   --shadow: none;
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-menu: 0 10px 30px rgb(0 0 0 / 45%);
   --shadow-dialog: 0 24px 60px rgb(0 0 0 / 50%);
-  --scrim: rgb(5 10 9 / 70%);
+  --scrim: rgb(6 8 10 / 70%);
   --analysis-error-border: #80534f;
   --dialog-error-line: #9d5662;
-  --button-green-hover: #244a40;
+  --button-green-hover: #1d3936;
   color-scheme: dark;
 }
+
+/* The page behind the app and the loading screen follow the app's theme. */
+:root { color-scheme: light; background: #f4f5f7; color: #1a1f25; }
+:root[data-theme="dark"] { color-scheme: dark; background: #131518; color: #eceef1; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) { color-scheme: dark; background: #131518; color: #eceef1; }
+}
+.boot-state { background: none; color: inherit; }
 
 /* Layout surfaces: one page background everywhere, white cards on top. */
 .app-shell[data-theme]:not(.app-shell--launcher) {
@@ -240,7 +266,7 @@
 .app-shell[data-theme] .segmented > :is([aria-current="page"], [aria-pressed="true"], [aria-selected="true"], .is-active) {
   background: var(--panel);
   color: var(--ink);
-  box-shadow: 0 1px 2px rgb(22 48 43 / 14%);
+  box-shadow: var(--shadow-raised);
 }
 
 .app-shell[data-theme] .segmented > :is(a, button):disabled { color: var(--muted); opacity: 0.55; cursor: not-allowed; }
@@ -254,8 +280,8 @@
   height: 20px;
   padding: 0 6px;
   border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--accent-soft-ink);
+  background: var(--track);
+  color: var(--ink-soft);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -287,15 +313,15 @@
 .app-shell[data-theme] :is(.button, .theme-toggle):hover:not(:disabled) { background: var(--subtle); border-color: var(--ink-soft); color: var(--ink); }
 
 .app-shell[data-theme] .button:is(.button--primary, .button--save, .button--success, .button--extract) {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .app-shell[data-theme] .button:is(.button--primary, .button--save, .button--success, .button--extract):hover:not(:disabled) {
-  border-color: var(--accent-hover);
-  background: var(--accent-hover);
-  color: var(--on-accent);
+  border-color: var(--primary-hover);
+  background: var(--primary-hover);
+  color: var(--on-primary);
 }
 
 .app-shell[data-theme] :is(.button--quiet, .theme-toggle) {
@@ -357,7 +383,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--panel);
-  box-shadow: 0 10px 30px rgb(22 48 43 / 16%);
+  box-shadow: var(--shadow-menu);
 }
 
 .menu-list button {
@@ -460,7 +486,7 @@
   background: #ffffff;
   transition: left 120ms ease;
 }
-.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"] { background: var(--primary); }
 .switch[aria-checked="true"] > span { left: 17px; }
 .switch:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
@@ -600,6 +626,8 @@
   place-items: center;
   width: 24px;
   height: 24px;
+  background: var(--track);
+  color: var(--ink-soft);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -653,7 +681,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--panel);
-  box-shadow: 0 -8px 24px rgb(22 48 43 / 8%);
+  box-shadow: 0 -8px 24px rgb(16 24 40 / 8%);
 }
 
 .app-shell[data-theme] .analysis-dock-status { color: var(--muted); font-weight: 500; }
@@ -663,6 +691,28 @@
 .app-shell[data-theme] .network-receipt > .button { margin-left: auto; }
 .app-shell[data-theme] .analysis-score-settings { margin-inline-start: 0; }
 .app-shell[data-theme] .analysis-step + .analysis-step { border-top: 1px solid var(--line); border-radius: 0; }
+
+/* Help icons and meters stay quiet so the accent only marks what matters. */
+.app-shell[data-theme] .field-hint__trigger { color: var(--muted); }
+.app-shell[data-theme] .field-hint__trigger:is(:hover, :focus-visible) { background: var(--track); color: var(--ink); }
+.app-shell[data-theme] .field-hint .field-hint__bubble {
+  border-color: var(--hint-line);
+  background: var(--hint-surface);
+  box-shadow: var(--shadow-menu);
+  color: var(--hint-ink);
+}
+.app-shell[data-theme] .retention-count-track { background: var(--track); }
+.app-shell[data-theme] .retention-count-percent { color: var(--ink-soft); }
+.app-shell[data-theme] .distribution {
+  --distribution-surface: var(--subtle);
+  --distribution-grid: var(--line);
+  --distribution-passed: var(--accent);
+  --distribution-excluded: #7d8692;
+}
+.app-shell[data-theme="dark"] .distribution {
+  --distribution-excluded: #6b747e;
+  --distribution-hatch: rgb(19 21 24 / 37%);
+}
 
 /* Network preview */
 .app-shell[data-theme] .graph-node { stroke: var(--panel); stroke-width: 2; }
@@ -752,13 +802,13 @@
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
-  color: var(--accent);
+  color: var(--ink-soft);
   font: inherit;
   font-size: var(--text-control);
   font-weight: 600;
   cursor: pointer;
 }
-.app-shell[data-theme] .back-link:hover { background: var(--accent-soft); color: var(--accent-soft-ink); }
+.app-shell[data-theme] .back-link:hover { background: var(--track); color: var(--ink); }
 .app-shell[data-theme] .back-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* Filter: a switch on the page, with the explanation of the chosen filter under it. */
@@ -787,7 +837,7 @@
   text-align: center;
 }
 .filter-switch > label:hover input:not(:checked) + span { color: var(--ink); }
-.filter-switch input:checked + span { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgb(22 48 43 / 14%); }
+.filter-switch input:checked + span { background: var(--panel); color: var(--ink); box-shadow: var(--shadow-raised); }
 .filter-switch input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
 .filter-switch input:disabled { cursor: not-allowed; }
 .filter-switch input:disabled + span { opacity: 0.55; }
@@ -860,7 +910,8 @@
   border-radius: var(--radius-control);
   background: var(--panel);
 }
-.app-shell[data-theme] .compare-workspace .saved-result.is-selected { border-color: var(--accent); background: var(--accent-soft); }
+/* The ticked box marks the selection, so the card itself stays plain. */
+.app-shell[data-theme] .compare-workspace .saved-result.is-selected { border-color: var(--line-strong); }
 .saved-result__pick {
   display: flex;
   flex: 1 1 auto;

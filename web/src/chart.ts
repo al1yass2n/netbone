@@ -1,8 +1,8 @@
 /** Series colours for exported figures. They match the theme's graph colours in light mode. */
-export const FIGURE_COLORS = ["#136b56", "#c2410c", "#6d4fc2", "#a16207", "#1d6fa5", "#be185d"];
+export const FIGURE_COLORS = ["#0f766e", "#c2410c", "#6d4fc2", "#a16207", "#1d6fa5", "#be185d"];
 
 export function figureColor(index: number): string {
-  return FIGURE_COLORS[((index % FIGURE_COLORS.length) + FIGURE_COLORS.length) % FIGURE_COLORS.length] ?? "#136b56";
+  return FIGURE_COLORS[((index % FIGURE_COLORS.length) + FIGURE_COLORS.length) % FIGURE_COLORS.length] ?? "#0f766e";
 }
 
 /** Round axis ticks (steps of 1, 2, 2.5 or 5 × 10^k) that cover [min, max]. Counts step by whole numbers. */

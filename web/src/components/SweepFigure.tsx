@@ -171,19 +171,19 @@ const SweepFigure = forwardRef<SVGSVGElement, {
   return <svg ref={ref} className="comparison-figure sweep-figure" viewBox={`0 0 ${width} ${height}`} role="group" aria-labelledby={`${id}-title ${id}-description`}>
     <title id={`${id}-title`}>{title}</title><desc id={`${id}-description`}>{description}</desc>
     <rect width={width} height={height} fill="#ffffff" />
-    <text x={24} y={35} fill="#16302b" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
-    <text x={24} y={61} fill="#586863" fontSize={12}>{truncate(description, 120)}</text>
+    <text x={24} y={35} fill="#1a1f25" fontSize={22} fontWeight={750}>{truncate(title, 68)}</text>
+    <text x={24} y={61} fill="#5d6670" fontSize={12}>{truncate(description, 120)}</text>
     {xTicks.map((tick) => <g key={`x${tick}`}>
-      <line x1={scaleX(tick)} y1={top} x2={scaleX(tick)} y2={top + plotHeight} stroke="#e6edea" />
-      <text x={scaleX(tick)} y={top + plotHeight + 21} fill="#586863" fontSize={11} textAnchor="middle">{axisValue(tick, xIsRatio)}</text>
+      <line x1={scaleX(tick)} y1={top} x2={scaleX(tick)} y2={top + plotHeight} stroke="#eceef1" />
+      <text x={scaleX(tick)} y={top + plotHeight + 21} fill="#5d6670" fontSize={11} textAnchor="middle">{axisValue(tick, xIsRatio)}</text>
     </g>)}
     {yTicks.map((tick) => <g key={`y${tick}`}>
-      <line x1={left} y1={scaleY(tick)} x2={left + plotWidth} y2={scaleY(tick)} stroke="#e6edea" />
-      <text x={left - 12} y={scaleY(tick) + 4} fill="#586863" fontSize={11} textAnchor="end">{axisValue(tick, yIsRatio)}</text>
+      <line x1={left} y1={scaleY(tick)} x2={left + plotWidth} y2={scaleY(tick)} stroke="#eceef1" />
+      <text x={left - 12} y={scaleY(tick) + 4} fill="#5d6670" fontSize={11} textAnchor="end">{axisValue(tick, yIsRatio)}</text>
     </g>)}
-    <line x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#c3cfcb" />
-    <text x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#41534e" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
-    <text transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#41534e" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
+    <line x1={left} y1={top + plotHeight} x2={left + plotWidth} y2={top + plotHeight} stroke="#c6ccd3" />
+    <text x={left + plotWidth / 2} y={top + plotHeight + 48} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{xLabel}</text>
+    <text transform={`translate(28 ${top + plotHeight / 2}) rotate(-90)`} fill="#3f4750" fontSize={13} fontWeight={650} textAnchor="middle">{yLabel}</text>
     <defs><clipPath id={`${id}-clip`}><rect x={left} y={top} width={plotWidth} height={plotHeight} /></clipPath></defs>
     <g clipPath={`url(#${id}-clip)`}>
       {labels.map((label, index) => {
@@ -205,7 +205,7 @@ const SweepFigure = forwardRef<SVGSVGElement, {
     })}
     {legendRows > 0 && labels.map((label, index) => <g key={label} transform={`translate(${24 + index % 3 * 305} ${92 + Math.floor(index / 3) * 24})`}>
       <circle cx={5} cy={-4} r={5} fill={figureColor(index)} />
-      <text x={17} fill="#41534e" fontSize={11}>{truncate(label, 39)}</text>
+      <text x={17} fill="#3f4750" fontSize={11}>{truncate(label, 39)}</text>
     </g>)}
   </svg>;
 });

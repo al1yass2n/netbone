@@ -67,6 +67,10 @@ ported. It adds:
   page through long results and mark rows as Kept or Dropped. Retained
   fractions read as percentages, run settings are listed in plain words,
   charts use round axis ticks, and each screen has one **Download** menu.
+- The web app follows the system's light or dark setting. The theme button
+  switches to the other theme and remembers the choice; switching back to the
+  system's theme follows the system again. Colors are calmer gray with one
+  teal accent, and small text is one step larger.
 
 **Stricter input checks**
 

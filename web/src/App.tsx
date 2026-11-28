@@ -21,7 +21,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { api } from "./api";
 import { BackboneDetails } from "./components/BackboneDetails";
@@ -72,15 +72,26 @@ import { demoMode, loadDemo } from "./demo-api";
 
 const BACKBONE_READY_MESSAGE = "Backbone ready to inspect and export.";
 
+type Theme = "light" | "dark";
+const THEME_KEY = "netbone-theme";
+const darkSystem = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+/** The theme someone picked with the switch, or null to follow the system. */
+function storedTheme(): Theme | null {
+  try {
+    const value = localStorage.getItem(THEME_KEY);
+    return value === "dark" || value === "light" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [schema, setSchema] = useState<UiSchema | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    try {
-      return localStorage.getItem("netbone-theme") === "dark" ? "dark" : "light";
-    } catch {
-      return "light";
-    }
-  });
+  // The app follows the system theme until someone picks the other one.
+  const [systemTheme, setSystemTheme] = useState<Theme>(() => (darkSystem?.matches ? "dark" : "light"));
+  const [themeChoice, setThemeChoice] = useState<Theme | null>(storedTheme);
+  const theme = themeChoice ?? systemTheme;
   const [workspace, setWorkspace] = useState<Workspace>(demoMode ? "analysis" : "start");
   const [data, setData] = useState<DataDraft>({ ...emptyDataDraft });
   const [context, setContext] = useState<NetworkContext>({ ...defaultContext });
@@ -104,6 +115,17 @@ export default function App() {
   const graphmlWeightDetected = useRef(false);
   const hasData = Boolean(data.text);
   const analysisOpen = workspace !== "start";
+
+  useEffect(() => {
+    if (!darkSystem) return;
+    const follow = () => setSystemTheme(darkSystem.matches ? "dark" : "light");
+    darkSystem.addEventListener("change", follow);
+    return () => darkSystem.removeEventListener("change", follow);
+  }, []);
+  // The page behind the app and the loading screen use the same theme.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   const shownWorkspace = useRef(workspace);
   useEffect(() => {
@@ -436,8 +458,13 @@ export default function App() {
   const themeLabel = nextTheme === "dark" ? "Switch to dark theme" : "Switch to light theme";
   const themeButton = (
     <button type="button" className="theme-toggle" aria-label={themeLabel} title={themeLabel} onClick={() => {
-      setTheme(nextTheme);
-      try { localStorage.setItem("netbone-theme", nextTheme); } catch { /* Theme switching still works for this visit. */ }
+      // Picking the system's own theme goes back to following the system.
+      const choice = nextTheme === systemTheme ? null : nextTheme;
+      setThemeChoice(choice);
+      try {
+        if (choice) localStorage.setItem(THEME_KEY, choice);
+        else localStorage.removeItem(THEME_KEY);
+      } catch { /* Theme switching still works for this visit. */ }
     }}>
       {nextTheme === "dark" ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
     </button>
@@ -1388,8 +1415,8 @@ function jumpToHeading(event: MouseEvent<HTMLAnchorElement>) {
 function BrandMark() {
   return (
     <svg className="brand-mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
-      <rect width="30" height="30" rx="8" fill="#136b56" />
-      <path d="M9 20 15 9l6 10Z" fill="none" stroke="#a7eccb" strokeWidth="1.6" />
+      <rect width="30" height="30" rx="8" fill="#0f766e" />
+      <path d="M9 20 15 9l6 10Z" fill="none" stroke="#a5e3da" strokeWidth="1.6" />
       <circle cx="9" cy="20" r="2.6" fill="#ffffff" />
       <circle cx="15" cy="9" r="2.6" fill="#ffffff" />
       <circle cx="21" cy="19" r="2.6" fill="#ffffff" />

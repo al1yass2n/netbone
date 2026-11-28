@@ -53,7 +53,7 @@ test("extract, compare and sweep backbones and download their experiments", asyn
 
   const save = page.getByRole("button", { name: "Save this backbone" });
   await page.mouse.move(0, 0);
-  await expect(save).toHaveCSS("background-color", "rgb(19, 107, 86)");
+  await expect(save).toHaveCSS("background-color", "rgb(15, 118, 110)");
   const saveColors = await save.evaluate((button) => {
     const style = getComputedStyle(button);
     return { background: style.backgroundColor, foreground: style.color };
