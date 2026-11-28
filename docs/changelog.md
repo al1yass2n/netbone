@@ -71,7 +71,8 @@ ported. It adds:
   switches to the other theme and remembers the choice; switching back to the
   system's theme follows the system again. Colors are calmer gray with one
   teal accent, and small text is one step larger. Charts follow the dark
-  theme on screen, while downloaded figures keep light colors.
+  theme on screen, while downloaded figures keep light colors. The app has a
+  new logo, a bone made of nodes, which is also the browser tab icon.
 
 **Stricter input checks**
 
