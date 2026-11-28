@@ -73,6 +73,7 @@ ported. It adds:
   teal accent, and small text is one step larger. Charts follow the dark
   theme on screen, while downloaded figures keep light colors. The app has a
   new logo, an N drawn from four nodes, which is also the browser tab icon.
+  The documentation site uses the same colors and logo.
 
 **Stricter input checks**
 
